@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agenda Ejecutiva PRO MAX FINAL</title>
+
+<style>
+body{font-family:Segoe UI;background:#0b1220;color:#e5e7eb;margin:0;}
+header{background:#111827;padding:15px;text-align:center;font-weight:bold;font-size:20px;}
+.container{display:grid;grid-template-columns:280px 1fr 320px;height:calc(100vh - 60px);}
+.panel{padding:15px;overflow:auto;}
+.left{background:#111827;border-right:1px solid #1f2937;}
+.right{background:#111827;border-left:1px solid #1f2937;}
+.center{padding:15px;}
+input,select{width:100%;padding:8px;margin-top:6px;border:none;border-radius:5px;background:#1f2937;color:white;}
+button{padding:6px;margin-top:5px;border:none;border-radius:5px;cursor:pointer;font-weight:bold;}
+.save{background:#22c55e;}
+.edit{background:#f59e0b;}
+.delete{background:red;}
+.clear{background:#6b7280;}
+.export{background:#3b82f6;}
+
+.task{background:#1f2937;padding:10px;margin-top:10px;border-radius:6px;}
+.done{opacity:.5;text-decoration:line-through;}
+
+.prioritario{border-left:5px solid #ef4444;}
+.importante{border-left:5px solid #f59e0b;}
+.seguimiento{border-left:5px solid #3b82f6;}
+
+.badge{display:inline-block;padding:3px 6px;border-radius:4px;font-size:11px;margin-top:5px;}
+.bad-prioritario{background:#ef4444;}
+.bad-importante{background:#f59e0b;}
+.bad-seguimiento{background:#3b82f6;}
+
+.metric{background:#1f2937;padding:10px;border-radius:6px;margin-top:10px;}
+</style>
+</head>
+
+<body>
+
+<header>📅 Agenda Ejecutiva PRO MAX FINAL</header>
+
+<div class="container">
+
+<div class="panel left">
+<h3>➕ Nueva / Editar</h3>
+<input type="hidden" id="editId">
+<input type="date" id="fecha">
+<input type="time" id="hora">
+<input type="text" id="persona" placeholder="Con quién">
+<input type="text" id="tema" placeholder="Tema">
+
+<select id="prioridad">
+<option value="prioritario">Prioritario</option>
+<option value="importante">Importante</option>
+<option value="seguimiento">Seguimiento</option>
+</select>
+
+<button class="save" onclick="guardar()">Guardar</button>
+
+<h3>📤 Exportar día</h3>
+<input type="date" id="exportFecha">
+<button class="export" onclick="exportar()">Generar texto WhatsApp</button>
+
+<h3>🔍 Buscar (persona)</h3>
+<input type="text" id="buscarTexto" oninput="render()">
+
+<h3>📆 Calendario</h3>
+<input type="date" id="buscarFecha" onchange="render()">
+
+<h3>📊 Métricas</h3>
+<div id="metricas" class="metric"></div>
+</div>
+
+<div class="panel center">
+<h3>📌 Hoy</h3><div id="hoy"></div>
+<h3>📆 Mañana</h3><div id="manana"></div>
+<h3>⏳ Atrasados</h3><div id="atrasados"></div>
+</div>
+
+<div class="panel right">
+<h3>📅 Mes actual</h3><div id="mes"></div>
+<h3>🗓 Próximos meses</h3><div id="meses"></div>
+
+<h3>🗑 Papelera</h3>
+<button class="clear" onclick="vaciarPapelera()">Vaciar papelera</button>
+<div id="papelera"></div>
+</div>
+
+</div>
+
+<script>
+
+let tareas = JSON.parse(localStorage.getItem("tareas") || "[]");
+let papeleraData = JSON.parse(localStorage.getItem("papelera") || "[]");
+
+function save(){
+localStorage.setItem("tareas", JSON.stringify(tareas));
+localStorage.setItem("papelera", JSON.stringify(papeleraData));
+}
+
+function nowCO(){
+return new Date(new Date().toLocaleString("en-US",{timeZone:"America/Bogota"}));
+}
+
+function format(d){return d.toISOString().split("T")[0];}
+
+function guardar(){
+let id=document.getElementById("editId").value;
+let fecha=document.getElementById("fecha").value;
+let hora=document.getElementById("hora").value;
+let persona=document.getElementById("persona").value;
+let tema=document.getElementById("tema").value;
+let prioridad=document.getElementById("prioridad").value;
+
+if(!fecha||!hora||!tema){alert("Completa todo");return;}
+
+let tarea={id:id?Number(id):Date.now(),fecha,hora,persona,tema,prioridad,done:false};
+
+if(id){
+tareas=tareas.map(t=>t.id==id?{...tarea,done:t.done}:t);
+}else{
+tareas.push(tarea);
+}
+
+document.getElementById("editId").value="";
+save();
+render();
+}
+
+function editar(t){
+document.getElementById("editId").value=t.id;
+document.getElementById("fecha").value=t.fecha;
+document.getElementById("hora").value=t.hora;
+document.getElementById("persona").value=t.persona;
+document.getElementById("tema").value=t.tema;
+document.getElementById("prioridad").value=t.prioridad;
+}
+
+function toggleDone(id){
+tareas=tareas.map(t=>t.id===id?{...t,done:!t.done}:t);
+save();
+render();
+}
+
+function eliminar(id){
+let t=tareas.find(x=>x.id===id);
+papeleraData.push(t);
+tareas=tareas.filter(x=>x.id!==id);
+save();
+render();
+}
+
+function restaurar(id){
+let t=papeleraData.find(x=>x.id===id);
+tareas.push(t);
+papeleraData=papeleraData.filter(x=>x.id!==id);
+save();
+render();
+}
+
+/* 🔥 FIX SOLO AQUÍ */
+function vaciarPapelera(){
+    if(!confirm("¿Vaciar papelera completamente?")) return;
+    papeleraData.splice(0, papeleraData.length);
+    save();
+    render();
+}
+
+function exportar(){
+let fecha=document.getElementById("exportFecha").value;
+if(!fecha){alert("Selecciona una fecha");return;}
+let lista=tareas.filter(t=>t.fecha===fecha);
+let texto="📅 Agenda del día \n\n";
+lista.forEach(t=>{
+texto+=`• ${t.hora} - ${t.persona||""}\n${t.tema}\n(${t.prioridad})\n\n`;
+});
+navigator.clipboard.writeText(texto);
+alert("Texto copiado");
+}
+
+function render(){
+
+let texto=document.getElementById("buscarTexto").value.toLowerCase();
+let fechaFiltro=document.getElementById("buscarFecha").value;
+
+let now=nowCO();
+let hoy=format(now);
+
+let mananaDate=new Date(now);
+mananaDate.setDate(mananaDate.getDate()+1);
+let manana=format(mananaDate);
+
+["hoy","manana","atrasados","mes","meses","papelera"].forEach(id=>{
+document.getElementById(id).innerHTML="";
+});
+
+let data=tareas.filter(t=>{
+return (!texto || (t.persona||"").toLowerCase().includes(texto)) &&
+(!fechaFiltro || t.fecha===fechaFiltro);
+});
+
+data.forEach(t=>{
+let div=document.createElement("div");
+div.className="task "+t.prioridad+(t.done?" done":"");
+
+div.innerHTML=`
+<strong>${t.hora}</strong> - ${t.persona||""}<br>
+${t.tema}<br>
+📅 ${t.fecha}<br>
+<span class="badge bad-${t.prioridad}">${t.prioridad.toUpperCase()}</span><br><br>
+<button onclick="toggleDone(${t.id})">✔</button>
+<button class="edit" onclick='editar(${JSON.stringify(t)})'>✏</button>
+<button class="delete" onclick="eliminar(${t.id})">🗑</button>
+`;
+
+if(t.fecha===hoy){
+document.getElementById("hoy").appendChild(div);
+}
+else if(t.fecha===manana){
+document.getElementById("manana").appendChild(div);
+}
+else{
+document.getElementById("mes").appendChild(div);
+}
+});
+
+papeleraData.forEach(t=>{
+let div=document.createElement("div");
+div.className="task";
+div.innerHTML=`
+${t.fecha} - ${t.tema}<br>
+<button onclick="restaurar(${t.id})">Recuperar</button>
+`;
+document.getElementById("papelera").appendChild(div);
+});
+
+document.getElementById("metricas").innerHTML="📊 Total: "+data.length;
+
+}
+
+document.getElementById("fecha").valueAsDate=nowCO();
+render();
+
+</script>
+
+</body>
+</html>
