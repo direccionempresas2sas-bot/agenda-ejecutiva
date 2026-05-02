@@ -5,17 +5,43 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GJAC · Panel Ejecutivo</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<!-- ══ FIREBASE SDK (no tocar) ══ -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
 <style>
 :root{--bg:#0b1220;--panel:#111827;--card:#1f2937;--txt:#e5e7eb;--muted:#9ca3af;--green:#22c55e;--amber:#f59e0b;--blue:#3b82f6;--red:#ef4444;}
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{overflow-x:hidden;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--txt);}
+
+/* ── PANTALLA DE CARGA ── */
+#loadingScreen{position:fixed;inset:0;background:#080e1a;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;}
+#loadingScreen.hidden{display:none;}
+.load-spinner{width:48px;height:48px;border:4px solid #1e2d45;border-top-color:#60a5fa;border-radius:50%;animation:spin 0.9s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.load-title{font-family:'DM Serif Display',serif;font-size:22px;background:linear-gradient(135deg,#60a5fa,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.load-msg{font-size:13px;color:#4b5563;}
+.load-error{color:#f87171;font-size:14px;text-align:center;max-width:380px;line-height:1.6;padding:20px;background:#1f1010;border:1px solid #7f1d1d;border-radius:12px;}
+.load-error code{background:#2d1010;padding:2px 6px;border-radius:4px;font-size:12px;}
+
+/* ── SYNC BADGE ── */
+#syncBadge{position:fixed;bottom:16px;right:16px;background:#0d1526;border:1px solid #1e2d45;border-radius:20px;padding:6px 14px;font-size:12px;color:#4b5563;z-index:300;display:flex;align-items:center;gap:6px;transition:.3s;}
+#syncBadge.syncing{color:#f59e0b;border-color:#78350f;}
+#syncBadge.ok{color:#4ade80;border-color:#166534;}
+#syncDot{width:7px;height:7px;border-radius:50%;background:currentColor;}
+
+/* ── NAV ── */
 #globalNav{display:flex;align-items:center;background:#080e1a;border-bottom:1px solid #1e2d45;padding:0 12px;height:52px;position:sticky;top:0;z-index:200;overflow-x:auto;overflow-y:hidden;}
 .nav-brand{font-family:'DM Serif Display',serif;font-size:15px;background:linear-gradient(135deg,#60a5fa,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-right:16px;white-space:nowrap;}
 .nav-btn{height:52px;padding:0 13px;background:transparent;border:none;color:#6b7280;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;border-bottom:2px solid transparent;transition:.15s;white-space:nowrap;}
 .nav-btn:hover{color:#e5e7eb;}
 .nav-btn.active{color:#60a5fa;border-bottom-color:#60a5fa;}
+
+/* ── PAGES ── */
 .page{display:none;}
 .page.active{display:block;}
+
 /* AGENDA */
 .agenda-wrap{display:grid;grid-template-columns:280px 1fr 320px;height:calc(100vh - 52px);}
 .ap{padding:15px;overflow:auto;}
@@ -41,6 +67,7 @@ button{padding:6px 10px;margin-top:5px;border:none;border-radius:5px;cursor:poin
 .bad-importante{background:var(--amber);color:#000;}
 .bad-seguimiento{background:var(--blue);}
 .metric{background:var(--card);padding:10px;border-radius:6px;margin-top:10px;}
+
 /* MODALES */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:10000;align-items:center;justify-content:center;}
 .modal-overlay.open{display:flex;}
@@ -53,6 +80,7 @@ button{padding:6px 10px;margin-top:5px;border:none;border-radius:5px;cursor:poin
 #modalObs{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:10001;align-items:center;justify-content:center;}
 #modalObs.open{display:flex;}
 .obs-box{background:#111827;padding:24px;border-radius:12px;width:420px;max-width:90vw;border:1px solid #374151;}
+
 /* VISTA EJECUTIVA */
 #vistaEjecutiva{display:none;position:fixed;inset:0;z-index:9998;background:#080e1a;overflow-y:auto;overflow-x:hidden;}
 #vistaEjecutiva.open{display:block;}
@@ -93,9 +121,10 @@ button{padding:6px 10px;margin-top:5px;border:none;border-radius:5px;cursor:poin
 .exec-close-btn:hover{background:rgba(34,197,94,.25);}
 .exec-empty{text-align:center;color:#374151;padding:60px 0;font-size:14px;}
 .exec-empty-icon{font-size:40px;margin-bottom:12px;}
+
 /* MODULE BASE */
 .module-page{height:calc(100vh - 52px);overflow-y:auto;overflow-x:hidden;background:var(--bg);}
-.module-wrap{max-width:1280px;margin:0 auto;padding:28px 24px 60px;}
+.module-wrap{max-width:1280px;margin:0 auto;padding:28px 24px 80px;}
 .module-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;gap:12px;flex-wrap:wrap;}
 .module-title{font-family:'DM Serif Display',serif;font-size:24px;background:linear-gradient(135deg,#60a5fa,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 .module-sub{font-size:11px;color:#4b5563;text-transform:uppercase;letter-spacing:1.5px;margin-top:2px;}
@@ -114,6 +143,7 @@ button{padding:6px 10px;margin-top:5px;border:none;border-radius:5px;cursor:poin
 .tag-teal{background:rgba(20,184,166,.12);color:#5eead4;border:1px solid rgba(20,184,166,.2);}
 .row-actions{display:flex;gap:6px;flex-wrap:wrap;}
 .row-actions button{padding:5px 10px;font-size:12px;border-radius:6px;margin-top:0;}
+
 /* DIRECTORIO tarjetas */
 .dir-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px;width:100%;}
 .dir-card{background:#0d1526;border:1px solid #1e2d45;border-radius:14px;padding:18px 20px;transition:.2s;word-break:break-word;overflow:hidden;}
@@ -129,6 +159,7 @@ button{padding:6px 10px;margin-top:5px;border:none;border-radius:5px;cursor:poin
 .dir-card-actions{display:flex;gap:6px;margin-top:14px;}
 .dir-card-actions button{flex:1;padding:7px;font-size:12px;border-radius:7px;margin-top:0;}
 .dir-empty{text-align:center;color:#374151;padding:80px 0;font-size:14px;grid-column:1/-1;}
+
 /* CUENTAS tabla fija */
 .mod-table-wrap{overflow:hidden;border-radius:12px;border:1px solid #1e2d45;width:100%;}
 .mod-table{width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed;}
@@ -139,6 +170,7 @@ button{padding:6px 10px;margin-top:5px;border:none;border-radius:5px;cursor:poin
 .mod-table tbody tr:last-child{border-bottom:none;}
 .mod-table td{padding:12px 14px;vertical-align:top;line-height:1.4;word-break:break-word;overflow-wrap:anywhere;}
 .mod-table td a{color:#60a5fa;text-decoration:none;}
+
 /* CORREO PERSONAL */
 .mail-section-date{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#374151;padding:10px 0;border-bottom:1px solid #0d1526;margin-bottom:14px;}
 .mail-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin-bottom:28px;width:100%;}
@@ -157,6 +189,21 @@ button{padding:6px 10px;margin-top:5px;border:none;border-radius:5px;cursor:poin
 </head>
 <body>
 
+<!-- ══ PANTALLA DE CARGA ══ -->
+<div id="loadingScreen">
+  <div class="load-spinner"></div>
+  <div class="load-title">GJAC · Panel Ejecutivo</div>
+  <div class="load-msg" id="loadMsg">Conectando con la nube…</div>
+  <div class="load-error" id="loadError" style="display:none;"></div>
+</div>
+
+<!-- ══ BADGE DE SINCRONIZACIÓN ══ -->
+<div id="syncBadge" class="ok">
+  <div id="syncDot"></div>
+  <span id="syncText">En línea</span>
+</div>
+
+<!-- ══ NAV ══ -->
 <nav id="globalNav">
   <span class="nav-brand">GJAC</span>
   <button class="nav-btn active" onclick="showPage('agenda',this)">📅 Agenda</button>
@@ -364,6 +411,239 @@ button{padding:6px 10px;margin-top:5px;border:none;border-radius:5px;cursor:poin
 </div>
 
 <script>
+/* ════════════════════════════════════════════════════════
+   🔧 CONFIGURACIÓN FIREBASE
+   ─── PEGA AQUÍ TU CONFIGURACIÓN DE FIREBASE ───────────
+   (Se explica en las instrucciones que vienen con el archivo)
+════════════════════════════════════════════════════════ */
+const firebaseConfig = {
+  apiKey:            "AIzaSyBUhXyHA_pZu4YTXH0gMiYdfHO4B4sz25I",
+  authDomain:        "agenda-ejecutiva-gjac.firebaseapp.com",
+  projectId:         "agenda-ejecutiva-gjac",
+  storageBucket:     "agenda-ejecutiva-gjac.firebasestorage.app",
+  messagingSenderId: "611050030747",
+  appId:             "1:611050030747:web:75659253e4c9e3ca7da83e"
+};
+/* ════════════════════════════════════════════════════════ */
+
+/* ── ESTADO LOCAL ── */
+let tareas=[], papeleraData=[], archivadosA=[];
+let directorio=[], cuentas=[], correos=[];
+let db;
+
+/* ── SINCRONIZACIÓN (badge) ── */
+function syncStart(){let b=document.getElementById('syncBadge');b.className='syncing';document.getElementById('syncText').textContent='Guardando…';}
+function syncOk(){let b=document.getElementById('syncBadge');b.className='ok';document.getElementById('syncText').textContent='En línea';}
+function syncErr(){let b=document.getElementById('syncBadge');b.className='';b.style.borderColor='#7f1d1d';document.getElementById('syncText').textContent='Sin conexión';}
+
+/* ── LOADING ── */
+function setLoadMsg(msg){document.getElementById('loadMsg').textContent=msg;}
+function hideLoading(){document.getElementById('loadingScreen').classList.add('hidden');}
+function showLoadError(msg){
+  let e=document.getElementById('loadError');
+  e.style.display='block';
+  e.innerHTML=msg;
+  document.getElementById('loadMsg').style.display='none';
+  document.querySelector('.load-spinner').style.display='none';
+}
+
+/* ════════ DATOS POR DEFECTO ════════ */
+const DIR_DEFAULT=[
+  {id:1,esp:"ORTOPEDISTA",nombre:"EDWIN MIGUEL TOVAR TORRES",tel:"6082747555",cel:"3046035555",ciudad:"IBAGUÉ",dir:"COMPLEJO MÉDICO LA SAMARIA",cons:"605",correo:"migueltovarortopedista@gmail.com",cita:"PROGRAMAR APROX. 10 Julio/2026"},
+  {id:2,esp:"CARDIÓLOGO",nombre:"ALEJANDRO MIGUEL SANTOS ZAVALA",tel:"6082798643",cel:"3165709731",ciudad:"IBAGUÉ",dir:"VÍA AEROPUERTO NUEVA CLÍNICA MEDICADIZ",cons:"204",correo:"dralejandrosantos@gmail.com",cita:"PROGRAMAR APROX. 24 Sept/2026"},
+  {id:3,esp:"BARIÁTRICO",nombre:"CARLOS FELIPE CHAUX MOSQUERA",tel:"6017033872",cel:"3126162182",ciudad:"BOGOTÁ",dir:"CALLE 83 No.16A-44 EDIFICIO CIMA",cons:"304 A",correo:"programacioncirugia@ucomcolombia.com",cita:"-"},
+  {id:4,esp:"OPTÓMETRA",nombre:"AGUSTIN VIDALLER NIETO",tel:"6012187077",cel:"",ciudad:"BOGOTÁ",dir:"AVENIDA 100 No.18a-51 CLÍNICA BARRAQUER",cons:"103",correo:"",cita:"-"},
+  {id:5,esp:"OFTALMÓLOGO",nombre:"LUIS MIGUEL SALAZAR AMATURE",tel:"6012187077",cel:"3188018671",ciudad:"BOGOTÁ",dir:"AVENIDA 100 No.18a-51 CLÍNICA BARRAQUER",cons:"322",correo:"LMSALAZARA@BARRAQUER.COM.CO",cita:"-"},
+  {id:6,esp:"REUMATÓLOGO",nombre:"SEBASTIAN MOLINA RIOS",tel:"6014824488",cel:"",ciudad:"BOGOTÁ",dir:"FUNDACIÓN SANTA FE BOGOTÁ · CALLE 119 # 7-80 PISO 3",cons:"305",correo:"",cita:"22 Abril/2026 a las 2:40PM"},
+  {id:7,esp:"URÓLOGO",nombre:"MAURICIO ANDRÉS LÓPEZ GUERRERO",tel:"6082596447",cel:"3168333134",ciudad:"IBAGUÉ",dir:"UROTOL - 3 PISO CLÍNICA MEDICADIZ VIA AEROPUERTO",cons:"",correo:"urotol@hotmail.com",cita:"PDTE HACERSE EXÁMENES"},
+  {id:8,esp:"NEURÓLOGO",nombre:"ORLANDO LÓPEZ CARVAJAL",tel:"6082771186",cel:"",ciudad:"IBAGUÉ",dir:"CRA 5 No.31-114 CADIZ",cons:"910",correo:"",cita:"PDTE PROGRAMAR CITA POLISOMNOGRAFÍA"},
+  {id:9,esp:"NEUROFISIOLOGÍA",nombre:"CENTRAL DE ESPECIALISTAS",tel:"",cel:"3161095388",ciudad:"IBAGUÉ",dir:"CRA 4BIS # 35-72 BRR CADIZ",cons:"1",correo:"atencion@centralespecialistascolombia.com",cita:""},
+  {id:10,esp:"NEUROFISIOLOGÍA",nombre:"FUNDACIÓN SANTA FE",tel:"6014824488",cel:"",ciudad:"BOGOTÁ",dir:"CALLE 119 # 7-14 PISO 2",cons:"1",correo:"",cita:"CITA POLISOMNOGRAFÍA 13 Mayo/2026 a las 8PM"},
+  {id:11,esp:"MEDICINA ESTÉTICA",nombre:"ANDREA DEL PILAR CARDONA OLMOS",tel:"6082632262",cel:"3102386611",ciudad:"IBAGUÉ",dir:"CALLE 6 No.5-82 BRR LA POLA",cons:"",correo:"ipsandreacardona@gmail.com",cita:"2 Mayo/2026 a las 10AM — (1)Sculptra + (2)Toxina Botulínica"},
+  {id:12,esp:"DERMATÓLOGA",nombre:"MONICA HERNANDEZ BULLA",tel:"",cel:"3178559081",ciudad:"IBAGUÉ",dir:"WORD TRADE CENTER, AQUA POWER CENTER, AV. GUABINAL #57-15",cons:"807",correo:"",cita:"-"},
+  {id:13,esp:"LABORATORIO CLÍNICO",nombre:"ANALICEMOS",tel:"6082772036",cel:"3219612486",ciudad:"IBAGUÉ",dir:"SEDE 1: CRA 4H No.34-83 | SEDE 2: CALLE 32 No.4K-27 | SEDE 3: TORRE MÉDICA MEDICADIZ CONS.909",cons:"-",correo:"recepcion@analicemoslaboratorio.com",cita:"-"},
+  {id:14,esp:"CHEQUEO EJECUTIVO",nombre:"CLÍNICA PABLO TOBÓN URIBE",tel:"6044459000",cel:"3147751125",ciudad:"MEDELLÍN",dir:"CL 78B No.69-240 PISO 7 - TORRE B CORDOBA",cons:"-",correo:"chequeos@hptu.org.co",cita:"-"},
+  {id:15,esp:"INTERNISTA",nombre:"ANTONIO JOSÉ OVIEDO LEONEL",tel:"",cel:"3102823544",ciudad:"IBAGUÉ",dir:"",cons:"",correo:"",cita:"-"},
+  {id:16,esp:"OFTALMÓLOGO",nombre:"PAOLO SOLANO LEAL",tel:"6082553855",cel:"3186912279",ciudad:"IBAGUÉ",dir:"CLÍNICA MEDICADIZ - NAZAR GRUPO OFTALMOLÓGICO",cons:"302",correo:"info@nazaroftalmologos.com",cita:"-"}
+];
+const CUENTAS_DEFAULT=[
+  {id:1,banco:"BANCOLOMBIA",num:"7973987644",tipo:"AHORROS",titular:"GERARDO JAVIER ALVARADO CUBILLOS",cc:"86059446"},
+  {id:2,banco:"BANCOLOMBIA",num:"079782612-34",tipo:"AHORROS",titular:"SARITA ALVARADO",cc:""},
+  {id:3,banco:"BANCOLOMBIA",num:"86948258562",tipo:"AHORROS",titular:"EDNA LORENA MURILLO RODRIGUEZ",cc:"38211759"},
+  {id:4,banco:"BANCOLOMBIA",num:"06881006039",tipo:"AHORROS",titular:"SANDRA LILIANA NIETO CASTRILLON",cc:"39565280"},
+  {id:5,banco:"NEQUI",num:"320 3770085",tipo:"DEP. ELECTRÓNICO",titular:"OLIVER LA TORRE CAPERA",cc:"12134257"},
+  {id:6,banco:"BANCOLOMBIA",num:"38341300581",tipo:"AHORROS",titular:"",cc:""},
+  {id:7,banco:"BANCOLOMBIA",num:"079000494-41",tipo:"AHORROS",titular:"DANNY FABIAN SALAZAR CAMACHO",cc:"1110525870"},
+  {id:8,banco:"BANCOLOMBIA",num:"29993077613",tipo:"AHORROS",titular:"SERGIO BODENSIEK",cc:"1026259624"},
+  {id:9,banco:"NEQUI",num:"3204612987",tipo:"DEP. ELECTRÓNICO",titular:"ARQUITECTO NICOLAS (JAIME FORERO)",cc:""},
+  {id:10,banco:"NEQUI",num:"3176635775",tipo:"DEP. ELECTRÓNICO",titular:"MANUEL POLLO (MANUEL CORREA)",cc:"86065449"}
+];
+const CORREOS_DEFAULT=[
+  {id:1,fecha:"2026-04-22",hora:"08:59",remitente:"DIRECCION EMPRESAS",email:"direccionempresas.sas@gmail.com",asunto:"REPORTE DIARIO DE SALDOS BANCARIOS 22/04/2026",nota:""},
+  {id:2,fecha:"2026-04-22",hora:"09:04",remitente:"NOTIFICACIONES MOVILGAS",email:"notificaciones@mileniumgas.com",asunto:"ACTA NO.45 JUNTA GENERAL ORDINARIA MOVILGAS LTDA 27 MARZO 2026",nota:""},
+  {id:3,fecha:"2026-04-22",hora:"09:11",remitente:"NOTIFICACIONES MOVILGAS",email:"notificaciones@mileniumgas.com",asunto:"ACTA NO.31 JUNTA GENERAL ORDINARIA MOVILGAS LTDA 28 MARZO 2026",nota:""},
+  {id:4,fecha:"2026-04-22",hora:"11:16",remitente:"LAURA CHALA",email:"subgerenciaeds@ksaval.com",asunto:"AUSENCIA LAURA CHALA MARTES DE 7AM A 11AM",nota:""},
+  {id:5,fecha:"2026-04-22",hora:"11:26",remitente:"CORPORACION COLEGIO SAN BONIFACION DE LAS LANZAS",email:"",asunto:"CORPORACION COLEGIO SAN BONIFACION DE LAS LANZAS",nota:""},
+  {id:6,fecha:"2026-04-22",hora:"13:35",remitente:"LAURA CHALA",email:"subgerenciaeds@ksaval.com",asunto:"BORRADOR ACTA N.4: ENVIO ESTADO DE PENDIENTES REUNION VIERNES 17",nota:""},
+  {id:7,fecha:"2026-04-22",hora:"15:00",remitente:"CORRESPONDENCIA",email:"correspondencia@millanyasociados.com",asunto:"29195 - KSAVAL INFORME SAGRILAFT Y PTEE 2025",nota:""},
+  {id:8,fecha:"2026-04-23",hora:"07:25",remitente:"HAROLD CASTRO CASTILLO",email:"haroldcastrocastillo@yahoo.com",asunto:"REVISION 2020-2024",nota:""},
+  {id:9,fecha:"2026-04-23",hora:"08:06",remitente:"SERGIO BODENSIEK",email:"sergiobodensiek12@gmail.com",asunto:"SOLICITUD REEMBOLSO GASTOS DE VIAJE",nota:""},
+  {id:10,fecha:"2026-04-23",hora:"08:45",remitente:"DIRECCION EMPRESAS",email:"direccionempresas.sas@gmail.com",asunto:"REPORTE DIARIO DE SALDOS BANCARIOS 23/04/2026",nota:""},
+  {id:11,fecha:"2026-04-23",hora:"09:14",remitente:"BANCOLOMBIA",email:"",asunto:"¡TOC-TOC! LLEGO TU EXTRACTO DEL MES (MARZO)",nota:""},
+  {id:12,fecha:"2026-04-23",hora:"15:01",remitente:"BANCOLOMBIA",email:"",asunto:"PAGA TU IMPUESTO PREDIAL",nota:"Se remite a gerente ksaval"},
+  {id:13,fecha:"2026-04-23",hora:"17:14",remitente:"MONICA SOFIA ALARCON ALARCON",email:"monica.alarcon@informacion.terpel.com",asunto:"REPORTE PAGOS A PROVEEDORES_20260423",nota:"Se remite a Yessica"},
+  {id:14,fecha:"2026-04-23",hora:"20:47",remitente:"LAURA CHALA",email:"subgerenciaeds@ksaval.com",asunto:"BORRADOR RENTA",nota:""},
+  {id:15,fecha:"2026-04-23",hora:"21:18",remitente:"LAURA CHALA",email:"subgerenciaeds@ksaval.com",asunto:"CERTIFICADO TRIBUTARIO 2025 GERARDO JAVIER ALVARADO",nota:"Se da a conocer a Andrea"},
+  {id:16,fecha:"2026-04-23",hora:"21:23",remitente:"LAURA CHALA",email:"subgerenciaeds@ksaval.com",asunto:"REPORTE DE VENTAS - K-SAVAL ABRRGY SAS",nota:""},
+  {id:17,fecha:"2026-04-23",hora:"23:00",remitente:"LAURA CHALA",email:"subgerenciaeds@ksaval.com",asunto:"VISITA EDS LAS MONEDAS MANUEL LARA",nota:""},
+  {id:18,fecha:"2026-04-23",hora:"23:10",remitente:"LAURA CHALA",email:"subgerenciaeds@ksaval.com",asunto:"CONSULTA TRATAMIENTO CONTABLE Y FISCAL - MOVIMIENTOS ACCIONISTA NO LEGALIZADOS",nota:""},
+  {id:19,fecha:"2026-04-24",hora:"09:02",remitente:"YESSICA",email:"direccionempresas.sas@gmail.com",asunto:"REPORTE DIARIO DE SALDOS BANCARIOS 24/04/2026",nota:""},
+  {id:20,fecha:"2026-04-26",hora:"17:17",remitente:"AVIANCA (e-ticket)",email:"eticket@avianca.com",asunto:"MONICA MARIA BOCANEGRA RICO, 03MAY/0905/ SAN ANDRES ISLAND",nota:"Pendiente respuesta Señora Monica"},
+  {id:21,fecha:"2026-04-26",hora:"17:18",remitente:"AVIANCA (e-ticket)",email:"eticket@avianca.com",asunto:"GERARDO JAVIER ALVARADO CUBILLOS, 03MAY/0905/SAN ANDRES ISLAND",nota:""},
+  {id:22,fecha:"2026-04-26",hora:"17:18",remitente:"AVIANCA",email:"",asunto:"GERARDO JAVIER ALVARADO CUBILLOS - DETALLES DE TU RESERVA ADZ - IBE",nota:""},
+  {id:23,fecha:"2026-04-26",hora:"20:09",remitente:"ANDREA ARIAS",email:"andreariasaquite@gmail.com",asunto:"INFORMACION ANGELICA - CONTRATO DE ACCIONES",nota:""},
+  {id:24,fecha:"2026-04-27",hora:"08:44",remitente:"FENALCO TOLIMA",email:"",asunto:"INVITACION EMPRESARIAL - JUEVES 30 ABRIL 2 A 5 PM AUDITORIO CAMARA DE COMERCIO IBAGUE",nota:"Informacion a Don Gerardo"},
+  {id:25,fecha:"2026-04-27",hora:"09:08",remitente:"BBVA",email:"",asunto:"ENVIO SOPORTES EXTRACTOS LEASING A LOS CLIENTES",nota:"Remitido a gerencia ksaval"},
+  {id:26,fecha:"2026-04-27",hora:"09:26",remitente:"LAURA CHALA",email:"subgerenciaeds@ksaval.com",asunto:"PAGA TU IMPUESTO PREDIAL - No hay vehiculos en Ibague, ya se pago impuestos vehiculos e ICA",nota:""},
+  {id:27,fecha:"2026-04-27",hora:"09:26",remitente:"LAURA CHALA",email:"subgerenciaeds@ksaval.com",asunto:"REUNION ENER 27/04/2025",nota:""},
+  {id:28,fecha:"2026-04-27",hora:"11:23",remitente:"ENERGY FALCON",email:"falconenergy7@gmail.com",asunto:"ORDEN DE FACTURACION CONTRATO 33214 CLIENTE K-SAVAL ENERGY SAS",nota:""},
+  {id:29,fecha:"2026-04-27",hora:"11:25",remitente:"EDER MAURICIO RUGELES SERRATO",email:"eder.rugeles@terpel.com",asunto:"COMUNICADO GESTION CONTROL FLOTA",nota:"Remitido a gerencia ksaval"},
+  {id:30,fecha:"2026-04-27",hora:"12:13",remitente:"EDER MAURICIO RUGELES SERRATO",email:"eder.rugeles@terpel.com",asunto:"FICHA DE DATOS DE SEGURIDAD COMBUSTIBLE",nota:"Remitido a gerencia ksaval"},
+  {id:31,fecha:"2026-04-27",hora:"12:32",remitente:"MARITZA LORENA COLORADO BARAJAS",email:"lorena.colorado@inalde.edu.co",asunto:"INALDE - DIRECTORIO PROGRAMA ENFOCADO EN JUNTAS DIRECTIVAS",nota:"Informacion a Don Gerardo"},
+  {id:32,fecha:"2026-04-27",hora:"14:21",remitente:"LAURA CHALA",email:"subgerenciaeds@ksaval.com",asunto:"INFORMACION ENEL REUNION 27/04/2026",nota:""},
+  {id:33,fecha:"2026-04-27",hora:"14:55",remitente:"LAURA CHALA",email:"subgerenciaeds@ksaval.com",asunto:"BORRADOR ACTA JUSTIFICACION DE INGRESOS 2025",nota:""},
+  {id:34,fecha:"2026-04-28",hora:"05:08",remitente:"EDES MAURICIO RUGELES SERRATO",email:"eder.rugeles@terpel.com",asunto:"SIGNIFICADO CERTIFICACION ICONTEC EN MEDIDA Y CALIDAD",nota:""},
+  {id:35,fecha:"2026-04-28",hora:"08:42",remitente:"DIRECCION EMPRESAS",email:"direccionempresas.sas@gmail.com",asunto:"REPORTE DIARIO DE SALDOS BANCARIOS 28/04/2026",nota:""},
+  {id:36,fecha:"2026-04-28",hora:"09:04",remitente:"COMUNICACIONES SANBONI",email:"mensajeria2@sanboni.edu.co",asunto:"PROCESO DE ADMISION 2027 - INICIO DE INSCRIPCIONES Y CARACTERIZACION",nota:""},
+  {id:37,fecha:"2026-04-28",hora:"09:42",remitente:"LAURA CHALA",email:"subgerenciaeds@ksaval.com",asunto:"RE: BORRADOR RENTA",nota:""},
+  {id:38,fecha:"2026-04-28",hora:"11:28",remitente:"BLANCA INCER CASALLAS",email:"blanca.casallas@amarilo.com",asunto:"INCUMPLIMIENTO CIERRE FINANCIERO (AMARILO)",nota:""},
+  {id:39,fecha:"2026-04-28",hora:"12:02",remitente:"CORPORACION COLEGIO SAN BONIFACION DE LAS LANZAS",email:"",asunto:"CORPORACION COLEGIO SAN BONIFACION DE LAS LANZAS (PENSION)",nota:"Informacion a Don Gerardo"},
+  {id:40,fecha:"2026-04-28",hora:"12:02",remitente:"CORPORACION COLEGIO SAN BONIFACION DE LAS LANZAS",email:"",asunto:"CORPORACION COLEGIO SAN BONIFACION DE LAS LANZAS (SERVICIO ALIMENTACION)",nota:"Informacion a Don Gerardo"},
+  {id:41,fecha:"2026-04-28",hora:"17:24",remitente:"EDES MAURICIO RUGELES SERRATO",email:"eder.rugeles@terpel.com",asunto:"RV: BOLETIN N.96 EL CASO DE LOS 999 GALONES",nota:""},
+  {id:42,fecha:"2026-04-29",hora:"09:19",remitente:"BBVA",email:"",asunto:"ENVIO SOPORTES EXTRACTOS LEASING A LOS CLIENTES",nota:""},
+  {id:43,fecha:"2026-04-29",hora:"09:29",remitente:"DIRECCION EMPRESAS",email:"direccionempresas.sas@gmail.com",asunto:"REPORTE DIARIO DE SALDOS BANCARIOS 29/04/2026",nota:""},
+  {id:44,fecha:"2026-04-29",hora:"09:38",remitente:"DIRECCION EMPRESAS",email:"direccionempresas.sas@gmail.com",asunto:"DEBITO CUENTA CORRIENTE BANCOLOMBIA 068-764422-91",nota:""},
+  {id:45,fecha:"2026-04-29",hora:"13:19",remitente:"LUCIO ANDRES ORDOÑEZ",email:"lucio.ordonez.ext@terpel.com",asunto:"VENTANA DE MANTENIMIENTO CONEXIÓN WIFI",nota:""},
+  {id:46,fecha:"2026-04-29",hora:"14:07",remitente:"CUENTAS POR COBRAR",email:"pagos.combustibles@primax.com.co",asunto:"GESTION DE COBRO PRE-CIERRE DE MES",nota:""},
+  {id:47,fecha:"2026-04-29",hora:"14:16",remitente:"CUENTAS POR COBRAR",email:"pagos.combustibles@primax.com.co",asunto:"GESTION PREVENTIVA - ESTADO DE CUENTA",nota:""},
+  {id:48,fecha:"2026-04-29",hora:"14:47",remitente:"BANCOLOMBIA",email:"",asunto:"CORREGIMOS EL PLAZO DE TU AMPLIACION CON TARJETA DE CREDITO",nota:""}
+];
+
+/* ════════ FIREBASE SAVE ════════ */
+function saveA(){
+  syncStart();
+  db.collection('gjac').doc('agendaState')
+    .set({tareas,papelera:papeleraData,archivados:archivadosA})
+    .then(syncOk).catch(syncErr);
+}
+function saveDir(){
+  syncStart();
+  db.collection('gjac').doc('directorio')
+    .set({items:directorio}).then(syncOk).catch(syncErr);
+}
+function saveCuentas(){
+  syncStart();
+  db.collection('gjac').doc('cuentas')
+    .set({items:cuentas}).then(syncOk).catch(syncErr);
+}
+function saveCorreos(){
+  syncStart();
+  db.collection('gjac').doc('correos')
+    .set({items:correos}).then(syncOk).catch(syncErr);
+}
+
+/* ════════ LISTENERS EN TIEMPO REAL ════════ */
+function setupListeners(){
+  // Agenda (tareas + papelera + archivados)
+  db.collection('gjac').doc('agendaState').onSnapshot(doc=>{
+    if(doc.exists){
+      const d=doc.data();
+      tareas=d.tareas||[];
+      papeleraData=d.papelera||[];
+      archivadosA=d.archivados||[];
+    }
+    hideLoading();
+    render();
+  }, err=>{console.error(err);syncErr();});
+
+  // Directorio
+  db.collection('gjac').doc('directorio').onSnapshot(doc=>{
+    directorio=doc.exists?(doc.data().items||[]):[];
+    if(document.getElementById('page-directorio').classList.contains('active'))renderDir();
+  });
+
+  // Cuentas
+  db.collection('gjac').doc('cuentas').onSnapshot(doc=>{
+    cuentas=doc.exists?(doc.data().items||[]):[];
+    if(document.getElementById('page-cuentas').classList.contains('active'))renderCuentas();
+  });
+
+  // Correos
+  db.collection('gjac').doc('correos').onSnapshot(doc=>{
+    correos=doc.exists?(doc.data().items||[]):[];
+    if(document.getElementById('page-correo').classList.contains('active'))renderCorreo();
+  });
+}
+
+/* ════════ INICIALIZACIÓN ════════ */
+async function initApp(){
+  // Verificar si el usuario configuró Firebase
+  if(firebaseConfig.apiKey==='PEGA_AQUI_TU_apiKey'){
+    showLoadError(`
+      ⚠️ Falta configurar Firebase.<br><br>
+      Sigue las instrucciones del documento <strong>INSTRUCCIONES.txt</strong>
+      que viene junto con este archivo, luego abre el archivo en un editor de texto,
+      busca la sección <code>CONFIGURACIÓN FIREBASE</code> y pega tus datos ahí.
+    `);
+    return;
+  }
+
+  try{
+    firebase.initializeApp(firebaseConfig);
+    db=firebase.firestore();
+
+    setLoadMsg('Revisando base de datos…');
+
+    // Primera vez: poblar con datos por defecto
+    const agendaDoc=await db.collection('gjac').doc('agendaState').get();
+    if(!agendaDoc.exists){
+      setLoadMsg('Primera vez: cargando datos…');
+      await Promise.all([
+        db.collection('gjac').doc('agendaState').set({tareas:[],papelera:[],archivados:[]}),
+        db.collection('gjac').doc('directorio').set({items:DIR_DEFAULT}),
+        db.collection('gjac').doc('cuentas').set({items:CUENTAS_DEFAULT}),
+        db.collection('gjac').doc('correos').set({items:CORREOS_DEFAULT}),
+      ]);
+    }
+
+    // Migrar datos viejos de localStorage si existen
+    const oldTareas=localStorage.getItem('tareas');
+    if(oldTareas&&JSON.parse(oldTareas).length>0&&!agendaDoc.exists){
+      try{
+        const t=JSON.parse(oldTareas||'[]');
+        const p=JSON.parse(localStorage.getItem('papelera')||'[]');
+        const a=JSON.parse(localStorage.getItem('archivados')||'[]');
+        if(t.length>0){
+          await db.collection('gjac').doc('agendaState').set({tareas:t,papelera:p,archivados:a});
+        }
+      }catch(e){console.log('No hay datos locales para migrar');}
+    }
+
+    setLoadMsg('Conectando en tiempo real…');
+    setupListeners();
+    document.getElementById('fecha').valueAsDate=nowCO();
+
+  }catch(err){
+    showLoadError(`
+      ❌ Error al conectar con Firebase.<br><br>
+      Revisa que los datos de configuración estén bien copiados.<br>
+      Error técnico: <code>${err.message}</code>
+    `);
+    console.error(err);
+  }
+}
+
+/* ════════ NAV ════════ */
 function showPage(name,btn){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
@@ -374,11 +654,7 @@ function showPage(name,btn){
   if(name==='correo')renderCorreo();
 }
 
-/* ═══ AGENDA ═══ */
-let tareas=JSON.parse(localStorage.getItem("tareas")||"[]");
-let papeleraData=JSON.parse(localStorage.getItem("papelera")||"[]");
-let archivadosA=JSON.parse(localStorage.getItem("archivados")||"[]");
-function saveA(){localStorage.setItem("tareas",JSON.stringify(tareas));localStorage.setItem("papelera",JSON.stringify(papeleraData));localStorage.setItem("archivados",JSON.stringify(archivadosA));}
+/* ════════ AGENDA ════════ */
 function nowCO(){return new Date(new Date().toLocaleString("en-US",{timeZone:"America/Bogota"}));}
 function format(d){return d.toISOString().split("T")[0];}
 function guardar(){
@@ -441,31 +717,8 @@ function renderExec(){
   data.forEach(t=>{let[y,m,d]=t.fecha.split("-");let fl=new Date(y,m-1,d).toLocaleDateString("es-CO",{weekday:"short",day:"numeric",month:"short"});let card=document.createElement("div");card.className=`exec-card e-${t.prioridad}`;card.innerHTML=`<div><div class="exec-time">${t.hora}</div><div class="exec-time-date">${fl}</div></div><div><div class="exec-body-persona">${t.persona||"—"}</div><div class="exec-body-tema">${t.tema}</div><span class="exec-badge e-badge-${t.prioridad}">${t.prioridad}</span>${t.observacion?`<div class="exec-body-obs">💬 ${t.observacion}</div>`:""}</div><div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;"><button class="exec-close-btn" onclick="cerrarPendienteExec(${t.id})">✔ Cerrar</button></div>`;lista.appendChild(card);});
 }
 
-/* ═══ DIRECTORIO MÉDICO ═══ */
+/* ════════ DIRECTORIO MÉDICO ════════ */
 const espColorMap={"ORTOPEDISTA":"tag-blue","CARDIÓLOGO":"tag-red","BARIÁTRICO":"tag-purple","OPTÓMETRA":"tag-green","OFTALMÓLOGO":"tag-blue","REUMATÓLOGO":"tag-amber","URÓLOGO":"tag-purple","NEURÓLOGO":"tag-amber","NEUROFISIOLOGÍA":"tag-amber","MEDICINA ESTÉTICA":"tag-purple","DERMATÓLOGA":"tag-green","LABORATORIO CLÍNICO":"tag-blue","CHEQUEO EJECUTIVO":"tag-teal","INTERNISTA":"tag-blue"};
-let directorio=JSON.parse(localStorage.getItem("directorio")||"null");
-if(!directorio){
-  directorio=[
-    {id:1,esp:"ORTOPEDISTA",nombre:"EDWIN MIGUEL TOVAR TORRES",tel:"6082747555",cel:"3046035555",ciudad:"IBAGUÉ",dir:"COMPLEJO MÉDICO LA SAMARIA",cons:"605",correo:"migueltovarortopedista@gmail.com",cita:"PROGRAMAR APROX. 10 Julio/2026"},
-    {id:2,esp:"CARDIÓLOGO",nombre:"ALEJANDRO MIGUEL SANTOS ZAVALA",tel:"6082798643",cel:"3165709731",ciudad:"IBAGUÉ",dir:"VÍA AEROPUERTO NUEVA CLÍNICA MEDICADIZ",cons:"204",correo:"dralejandrosantos@gmail.com",cita:"PROGRAMAR APROX. 24 Sept/2026"},
-    {id:3,esp:"BARIÁTRICO",nombre:"CARLOS FELIPE CHAUX MOSQUERA",tel:"6017033872",cel:"3126162182",ciudad:"BOGOTÁ",dir:"CALLE 83 No.16A-44 EDIFICIO CIMA",cons:"304 A",correo:"programacioncirugia@ucomcolombia.com",cita:"-"},
-    {id:4,esp:"OPTÓMETRA",nombre:"AGUSTIN VIDALLER NIETO",tel:"6012187077",cel:"",ciudad:"BOGOTÁ",dir:"AVENIDA 100 No.18a-51 CLÍNICA BARRAQUER",cons:"103",correo:"",cita:"-"},
-    {id:5,esp:"OFTALMÓLOGO",nombre:"LUIS MIGUEL SALAZAR AMATURE",tel:"6012187077",cel:"3188018671",ciudad:"BOGOTÁ",dir:"AVENIDA 100 No.18a-51 CLÍNICA BARRAQUER",cons:"322",correo:"LMSALAZARA@BARRAQUER.COM.CO",cita:"-"},
-    {id:6,esp:"REUMATÓLOGO",nombre:"SEBASTIAN MOLINA RIOS",tel:"6014824488",cel:"",ciudad:"BOGOTÁ",dir:"FUNDACIÓN SANTA FE BOGOTÁ · CALLE 119 # 7-80 PISO 3",cons:"305",correo:"",cita:"22 Abril/2026 a las 2:40PM"},
-    {id:7,esp:"URÓLOGO",nombre:"MAURICIO ANDRÉS LÓPEZ GUERRERO",tel:"6082596447",cel:"3168333134",ciudad:"IBAGUÉ",dir:"UROTOL - 3 PISO CLÍNICA MEDICADIZ VIA AEROPUERTO",cons:"",correo:"urotol@hotmail.com",cita:"PDTE HACERSE EXÁMENES"},
-    {id:8,esp:"NEURÓLOGO",nombre:"ORLANDO LÓPEZ CARVAJAL",tel:"6082771186",cel:"",ciudad:"IBAGUÉ",dir:"CRA 5 No.31-114 CADIZ",cons:"910",correo:"",cita:"PDTE PROGRAMAR CITA POLISOMNOGRAFÍA"},
-    {id:9,esp:"NEUROFISIOLOGÍA",nombre:"CENTRAL DE ESPECIALISTAS",tel:"",cel:"3161095388",ciudad:"IBAGUÉ",dir:"CRA 4BIS # 35-72 BRR CADIZ",cons:"1",correo:"atencion@centralespecialistascolombia.com",cita:""},
-    {id:10,esp:"NEUROFISIOLOGÍA",nombre:"FUNDACIÓN SANTA FE",tel:"6014824488",cel:"",ciudad:"BOGOTÁ",dir:"CALLE 119 # 7-14 PISO 2",cons:"1",correo:"",cita:"CITA POLISOMNOGRAFÍA 13 Mayo/2026 a las 8PM"},
-    {id:11,esp:"MEDICINA ESTÉTICA",nombre:"ANDREA DEL PILAR CARDONA OLMOS",tel:"6082632262",cel:"3102386611",ciudad:"IBAGUÉ",dir:"CALLE 6 No.5-82 BRR LA POLA",cons:"",correo:"ipsandreacardona@gmail.com",cita:"2 Mayo/2026 a las 10AM — (1)Sculptra + (2)Toxina Botulínica"},
-    {id:12,esp:"DERMATÓLOGA",nombre:"MONICA HERNANDEZ BULLA",tel:"",cel:"3178559081",ciudad:"IBAGUÉ",dir:"WORD TRADE CENTER, AQUA POWER CENTER, AV. GUABINAL #57-15",cons:"807",correo:"",cita:"-"},
-    {id:13,esp:"LABORATORIO CLÍNICO",nombre:"ANALICEMOS",tel:"6082772036",cel:"3219612486",ciudad:"IBAGUÉ",dir:"SEDE 1: CRA 4H No.34-83 B/CÁDIZ | SEDE 2: CALLE 32 No.4K-27 B/CÁDIZ | SEDE 3: TORRE MÉDICA MEDICADIZ CONS.909 VÍA AEROPUERTO",cons:"-",correo:"recepcion@analicemoslaboratorio.com",cita:"-"},
-    {id:14,esp:"CHEQUEO EJECUTIVO",nombre:"CLÍNICA PABLO TOBÓN URIBE",tel:"6044459000",cel:"3147751125",ciudad:"MEDELLÍN",dir:"CL 78B No.69-240 PISO 7 - TORRE B CORDOBA",cons:"-",correo:"chequeos@hptu.org.co",cita:"-"},
-    {id:15,esp:"INTERNISTA",nombre:"ANTONIO JOSÉ OVIEDO LEONEL",tel:"",cel:"3102823544",ciudad:"IBAGUÉ",dir:"",cons:"",correo:"",cita:"-"},
-    {id:16,esp:"OFTALMÓLOGO",nombre:"PAOLO SOLANO LEAL",tel:"6082553855",cel:"3186912279",ciudad:"IBAGUÉ",dir:"CLÍNICA MEDICADIZ - NAZAR GRUPO OFTALMOLÓGICO",cons:"302",correo:"info@nazaroftalmologos.com",cita:"-"}
-  ];
-  localStorage.setItem("directorio",JSON.stringify(directorio));
-}
-function saveDir(){localStorage.setItem("directorio",JSON.stringify(directorio));}
 function renderDir(){
   let buscar=document.getElementById("dirBuscar").value.toLowerCase();
   let filtroEsp=document.getElementById("dirFiltroEsp").value;
@@ -501,24 +754,7 @@ function editarDir(id){let d=directorio.find(x=>x.id===id);if(!d)return;document
 function guardarDir(){let esp=document.getElementById("dirEsp").value.trim(),nombre=document.getElementById("dirNombre").value.trim();if(!esp||!nombre){alert("Especialidad y Nombre son requeridos");return;}let obj={esp,nombre,tel:document.getElementById("dirTel").value.trim(),cel:document.getElementById("dirCel").value.trim(),ciudad:document.getElementById("dirCiudad").value.trim(),dir:document.getElementById("dirDir").value.trim(),cons:document.getElementById("dirCons").value.trim(),correo:document.getElementById("dirCorreo").value.trim(),cita:document.getElementById("dirCita").value.trim()};let eid=document.getElementById("dirEditId").value;if(eid){directorio=directorio.map(d=>d.id===Number(eid)?{...obj,id:Number(eid)}:d);}else{obj.id=Date.now();directorio.push(obj);}saveDir();cerrarModalDir();renderDir();}
 function eliminarDir(id){let d=directorio.find(x=>x.id===id);if(!d)return;if(!confirm(`¿Eliminar a ${d.nombre}?`))return;directorio=directorio.filter(x=>x.id!==id);saveDir();renderDir();}
 
-/* ═══ CUENTAS BANCARIAS ═══ */
-let cuentas=JSON.parse(localStorage.getItem("cuentas")||"null");
-if(!cuentas){
-  cuentas=[
-    {id:1,banco:"BANCOLOMBIA",num:"7973987644",tipo:"AHORROS",titular:"GERARDO JAVIER ALVARADO CUBILLOS",cc:"86059446"},
-    {id:2,banco:"BANCOLOMBIA",num:"079782612-34",tipo:"AHORROS",titular:"SARITA ALVARADO",cc:""},
-    {id:3,banco:"BANCOLOMBIA",num:"86948258562",tipo:"AHORROS",titular:"EDNA LORENA MURILLO RODRIGUEZ",cc:"38211759"},
-    {id:4,banco:"BANCOLOMBIA",num:"06881006039",tipo:"AHORROS",titular:"SANDRA LILIANA NIETO CASTRILLON",cc:"39565280"},
-    {id:5,banco:"NEQUI",num:"320 3770085",tipo:"DEP. ELECTRÓNICO",titular:"OLIVER LA TORRE CAPERA",cc:"12134257"},
-    {id:6,banco:"BANCOLOMBIA",num:"38341300581",tipo:"AHORROS",titular:"",cc:""},
-    {id:7,banco:"BANCOLOMBIA",num:"079000494-41",tipo:"AHORROS",titular:"DANNY FABIAN SALAZAR CAMACHO",cc:"1110525870"},
-    {id:8,banco:"BANCOLOMBIA",num:"29993077613",tipo:"AHORROS",titular:"SERGIO BODENSIEK",cc:"1026259624"},
-    {id:9,banco:"NEQUI",num:"3204612987",tipo:"DEP. ELECTRÓNICO",titular:"ARQUITECTO NICOLAS (JAIME FORERO)",cc:""},
-    {id:10,banco:"NEQUI",num:"3176635775",tipo:"DEP. ELECTRÓNICO",titular:"MANUEL POLLO (MANUEL CORREA)",cc:"86065449"}
-  ];
-  localStorage.setItem("cuentas",JSON.stringify(cuentas));
-}
-function saveCuentas(){localStorage.setItem("cuentas",JSON.stringify(cuentas));}
+/* ════════ CUENTAS BANCARIAS ════════ */
 const bankColorMap={"BANCOLOMBIA":"tag-amber","NEQUI":"tag-purple","DAVIVIENDA":"tag-red","BBVA":"tag-blue","AV VILLAS":"tag-green"};
 function renderCuentas(){
   let buscar=document.getElementById("cuentaBuscar").value.toLowerCase();
@@ -544,62 +780,7 @@ function editarCuenta(id){let c=cuentas.find(x=>x.id===id);if(!c)return;document
 function guardarCuenta(){let banco=document.getElementById("cuentaBanco").value.trim().toUpperCase(),num=document.getElementById("cuentaNum").value.trim();if(!banco||!num){alert("Banco y número son requeridos");return;}let obj={banco,num,tipo:document.getElementById("cuentaTipo").value.trim().toUpperCase(),titular:document.getElementById("cuentaTitular").value.trim().toUpperCase(),cc:document.getElementById("cuentaCC").value.trim()};let eid=document.getElementById("cuentaEditId").value;if(eid){cuentas=cuentas.map(c=>c.id===Number(eid)?{...obj,id:Number(eid)}:c);}else{obj.id=Date.now();cuentas.push(obj);}saveCuentas();cerrarModalCuenta();renderCuentas();}
 function eliminarCuenta(id){let c=cuentas.find(x=>x.id===id);if(!c)return;if(!confirm(`¿Eliminar cuenta de ${c.titular||c.num}?`))return;cuentas=cuentas.filter(x=>x.id!==id);saveCuentas();renderCuentas();}
 
-/* ═══ CORREO PERSONAL ═══ */
-let correos=JSON.parse(localStorage.getItem("correos")||"null");
-if(!correos){
-  correos=[
-    {id:1,fecha:"2026-04-22",hora:"08:59",remitente:"DIRECCION EMPRESAS",email:"direccionempresas.sas@gmail.com",asunto:"REPORTE DIARIO DE SALDOS BANCARIOS 22/04/2026",nota:""},
-    {id:2,fecha:"2026-04-22",hora:"09:04",remitente:"NOTIFICACIONES MOVILGAS",email:"notificaciones@mileniumgas.com",asunto:"ACTA NO.45 JUNTA GENERAL ORDINARIA DE SOCIOS DE MOVILGAS LTDA - 27 MARZO 2026",nota:""},
-    {id:3,fecha:"2026-04-22",hora:"09:11",remitente:"NOTIFICACIONES MOVILGAS",email:"notificaciones@mileniumgas.com",asunto:"ACTA NO.31 JUNTA GENERAL ORDINARIA DE SOCIOS DE MOVILGAS LTDA - 28 MARZO 2026",nota:""},
-    {id:4,fecha:"2026-04-22",hora:"11:16",remitente:"LAURA CHALA",email:"subgerenciaeds@ksaval.com",asunto:"AUSENCIA LAURA CHALA MARTES DE 7AM A 11AM",nota:""},
-    {id:5,fecha:"2026-04-22",hora:"11:26",remitente:"CORPORACION COLEGIO SAN BONIFACION DE LAS LANZAS",email:"",asunto:"CORPORACION COLEGIO SAN BONIFACION DE LAS LANZAS",nota:""},
-    {id:6,fecha:"2026-04-22",hora:"13:35",remitente:"LAURA CHALA",email:"subgerenciaeds@ksaval.com",asunto:"BORRADOR ACTA N.4: ENVIO ESTADO DE PENDIENTES VISTOS EN EL REUNION DEL VIERNES 17",nota:""},
-    {id:7,fecha:"2026-04-22",hora:"15:00",remitente:"CORRESPONDENCIA",email:"correspondencia@millanyasociados.com",asunto:"29195 - KSAVAL INFORME SAGRILAFT Y PTEE 2025",nota:""},
-    {id:8,fecha:"2026-04-23",hora:"07:25",remitente:"HAROLD CASTRO CASTILLO",email:"haroldcastrocastillo@yahoo.com",asunto:"REVISION 2020-2024",nota:""},
-    {id:9,fecha:"2026-04-23",hora:"08:06",remitente:"SERGIO BODENSIEK",email:"sergiobodensiek12@gmail.com",asunto:"SOLICITUD REEMBOLSO GASTOS DE VIAJE",nota:""},
-    {id:10,fecha:"2026-04-23",hora:"08:45",remitente:"DIRECCION EMPRESAS",email:"direccionempresas.sas@gmail.com",asunto:"REPORTE DIARIO DE SALDOS BANCARIOS 23/04/2026",nota:""},
-    {id:11,fecha:"2026-04-23",hora:"09:14",remitente:"BANCOLOMBIA",email:"",asunto:"¡TOC-TOC! LLEGO TU EXTRACTO DEL MES (MARZO)",nota:""},
-    {id:12,fecha:"2026-04-23",hora:"15:01",remitente:"BANCOLOMBIA",email:"",asunto:"PAGA TU IMPUESTO PREDIAL",nota:"Se remite a gerente ksaval"},
-    {id:13,fecha:"2026-04-23",hora:"17:14",remitente:"MONICA SOFIA ALARCON ALARCON",email:"monica.alarcon@informacion.terpel.com",asunto:"REPORTE PAGOS A PROVEEDORES_20260423",nota:"Se remite a Yessica"},
-    {id:14,fecha:"2026-04-23",hora:"20:47",remitente:"LAURA CHALA",email:"subgerenciaeds@ksaval.com",asunto:"BORRADOR RENTA",nota:""},
-    {id:15,fecha:"2026-04-23",hora:"21:18",remitente:"LAURA CHALA",email:"subgerenciaeds@ksaval.com",asunto:"CERTIFICADO TRIBUTARIO 2025 GERARDO JAVIER ALVARADO",nota:"Se da a conocer a Andrea"},
-    {id:16,fecha:"2026-04-23",hora:"21:23",remitente:"LAURA CHALA",email:"subgerenciaeds@ksaval.com",asunto:"REPORTE DE VENTAS - K-SAVAL ABRRGY SAS",nota:""},
-    {id:17,fecha:"2026-04-23",hora:"23:00",remitente:"LAURA CHALA",email:"subgerenciaeds@ksaval.com",asunto:"VISITA EDS LAS MONEDAS MANUEL LARA",nota:""},
-    {id:18,fecha:"2026-04-23",hora:"23:10",remitente:"LAURA CHALA",email:"subgerenciaeds@ksaval.com",asunto:"CONSULTA TRATAMIENTO CONTABLE Y FISCAL - MOVIMIENTOS ACCIONISTA/PRESIDENCIA NO LEGALIZADOS",nota:""},
-    {id:19,fecha:"2026-04-24",hora:"09:02",remitente:"YESSICA",email:"direccionempresas.sas@gmail.com",asunto:"REPORTE DIARIO DE SALDOS BANCARIOS 24/04/2026",nota:""},
-    {id:20,fecha:"2026-04-26",hora:"17:17",remitente:"AVIANCA (e-ticket)",email:"eticket@avianca.com",asunto:"MONICA MARIA BOCANEGRA RICO, 03MAY/0905/ SAN ANDRES ISLAND",nota:"Pendiente respuesta Señora Monica"},
-    {id:21,fecha:"2026-04-26",hora:"17:18",remitente:"AVIANCA (e-ticket)",email:"eticket@avianca.com",asunto:"GERARDO JAVIER ALVARADO CUBILLOS, 03MAY/0905/SAN ANDRES ISLAND",nota:""},
-    {id:22,fecha:"2026-04-26",hora:"17:18",remitente:"AVIANCA",email:"",asunto:"GERARDO JAVIER ALVARADO CUBILLOS AQUÍ ESTAN LOS DETALLES DE TU RESERVA ADZ - IBE",nota:""},
-    {id:23,fecha:"2026-04-26",hora:"20:09",remitente:"ANDREA ARIAS",email:"andreariasaquite@gmail.com",asunto:"INFORMACION ANGELICA - CONTRATO DE ACCIONES",nota:""},
-    {id:24,fecha:"2026-04-27",hora:"08:44",remitente:"FENALCO TOLIMA",email:"",asunto:"INVITACION EMPRESARIAL - JUEVES 30 ABRIL 2 A 5 PM AUDITORIO CAMARA DE COMERCIO IBAGUE",nota:"Informacion a Don Gerardo"},
-    {id:25,fecha:"2026-04-27",hora:"09:08",remitente:"BBVA",email:"",asunto:"ENVIO SOPORTES EXTRACTOS LEASING A LOS CLIENTES",nota:"Remitido a gerencia ksaval"},
-    {id:26,fecha:"2026-04-27",hora:"09:26",remitente:"LAURA CHALA",email:"subgerenciaeds@ksaval.com",asunto:"PAGA TU IMPUESTO PREDIAL - No hay vehiculos matriculados en Ibague, ya se pago todos los impuestos vehiculos e ICA",nota:""},
-    {id:27,fecha:"2026-04-27",hora:"09:26",remitente:"LAURA CHALA",email:"subgerenciaeds@ksaval.com",asunto:"REUNION ENER 27/04/2025",nota:""},
-    {id:28,fecha:"2026-04-27",hora:"11:23",remitente:"ENERGY FALCON",email:"falconenergy7@gmail.com",asunto:"ORDEN DE FACTURACION CONTRATO 33214 CLIENTE K-SAVAL ENERGY SAS",nota:""},
-    {id:29,fecha:"2026-04-27",hora:"11:25",remitente:"EDER MAURICIO RUGELES SERRATO",email:"eder.rugeles@terpel.com",asunto:"COMUNICADO GESTION CONTROL FLOTA",nota:"Remitido a gerencia ksaval"},
-    {id:30,fecha:"2026-04-27",hora:"12:13",remitente:"EDER MAURICIO RUGELES SERRATO",email:"eder.rugeles@terpel.com",asunto:"FICHA DE DATOS DE SEGURIDAD COMBUSTIBLE",nota:"Remitido a gerencia ksaval"},
-    {id:31,fecha:"2026-04-27",hora:"12:32",remitente:"MARITZA LORENA COLORADO BARAJAS",email:"lorena.colorado@inalde.edu.co",asunto:"INALDE - DIRECTORIO PROGRAMA ENFOCADO EN JUNTAS DIRECTIVAS",nota:"Informacion a Don Gerardo"},
-    {id:32,fecha:"2026-04-27",hora:"14:21",remitente:"LAURA CHALA",email:"subgerenciaeds@ksaval.com",asunto:"INFORMACION ENEL REUNION 27/04/2026",nota:""},
-    {id:33,fecha:"2026-04-27",hora:"14:55",remitente:"LAURA CHALA",email:"subgerenciaeds@ksaval.com",asunto:"BORRADOR ACTA JUSTIFICACION DE INGRESOS 2025",nota:""},
-    {id:34,fecha:"2026-04-28",hora:"05:08",remitente:"EDES MAURICIO RUGELES SERRATO",email:"eder.rugeles@terpel.com",asunto:"SIGNIFICADO CERTIFICACION ICONTEC EN MEDIDA Y CALIDAD",nota:""},
-    {id:35,fecha:"2026-04-28",hora:"08:42",remitente:"DIRECCION EMPRESAS",email:"direccionempresas.sas@gmail.com",asunto:"REPORTE DIARIO DE SALDOS BANCARIOS 28/04/2026",nota:""},
-    {id:36,fecha:"2026-04-28",hora:"09:04",remitente:"COMUNICACIONES SANBONI",email:"mensajeria2@sanboni.edu.co",asunto:"PROCESO DE ADMISION 2027 - INICIO DE INSCRIPCIONES Y CARACTERIZACION",nota:""},
-    {id:37,fecha:"2026-04-28",hora:"09:42",remitente:"LAURA CHALA",email:"subgerenciaeds@ksaval.com",asunto:"RE: BORRADOR RENTA",nota:""},
-    {id:38,fecha:"2026-04-28",hora:"11:28",remitente:"BLANCA INCER CASALLAS",email:"blanca.casallas@amarilo.com",asunto:"INCUMPLIMIENTO CIERRE FINANCIERO (AMARILO)",nota:""},
-    {id:39,fecha:"2026-04-28",hora:"12:02",remitente:"CORPORACION COLEGIO SAN BONIFACION DE LAS LANZAS",email:"",asunto:"CORPORACION COLEGIO SAN BONIFACION DE LAS LANZAS (PENSION)",nota:"Informacion a Don Gerardo"},
-    {id:40,fecha:"2026-04-28",hora:"12:02",remitente:"CORPORACION COLEGIO SAN BONIFACION DE LAS LANZAS",email:"",asunto:"CORPORACION COLEGIO SAN BONIFACION DE LAS LANZAS (SERVICIO ALIMENTACION)",nota:"Informacion a Don Gerardo"},
-    {id:41,fecha:"2026-04-28",hora:"17:24",remitente:"EDES MAURICIO RUGELES SERRATO",email:"eder.rugeles@terpel.com",asunto:"RV: BOLETIN N.96 EL CASO DE LOS 999 GALONES",nota:""},
-    {id:42,fecha:"2026-04-29",hora:"09:19",remitente:"BBVA",email:"",asunto:"ENVIO SOPORTES EXTRACTOS LEASING A LOS CLIENTES",nota:""},
-    {id:43,fecha:"2026-04-29",hora:"09:29",remitente:"DIRECCION EMPRESAS",email:"direccionempresas.sas@gmail.com",asunto:"REPORTE DIARIO DE SALDOS BANCARIOS 29/04/2026",nota:""},
-    {id:44,fecha:"2026-04-29",hora:"09:38",remitente:"DIRECCION EMPRESAS",email:"direccionempresas.sas@gmail.com",asunto:"DEBITO CUENTA CORRIENTE BANCOLOMBIA 068-764422-91",nota:""},
-    {id:45,fecha:"2026-04-29",hora:"13:19",remitente:"LUCIO ANDRES ORDOÑEZ",email:"lucio.ordonez.ext@terpel.com",asunto:"VENTANA DE MANTENIMIENTO CONEXIÓN WIFI",nota:""},
-    {id:46,fecha:"2026-04-29",hora:"14:07",remitente:"CUENTAS POR COBRAR",email:"pagos.combustibles@primax.com.co",asunto:"GESTION DE COBRO PRE-CIERRE DE MES",nota:""},
-    {id:47,fecha:"2026-04-29",hora:"14:16",remitente:"CUENTAS POR COBRAR",email:"pagos.combustibles@primax.com.co",asunto:"GESTION PREVENTIVA - ESTADO DE CUENTA",nota:""},
-    {id:48,fecha:"2026-04-29",hora:"14:47",remitente:"BANCOLOMBIA",email:"",asunto:"CORREGIMOS EL PLAZO DE TU AMPLIACION CON TARJETA DE CREDITO",nota:""}
-  ];
-  localStorage.setItem("correos",JSON.stringify(correos));
-}
-function saveCorreos(){localStorage.setItem("correos",JSON.stringify(correos));}
+/* ════════ CORREO PERSONAL ════════ */
 function renderCorreo(){
   let buscar=document.getElementById("correoBuscar").value.toLowerCase();
   let fechaFiltro=document.getElementById("correoFechaFiltro").value;
@@ -607,7 +788,7 @@ function renderCorreo(){
   data.sort((a,b)=>a.fecha===b.fecha?a.hora.localeCompare(b.hora):a.fecha.localeCompare(b.fecha));
   document.getElementById("correoCount").textContent=data.length+" correo"+(data.length!==1?"s":"");
   let container=document.getElementById("correoContainer");container.innerHTML="";
-  if(!data.length){container.innerHTML='<div class="mail-empty">📭 No se encontraron correos con los filtros actuales.</div>';return;}
+  if(!data.length){container.innerHTML='<div class="mail-empty">📭 No se encontraron correos.</div>';return;}
   let grupos={};data.forEach(c=>{if(!grupos[c.fecha])grupos[c.fecha]=[];grupos[c.fecha].push(c);});
   Object.keys(grupos).sort().forEach(fecha=>{
     let[y,m,d]=fecha.split("-");
@@ -618,10 +799,7 @@ function renderCorreo(){
     grupos[fecha].forEach(c=>{
       let card=document.createElement("div");card.className="mail-card";
       card.innerHTML=`
-        <div class="mail-card-top">
-          <span class="mail-card-hora">🕐 ${c.hora}</span>
-          <span class="tag tag-purple" style="font-size:10px;">${c.fecha}</span>
-        </div>
+        <div class="mail-card-top"><span class="mail-card-hora">🕐 ${c.hora}</span><span class="tag tag-purple" style="font-size:10px;">${c.fecha}</span></div>
         <div class="mail-card-remitente">${c.remitente||"(sin remitente)"}</div>
         ${c.email?`<div class="mail-card-email">✉️ ${c.email}</div>`:""}
         <div class="mail-card-asunto">${c.asunto}</div>
@@ -642,9 +820,8 @@ function editarCorreo(id){let c=correos.find(x=>x.id===id);if(!c)return;document
 function guardarCorreo(){let fecha=document.getElementById("correoFecha").value,hora=document.getElementById("correoHora").value,asunto=document.getElementById("correoAsunto").value.trim();if(!fecha||!hora||!asunto){alert("Fecha, hora y asunto son requeridos");return;}let obj={fecha,hora,remitente:document.getElementById("correoRemitente").value.trim(),email:document.getElementById("correoEmail").value.trim(),asunto,nota:document.getElementById("correoNota").value.trim()};let eid=document.getElementById("correoEditId").value;if(eid){correos=correos.map(c=>c.id===Number(eid)?{...obj,id:Number(eid)}:c);}else{obj.id=Date.now();correos.push(obj);}saveCorreos();cerrarModalCorreo();renderCorreo();}
 function eliminarCorreo(id){let c=correos.find(x=>x.id===id);if(!c)return;if(!confirm("¿Eliminar este correo?"))return;correos=correos.filter(x=>x.id!==id);saveCorreos();renderCorreo();}
 
-/* INIT */
-document.getElementById("fecha").valueAsDate=nowCO();
-render();
+/* ── ARRANCAR ── */
+initApp();
 </script>
 </body>
 </html>
