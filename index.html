@@ -5,61 +5,40 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GJAC · Panel Ejecutivo</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<!-- ══ FIREBASE SDK (no tocar) ══ -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+
 <style>
 :root{--bg:#0b1220;--panel:#111827;--card:#1f2937;--txt:#e5e7eb;--muted:#9ca3af;--green:#22c55e;--amber:#f59e0b;--blue:#3b82f6;--red:#ef4444;}
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{overflow-x:hidden;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--txt);}
 
-/* PANTALLA DE CARGA */
+/* ── PANTALLA DE CARGA ── */
 #loadingScreen{position:fixed;inset:0;background:#080e1a;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;}
 #loadingScreen.hidden{display:none;}
 .load-spinner{width:48px;height:48px;border:4px solid #1e2d45;border-top-color:#60a5fa;border-radius:50%;animation:spin 0.9s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg)}}
 .load-title{font-family:'DM Serif Display',serif;font-size:22px;background:linear-gradient(135deg,#60a5fa,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-.load-msg{font-size:13px;color:#4b5563;text-align:center;}
+.load-msg{font-size:13px;color:#4b5563;}
+.load-error{color:#f87171;font-size:14px;text-align:center;max-width:380px;line-height:1.6;padding:20px;background:#1f1010;border:1px solid #7f1d1d;border-radius:12px;}
+.load-error code{background:#2d1010;padding:2px 6px;border-radius:4px;font-size:12px;}
 
-/* PANTALLA DE LOGIN */
-#loginScreen{position:fixed;inset:0;background:#080e1a;z-index:99998;display:none;flex-direction:column;align-items:center;justify-content:center;gap:24px;}
-#loginScreen.show{display:flex;}
-.login-card{background:#111827;border:1px solid #1e2d45;border-radius:20px;padding:40px 48px;text-align:center;max-width:400px;width:90%;}
-.login-logo{font-family:'DM Serif Display',serif;font-size:32px;background:linear-gradient(135deg,#60a5fa,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px;}
-.login-sub{font-size:12px;color:#4b5563;text-transform:uppercase;letter-spacing:2px;margin-bottom:32px;}
-.login-desc{font-size:14px;color:#6b7280;margin-bottom:28px;line-height:1.6;}
-.btn-google{display:flex;align-items:center;justify-content:center;gap:12px;background:#fff;color:#1f2937;border:none;border-radius:10px;padding:14px 28px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;width:100%;transition:.2s;box-shadow:0 4px 14px rgba(0,0,0,.3);}
-.btn-google:hover{background:#f3f4f6;transform:translateY(-1px);}
-.btn-google svg{width:20px;height:20px;flex-shrink:0;}
-.login-note{font-size:11px;color:#374151;margin-top:20px;line-height:1.5;}
-
-/* VISTA SOLO LECTURA (jefe) */
-#viewerScreen{display:none;position:fixed;inset:0;background:#080e1a;overflow-y:auto;overflow-x:hidden;z-index:100;}
-#viewerScreen.show{display:block;}
-.viewer-topbar{background:#080e1a;border-bottom:1px solid #1e2d45;padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
-.viewer-brand{font-family:'DM Serif Display',serif;font-size:15px;background:linear-gradient(135deg,#60a5fa,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-.viewer-user{font-size:12px;color:#4b5563;display:flex;align-items:center;gap:10px;}
-.btn-logout-small{background:transparent;border:1px solid #374151;color:#6b7280;padding:5px 12px;border-radius:6px;cursor:pointer;font-size:12px;font-family:'DM Sans',sans-serif;transition:.2s;}
-.btn-logout-small:hover{background:#1f2937;color:#fff;}
-
-/* SYNC BADGE */
+/* ── SYNC BADGE ── */
 #syncBadge{position:fixed;bottom:16px;right:16px;background:#0d1526;border:1px solid #1e2d45;border-radius:20px;padding:6px 14px;font-size:12px;color:#4b5563;z-index:300;display:flex;align-items:center;gap:6px;transition:.3s;}
 #syncBadge.syncing{color:#f59e0b;border-color:#78350f;}
 #syncBadge.ok{color:#4ade80;border-color:#166534;}
 #syncDot{width:7px;height:7px;border-radius:50%;background:currentColor;}
 
-/* NAV */
+/* ── NAV ── */
 #globalNav{display:flex;align-items:center;background:#080e1a;border-bottom:1px solid #1e2d45;padding:0 12px;height:52px;position:sticky;top:0;z-index:200;overflow-x:auto;overflow-y:hidden;}
 .nav-brand{font-family:'DM Serif Display',serif;font-size:15px;background:linear-gradient(135deg,#60a5fa,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-right:16px;white-space:nowrap;}
 .nav-btn{height:52px;padding:0 13px;background:transparent;border:none;color:#6b7280;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;border-bottom:2px solid transparent;transition:.15s;white-space:nowrap;}
 .nav-btn:hover{color:#e5e7eb;}
 .nav-btn.active{color:#60a5fa;border-bottom-color:#60a5fa;}
-.nav-right{margin-left:auto;display:flex;align-items:center;gap:10px;}
-.nav-user{font-size:12px;color:#4b5563;}
-.btn-logout{background:transparent;border:1px solid #374151;color:#6b7280;padding:5px 12px;border-radius:6px;cursor:pointer;font-size:12px;font-family:'DM Sans',sans-serif;transition:.2s;margin-top:0;}
-.btn-logout:hover{background:#1f2937;color:#fff;}
 
-/* PAGES */
+/* ── PAGES ── */
 .page{display:none;}
 .page.active{display:block;}
 
@@ -102,7 +81,7 @@ button{padding:6px 10px;margin-top:5px;border:none;border-radius:5px;cursor:poin
 #modalObs.open{display:flex;}
 .obs-box{background:#111827;padding:24px;border-radius:12px;width:420px;max-width:90vw;border:1px solid #374151;}
 
-/* VISTA EJECUTIVA (admin) */
+/* VISTA EJECUTIVA */
 #vistaEjecutiva{display:none;position:fixed;inset:0;z-index:9998;background:#080e1a;overflow-y:auto;overflow-x:hidden;}
 #vistaEjecutiva.open{display:block;}
 .exec-wrap{max-width:1100px;margin:0 auto;padding:32px 24px 60px;}
@@ -165,7 +144,7 @@ button{padding:6px 10px;margin-top:5px;border:none;border-radius:5px;cursor:poin
 .row-actions{display:flex;gap:6px;flex-wrap:wrap;}
 .row-actions button{padding:5px 10px;font-size:12px;border-radius:6px;margin-top:0;}
 
-/* DIRECTORIO */
+/* DIRECTORIO tarjetas */
 .dir-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px;width:100%;}
 .dir-card{background:#0d1526;border:1px solid #1e2d45;border-radius:14px;padding:18px 20px;transition:.2s;word-break:break-word;overflow:hidden;}
 .dir-card:hover{border-color:#334155;box-shadow:0 6px 20px rgba(0,0,0,.4);}
@@ -181,7 +160,7 @@ button{padding:6px 10px;margin-top:5px;border:none;border-radius:5px;cursor:poin
 .dir-card-actions button{flex:1;padding:7px;font-size:12px;border-radius:7px;margin-top:0;}
 .dir-empty{text-align:center;color:#374151;padding:80px 0;font-size:14px;grid-column:1/-1;}
 
-/* CUENTAS */
+/* CUENTAS tabla fija */
 .mod-table-wrap{overflow:hidden;border-radius:12px;border:1px solid #1e2d45;width:100%;}
 .mod-table{width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed;}
 .mod-table thead{background:#0d1526;}
@@ -190,8 +169,9 @@ button{padding:6px 10px;margin-top:5px;border:none;border-radius:5px;cursor:poin
 .mod-table tbody tr:hover{background:#0d1526;}
 .mod-table tbody tr:last-child{border-bottom:none;}
 .mod-table td{padding:12px 14px;vertical-align:top;line-height:1.4;word-break:break-word;overflow-wrap:anywhere;}
+.mod-table td a{color:#60a5fa;text-decoration:none;}
 
-/* CORREO */
+/* CORREO PERSONAL */
 .mail-section-date{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#374151;padding:10px 0;border-bottom:1px solid #0d1526;margin-bottom:14px;}
 .mail-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin-bottom:28px;width:100%;}
 .mail-card{background:#0d1526;border:1px solid #1e2d45;border-radius:12px;padding:16px 18px;transition:.2s;word-break:break-word;overflow:hidden;}
@@ -205,99 +185,31 @@ button{padding:6px 10px;margin-top:5px;border:none;border-radius:5px;cursor:poin
 .mail-card-actions{display:flex;gap:6px;margin-top:12px;}
 .mail-card-actions button{flex:1;padding:6px;font-size:12px;border-radius:7px;margin-top:0;}
 .mail-empty{text-align:center;color:#374151;padding:80px 0;font-size:14px;}
-
-/* VIEWER — Vista ejecutiva solo lectura */
-.vw-wrap{max-width:1100px;margin:0 auto;padding:24px 20px 80px;}
-.vw-filters{display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap;background:#0d1526;border:1px solid #1e2d45;border-radius:12px;padding:16px 20px;}
-.vw-filters label{font-size:11px;color:#4b5563;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px;}
-.vw-filter-group{flex:1;min-width:140px;}
-.vw-filter-group input{background:#111827;border:1px solid #1f2937;border-radius:8px;color:#e5e7eb;padding:8px 12px;font-size:13px;width:100%;font-family:'DM Sans',sans-serif;margin-top:0;}
-.vw-filter-group input:focus{outline:none;border-color:#3b82f6;}
-.vw-filter-btn{align-self:flex-end;padding:8px 16px;background:#1e3a5f;border:1px solid #2563eb;color:#93c5fd;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;}
-.vw-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-bottom:24px;}
-.vw-kpi{background:#0d1526;border:1px solid #1e2d45;border-radius:10px;padding:12px 14px;text-align:center;}
-.vw-kpi-val{font-size:26px;font-weight:700;}
-.vw-kpi-lbl{font-size:10px;color:#4b5563;text-transform:uppercase;letter-spacing:1px;margin-top:3px;}
-.vw-section-title{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:#374151;font-weight:700;margin:0 0 14px;padding-bottom:8px;border-bottom:1px solid #111827;}
-.vw-card{background:#0d1526;border:1px solid #1e2d45;border-radius:14px;padding:18px 20px;margin-bottom:10px;display:grid;grid-template-columns:auto 1fr auto;gap:0 18px;align-items:start;transition:.2s;}
-.vw-card:hover{border-color:#334155;}
-.vw-card.e-prioritario{border-left:4px solid #ef4444;}
-.vw-card.e-importante{border-left:4px solid #f59e0b;}
-.vw-card.e-seguimiento{border-left:4px solid #3b82f6;}
-.vw-time{font-size:20px;font-weight:700;color:#60a5fa;min-width:48px;text-align:center;}
-.vw-time-date{font-size:10px;color:#4b5563;text-align:center;margin-top:2px;}
-.vw-persona{font-size:11px;color:#6b7280;font-weight:500;text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px;}
-.vw-tema{font-size:14px;font-weight:600;color:#e5e7eb;}
-.vw-obs{margin-top:8px;background:#111827;border-left:3px solid #2563eb;border-radius:0 6px 6px 0;padding:7px 10px;font-size:12px;color:#9ca3af;white-space:pre-wrap;line-height:1.5;}
-.vw-badge{display:inline-block;margin-top:6px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;}
-.vw-close-btn{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);color:#4ade80;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;font-family:'DM Sans',sans-serif;transition:.2s;white-space:nowrap;}
-.vw-close-btn:hover{background:rgba(34,197,94,.25);}
-.vw-empty{text-align:center;color:#374151;padding:60px 0;font-size:14px;}
 </style>
 </head>
 <body>
 
-<!-- CARGA -->
+<!-- ══ PANTALLA DE CARGA ══ -->
 <div id="loadingScreen">
   <div class="load-spinner"></div>
   <div class="load-title">GJAC · Panel Ejecutivo</div>
-  <div class="load-msg" id="loadMsg">Iniciando…</div>
+  <div class="load-msg" id="loadMsg">Conectando con la nube…</div>
+  <div class="load-error" id="loadError" style="display:none;"></div>
 </div>
 
-<!-- LOGIN -->
-<div id="loginScreen">
-  <div class="login-card">
-    <div class="login-logo">GJAC</div>
-    <div class="login-sub">Panel Ejecutivo</div>
-    <div class="login-desc">Inicia sesión con tu cuenta de Google para acceder al panel.</div>
-    <button class="btn-google" onclick="loginGoogle()">
-      <svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/><path fill="none" d="M0 0h48v48H0z"/></svg>
-      Continuar con Google
-    </button>
-    <div class="login-note">Solo usuarios autorizados tienen acceso completo.<br>Otros usuarios verán la Vista Ejecutiva de solo lectura.</div>
-  </div>
+<!-- ══ BADGE DE SINCRONIZACIÓN ══ -->
+<div id="syncBadge" class="ok">
+  <div id="syncDot"></div>
+  <span id="syncText">En línea</span>
 </div>
 
-<!-- VISTA SOLO LECTURA (jefe/invitados) -->
-<div id="viewerScreen">
-  <div class="viewer-topbar">
-    <span class="viewer-brand">GJAC · Vista Ejecutiva</span>
-    <div class="viewer-user">
-      <span id="viewerUserName"></span>
-      <button class="btn-logout-small" onclick="cerrarSesion()">Cerrar sesión</button>
-    </div>
-  </div>
-  <div class="vw-wrap">
-    <div style="margin-bottom:20px;">
-      <div style="font-family:'DM Serif Display',serif;font-size:22px;background:linear-gradient(135deg,#60a5fa,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Vista Ejecutiva</div>
-      <div style="font-size:11px;color:#4b5563;text-transform:uppercase;letter-spacing:2px;margin-top:2px;">Pendientes activos · Solo lectura</div>
-    </div>
-    <div class="vw-filters">
-      <div class="vw-filter-group"><label>Desde</label><input type="date" id="vwDesde" oninput="renderViewer()"></div>
-      <div class="vw-filter-group"><label>Hasta</label><input type="date" id="vwHasta" oninput="renderViewer()"></div>
-      <div class="vw-filter-group" style="flex:2;min-width:160px;"><label>Buscar por nombre</label><input type="text" id="vwNombre" placeholder="Filtrar…" oninput="renderViewer()"></div>
-      <button class="vw-filter-btn" onclick="limpiarVw()">Limpiar</button>
-    </div>
-    <div class="vw-kpis" id="vwKpis"></div>
-    <p class="vw-section-title" id="vwTitle">PENDIENTES</p>
-    <div id="vwLista"></div>
-  </div>
-</div>
-
-<!-- BADGE SYNC -->
-<div id="syncBadge" class="ok"><div id="syncDot"></div><span id="syncText">En línea</span></div>
-
-<!-- NAV (solo admin) -->
-<nav id="globalNav" style="display:none;">
+<!-- ══ NAV ══ -->
+<nav id="globalNav">
   <span class="nav-brand">GJAC</span>
   <button class="nav-btn active" onclick="showPage('agenda',this)">📅 Agenda</button>
   <button class="nav-btn" onclick="showPage('directorio',this)">🏥 Directorio Médico</button>
   <button class="nav-btn" onclick="showPage('cuentas',this)">🏦 Cuentas Bancarias</button>
   <button class="nav-btn" onclick="showPage('correo',this)">📧 Correo Personal</button>
-  <div class="nav-right">
-    <span class="nav-user" id="adminUserName"></span>
-    <button class="btn-logout" onclick="cerrarSesion()">Salir</button>
-  </div>
 </nav>
 
 <!-- AGENDA -->
@@ -340,7 +252,7 @@ button{padding:6px 10px;margin-top:5px;border:none;border-radius:5px;cursor:poin
 </div>
 </div>
 
-<!-- DIRECTORIO -->
+<!-- DIRECTORIO MÉDICO -->
 <div id="page-directorio" class="page module-page">
 <div class="module-wrap">
   <div class="module-header">
@@ -358,7 +270,7 @@ button{padding:6px 10px;margin-top:5px;border:none;border-radius:5px;cursor:poin
 </div>
 </div>
 
-<!-- CUENTAS -->
+<!-- CUENTAS BANCARIAS -->
 <div id="page-cuentas" class="page module-page">
 <div class="module-wrap">
   <div class="module-header">
@@ -384,7 +296,7 @@ button{padding:6px 10px;margin-top:5px;border:none;border-radius:5px;cursor:poin
 </div>
 </div>
 
-<!-- CORREO -->
+<!-- CORREO PERSONAL -->
 <div id="page-correo" class="page module-page">
 <div class="module-wrap">
   <div class="module-header">
@@ -399,14 +311,14 @@ button{padding:6px 10px;margin-top:5px;border:none;border-radius:5px;cursor:poin
   </div>
   <div class="module-search">
     <input type="text" id="correoBuscar" placeholder="🔍 Buscar por remitente, asunto, correo…" oninput="renderCorreo()">
-    <input type="date" id="correoFechaFiltro" onchange="renderCorreo()" style="flex:0;min-width:155px;">
+    <input type="date" id="correoFechaFiltro" onchange="renderCorreo()" style="flex:0;min-width:155px;" title="Filtrar por fecha">
     <button onclick="document.getElementById('correoFechaFiltro').value='';renderCorreo();" style="flex:0;background:#1f2937;color:#9ca3af;padding:10px 14px;border-radius:8px;border:1px solid #374151;font-size:13px;margin-top:0;cursor:pointer;white-space:nowrap;">✕ Limpiar</button>
   </div>
   <div id="correoContainer"></div>
 </div>
 </div>
 
-<!-- MODALES AGENDA -->
+<!-- MODAL AGENDA -->
 <div id="modalEditar" class="modal-overlay">
   <div class="modal-box">
     <h3>✏️ Editar pendiente</h3>
@@ -434,12 +346,12 @@ button{padding:6px 10px;margin-top:5px;border:none;border-radius:5px;cursor:poin
   <div class="modal-box">
     <h3 id="modalDirTitle">➕ Agregar especialista</h3>
     <input type="hidden" id="dirEditId">
-    <label>Especialidad *</label><input type="text" id="dirEsp">
-    <label>Nombre *</label><input type="text" id="dirNombre">
+    <label>Especialidad *</label><input type="text" id="dirEsp" placeholder="Ej. Cardiólogo">
+    <label>Nombre *</label><input type="text" id="dirNombre" placeholder="Nombre completo">
     <label>Teléfono</label><input type="text" id="dirTel">
     <label>Celular</label><input type="text" id="dirCel">
     <label>Ciudad</label><input type="text" id="dirCiudad">
-    <label>Dirección</label><input type="text" id="dirDir">
+    <label>Dirección</label><input type="text" id="dirDir" placeholder="Clínica / consultorio">
     <label>Consultorio / Piso</label><input type="text" id="dirCons">
     <label>Correo electrónico</label><input type="email" id="dirCorreo">
     <label>Próxima cita</label><input type="text" id="dirCita">
@@ -452,9 +364,9 @@ button{padding:6px 10px;margin-top:5px;border:none;border-radius:5px;cursor:poin
   <div class="modal-box">
     <h3 id="modalCuentaTitle">➕ Agregar cuenta bancaria</h3>
     <input type="hidden" id="cuentaEditId">
-    <label>Banco *</label><input type="text" id="cuentaBanco">
+    <label>Banco *</label><input type="text" id="cuentaBanco" placeholder="Ej. BANCOLOMBIA">
     <label>Número de producto *</label><input type="text" id="cuentaNum">
-    <label>Tipo de cuenta</label><input type="text" id="cuentaTipo">
+    <label>Tipo de cuenta</label><input type="text" id="cuentaTipo" placeholder="Ej. AHORROS">
     <label>Titular *</label><input type="text" id="cuentaTitular">
     <label>Cédula (C.C.)</label><input type="text" id="cuentaCC">
     <div class="modal-actions"><button class="btn-cancel" onclick="cerrarModalCuenta()">Cancelar</button><button class="save" onclick="guardarCuenta()">💾 Guardar</button></div>
@@ -468,10 +380,10 @@ button{padding:6px 10px;margin-top:5px;border:none;border-radius:5px;cursor:poin
     <input type="hidden" id="correoEditId">
     <label>Fecha *</label><input type="date" id="correoFecha">
     <label>Hora llegada *</label><input type="time" id="correoHora">
-    <label>Remitente (nombre)</label><input type="text" id="correoRemitente">
-    <label>Correo del remitente</label><input type="text" id="correoEmail">
-    <label>Asunto *</label><textarea id="correoAsunto" rows="2"></textarea>
-    <label>Acción / Nota interna</label><textarea id="correoNota" rows="2"></textarea>
+    <label>Remitente (nombre)</label><input type="text" id="correoRemitente" placeholder="Ej. LAURA CHALA">
+    <label>Correo del remitente</label><input type="text" id="correoEmail" placeholder="ejemplo@empresa.com">
+    <label>Asunto *</label><textarea id="correoAsunto" rows="2" placeholder="Asunto del correo"></textarea>
+    <label>Acción / Nota interna</label><textarea id="correoNota" rows="2" placeholder="Ej. Remitido a gerencia ksaval"></textarea>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="cerrarModalCorreo()">Cancelar</button>
       <button class="save" style="background:#7c3aed;" onclick="guardarCorreo()">💾 Guardar</button>
@@ -479,7 +391,7 @@ button{padding:6px 10px;margin-top:5px;border:none;border-radius:5px;cursor:poin
   </div>
 </div>
 
-<!-- VISTA EJECUTIVA ADMIN -->
+<!-- VISTA EJECUTIVA -->
 <div id="vistaEjecutiva">
   <div class="exec-wrap">
     <div class="exec-topbar">
@@ -499,9 +411,11 @@ button{padding:6px 10px;margin-top:5px;border:none;border-radius:5px;cursor:poin
 </div>
 
 <script>
-/* ══════════════════════════════════════════
-   CONFIGURACIÓN FIREBASE
-══════════════════════════════════════════ */
+/* ════════════════════════════════════════════════════════
+   🔧 CONFIGURACIÓN FIREBASE
+   ─── PEGA AQUÍ TU CONFIGURACIÓN DE FIREBASE ───────────
+   (Se explica en las instrucciones que vienen con el archivo)
+════════════════════════════════════════════════════════ */
 const firebaseConfig = {
   apiKey:            "AIzaSyBUhXyHA_pZu4YTXH0gMiYdfHO4B4sz25I",
   authDomain:        "agenda-ejecutiva-gjac.firebaseapp.com",
@@ -510,124 +424,226 @@ const firebaseConfig = {
   messagingSenderId: "611050030747",
   appId:             "1:611050030747:web:75659253e4c9e3ca7da83e"
 };
+/* ════════════════════════════════════════════════════════ */
 
-/* ══ CORREO ADMINISTRADOR ══ */
-const ADMIN_EMAIL = "direccionempresas2.sas@gmail.com";
-
-/* ══ VARIABLES GLOBALES ══ */
-let db, auth;
+/* ── ESTADO LOCAL ── */
 let tareas=[], papeleraData=[], archivadosA=[];
 let directorio=[], cuentas=[], correos=[];
-let esAdmin = false;
+let db;
 
-/* ══ SYNC BADGE ══ */
+/* ── SINCRONIZACIÓN (badge) ── */
 function syncStart(){let b=document.getElementById('syncBadge');b.className='syncing';document.getElementById('syncText').textContent='Guardando…';}
 function syncOk(){let b=document.getElementById('syncBadge');b.className='ok';document.getElementById('syncText').textContent='En línea';}
-function syncErr(){document.getElementById('syncBadge').className='';document.getElementById('syncText').textContent='Sin conexión';}
+function syncErr(){let b=document.getElementById('syncBadge');b.className='';b.style.borderColor='#7f1d1d';document.getElementById('syncText').textContent='Sin conexión';}
 
-/* ══ LOGIN ══ */
-function loginGoogle(){
-  const provider = new firebase.auth.GoogleAuthProvider();
-  auth.signInWithPopup(provider).catch(err=>{
-    alert('Error al iniciar sesión: '+err.message);
-  });
-}
-function cerrarSesion(){
-  auth.signOut().then(()=>{
-    document.getElementById('loginScreen').classList.add('show');
-    document.getElementById('globalNav').style.display='none';
-    document.getElementById('viewerScreen').classList.remove('show');
-    document.getElementById('syncBadge').style.display='none';
-  });
+/* ── LOADING ── */
+function setLoadMsg(msg){document.getElementById('loadMsg').textContent=msg;}
+function hideLoading(){document.getElementById('loadingScreen').classList.add('hidden');}
+function showLoadError(msg){
+  let e=document.getElementById('loadError');
+  e.style.display='block';
+  e.innerHTML=msg;
+  document.getElementById('loadMsg').style.display='none';
+  document.querySelector('.load-spinner').style.display='none';
 }
 
-/* ══ ROUTING SEGÚN ROL ══ */
-function mostrarAdmin(user){
-  esAdmin = true;
-  document.getElementById('loginScreen').classList.remove('show');
-  document.getElementById('viewerScreen').classList.remove('show');
-  document.getElementById('globalNav').style.display='flex';
-  document.getElementById('syncBadge').style.display='flex';
-  document.getElementById('adminUserName').textContent = user.displayName || user.email;
-  document.getElementById('fecha').valueAsDate = nowCO();
-  setupListeners();
+/* ════════ DATOS POR DEFECTO ════════ */
+const DIR_DEFAULT=[
+  {id:1,esp:"ORTOPEDISTA",nombre:"EDWIN MIGUEL TOVAR TORRES",tel:"6082747555",cel:"3046035555",ciudad:"IBAGUÉ",dir:"COMPLEJO MÉDICO LA SAMARIA",cons:"605",correo:"migueltovarortopedista@gmail.com",cita:"PROGRAMAR APROX. 10 Julio/2026"},
+  {id:2,esp:"CARDIÓLOGO",nombre:"ALEJANDRO MIGUEL SANTOS ZAVALA",tel:"6082798643",cel:"3165709731",ciudad:"IBAGUÉ",dir:"VÍA AEROPUERTO NUEVA CLÍNICA MEDICADIZ",cons:"204",correo:"dralejandrosantos@gmail.com",cita:"PROGRAMAR APROX. 24 Sept/2026"},
+  {id:3,esp:"BARIÁTRICO",nombre:"CARLOS FELIPE CHAUX MOSQUERA",tel:"6017033872",cel:"3126162182",ciudad:"BOGOTÁ",dir:"CALLE 83 No.16A-44 EDIFICIO CIMA",cons:"304 A",correo:"programacioncirugia@ucomcolombia.com",cita:"-"},
+  {id:4,esp:"OPTÓMETRA",nombre:"AGUSTIN VIDALLER NIETO",tel:"6012187077",cel:"",ciudad:"BOGOTÁ",dir:"AVENIDA 100 No.18a-51 CLÍNICA BARRAQUER",cons:"103",correo:"",cita:"-"},
+  {id:5,esp:"OFTALMÓLOGO",nombre:"LUIS MIGUEL SALAZAR AMATURE",tel:"6012187077",cel:"3188018671",ciudad:"BOGOTÁ",dir:"AVENIDA 100 No.18a-51 CLÍNICA BARRAQUER",cons:"322",correo:"LMSALAZARA@BARRAQUER.COM.CO",cita:"-"},
+  {id:6,esp:"REUMATÓLOGO",nombre:"SEBASTIAN MOLINA RIOS",tel:"6014824488",cel:"",ciudad:"BOGOTÁ",dir:"FUNDACIÓN SANTA FE BOGOTÁ · CALLE 119 # 7-80 PISO 3",cons:"305",correo:"",cita:"22 Abril/2026 a las 2:40PM"},
+  {id:7,esp:"URÓLOGO",nombre:"MAURICIO ANDRÉS LÓPEZ GUERRERO",tel:"6082596447",cel:"3168333134",ciudad:"IBAGUÉ",dir:"UROTOL - 3 PISO CLÍNICA MEDICADIZ VIA AEROPUERTO",cons:"",correo:"urotol@hotmail.com",cita:"PDTE HACERSE EXÁMENES"},
+  {id:8,esp:"NEURÓLOGO",nombre:"ORLANDO LÓPEZ CARVAJAL",tel:"6082771186",cel:"",ciudad:"IBAGUÉ",dir:"CRA 5 No.31-114 CADIZ",cons:"910",correo:"",cita:"PDTE PROGRAMAR CITA POLISOMNOGRAFÍA"},
+  {id:9,esp:"NEUROFISIOLOGÍA",nombre:"CENTRAL DE ESPECIALISTAS",tel:"",cel:"3161095388",ciudad:"IBAGUÉ",dir:"CRA 4BIS # 35-72 BRR CADIZ",cons:"1",correo:"atencion@centralespecialistascolombia.com",cita:""},
+  {id:10,esp:"NEUROFISIOLOGÍA",nombre:"FUNDACIÓN SANTA FE",tel:"6014824488",cel:"",ciudad:"BOGOTÁ",dir:"CALLE 119 # 7-14 PISO 2",cons:"1",correo:"",cita:"CITA POLISOMNOGRAFÍA 13 Mayo/2026 a las 8PM"},
+  {id:11,esp:"MEDICINA ESTÉTICA",nombre:"ANDREA DEL PILAR CARDONA OLMOS",tel:"6082632262",cel:"3102386611",ciudad:"IBAGUÉ",dir:"CALLE 6 No.5-82 BRR LA POLA",cons:"",correo:"ipsandreacardona@gmail.com",cita:"2 Mayo/2026 a las 10AM — (1)Sculptra + (2)Toxina Botulínica"},
+  {id:12,esp:"DERMATÓLOGA",nombre:"MONICA HERNANDEZ BULLA",tel:"",cel:"3178559081",ciudad:"IBAGUÉ",dir:"WORD TRADE CENTER, AQUA POWER CENTER, AV. GUABINAL #57-15",cons:"807",correo:"",cita:"-"},
+  {id:13,esp:"LABORATORIO CLÍNICO",nombre:"ANALICEMOS",tel:"6082772036",cel:"3219612486",ciudad:"IBAGUÉ",dir:"SEDE 1: CRA 4H No.34-83 | SEDE 2: CALLE 32 No.4K-27 | SEDE 3: TORRE MÉDICA MEDICADIZ CONS.909",cons:"-",correo:"recepcion@analicemoslaboratorio.com",cita:"-"},
+  {id:14,esp:"CHEQUEO EJECUTIVO",nombre:"CLÍNICA PABLO TOBÓN URIBE",tel:"6044459000",cel:"3147751125",ciudad:"MEDELLÍN",dir:"CL 78B No.69-240 PISO 7 - TORRE B CORDOBA",cons:"-",correo:"chequeos@hptu.org.co",cita:"-"},
+  {id:15,esp:"INTERNISTA",nombre:"ANTONIO JOSÉ OVIEDO LEONEL",tel:"",cel:"3102823544",ciudad:"IBAGUÉ",dir:"",cons:"",correo:"",cita:"-"},
+  {id:16,esp:"OFTALMÓLOGO",nombre:"PAOLO SOLANO LEAL",tel:"6082553855",cel:"3186912279",ciudad:"IBAGUÉ",dir:"CLÍNICA MEDICADIZ - NAZAR GRUPO OFTALMOLÓGICO",cons:"302",correo:"info@nazaroftalmologos.com",cita:"-"}
+];
+const CUENTAS_DEFAULT=[
+  {id:1,banco:"BANCOLOMBIA",num:"7973987644",tipo:"AHORROS",titular:"GERARDO JAVIER ALVARADO CUBILLOS",cc:"86059446"},
+  {id:2,banco:"BANCOLOMBIA",num:"079782612-34",tipo:"AHORROS",titular:"SARITA ALVARADO",cc:""},
+  {id:3,banco:"BANCOLOMBIA",num:"86948258562",tipo:"AHORROS",titular:"EDNA LORENA MURILLO RODRIGUEZ",cc:"38211759"},
+  {id:4,banco:"BANCOLOMBIA",num:"06881006039",tipo:"AHORROS",titular:"SANDRA LILIANA NIETO CASTRILLON",cc:"39565280"},
+  {id:5,banco:"NEQUI",num:"320 3770085",tipo:"DEP. ELECTRÓNICO",titular:"OLIVER LA TORRE CAPERA",cc:"12134257"},
+  {id:6,banco:"BANCOLOMBIA",num:"38341300581",tipo:"AHORROS",titular:"",cc:""},
+  {id:7,banco:"BANCOLOMBIA",num:"079000494-41",tipo:"AHORROS",titular:"DANNY FABIAN SALAZAR CAMACHO",cc:"1110525870"},
+  {id:8,banco:"BANCOLOMBIA",num:"29993077613",tipo:"AHORROS",titular:"SERGIO BODENSIEK",cc:"1026259624"},
+  {id:9,banco:"NEQUI",num:"3204612987",tipo:"DEP. ELECTRÓNICO",titular:"ARQUITECTO NICOLAS (JAIME FORERO)",cc:""},
+  {id:10,banco:"NEQUI",num:"3176635775",tipo:"DEP. ELECTRÓNICO",titular:"MANUEL POLLO (MANUEL CORREA)",cc:"86065449"}
+];
+const CORREOS_DEFAULT=[
+  {id:1,fecha:"2026-04-22",hora:"08:59",remitente:"DIRECCION EMPRESAS",email:"direccionempresas.sas@gmail.com",asunto:"REPORTE DIARIO DE SALDOS BANCARIOS 22/04/2026",nota:""},
+  {id:2,fecha:"2026-04-22",hora:"09:04",remitente:"NOTIFICACIONES MOVILGAS",email:"notificaciones@mileniumgas.com",asunto:"ACTA NO.45 JUNTA GENERAL ORDINARIA MOVILGAS LTDA 27 MARZO 2026",nota:""},
+  {id:3,fecha:"2026-04-22",hora:"09:11",remitente:"NOTIFICACIONES MOVILGAS",email:"notificaciones@mileniumgas.com",asunto:"ACTA NO.31 JUNTA GENERAL ORDINARIA MOVILGAS LTDA 28 MARZO 2026",nota:""},
+  {id:4,fecha:"2026-04-22",hora:"11:16",remitente:"LAURA CHALA",email:"subgerenciaeds@ksaval.com",asunto:"AUSENCIA LAURA CHALA MARTES DE 7AM A 11AM",nota:""},
+  {id:5,fecha:"2026-04-22",hora:"11:26",remitente:"CORPORACION COLEGIO SAN BONIFACION DE LAS LANZAS",email:"",asunto:"CORPORACION COLEGIO SAN BONIFACION DE LAS LANZAS",nota:""},
+  {id:6,fecha:"2026-04-22",hora:"13:35",remitente:"LAURA CHALA",email:"subgerenciaeds@ksaval.com",asunto:"BORRADOR ACTA N.4: ENVIO ESTADO DE PENDIENTES REUNION VIERNES 17",nota:""},
+  {id:7,fecha:"2026-04-22",hora:"15:00",remitente:"CORRESPONDENCIA",email:"correspondencia@millanyasociados.com",asunto:"29195 - KSAVAL INFORME SAGRILAFT Y PTEE 2025",nota:""},
+  {id:8,fecha:"2026-04-23",hora:"07:25",remitente:"HAROLD CASTRO CASTILLO",email:"haroldcastrocastillo@yahoo.com",asunto:"REVISION 2020-2024",nota:""},
+  {id:9,fecha:"2026-04-23",hora:"08:06",remitente:"SERGIO BODENSIEK",email:"sergiobodensiek12@gmail.com",asunto:"SOLICITUD REEMBOLSO GASTOS DE VIAJE",nota:""},
+  {id:10,fecha:"2026-04-23",hora:"08:45",remitente:"DIRECCION EMPRESAS",email:"direccionempresas.sas@gmail.com",asunto:"REPORTE DIARIO DE SALDOS BANCARIOS 23/04/2026",nota:""},
+  {id:11,fecha:"2026-04-23",hora:"09:14",remitente:"BANCOLOMBIA",email:"",asunto:"¡TOC-TOC! LLEGO TU EXTRACTO DEL MES (MARZO)",nota:""},
+  {id:12,fecha:"2026-04-23",hora:"15:01",remitente:"BANCOLOMBIA",email:"",asunto:"PAGA TU IMPUESTO PREDIAL",nota:"Se remite a gerente ksaval"},
+  {id:13,fecha:"2026-04-23",hora:"17:14",remitente:"MONICA SOFIA ALARCON ALARCON",email:"monica.alarcon@informacion.terpel.com",asunto:"REPORTE PAGOS A PROVEEDORES_20260423",nota:"Se remite a Yessica"},
+  {id:14,fecha:"2026-04-23",hora:"20:47",remitente:"LAURA CHALA",email:"subgerenciaeds@ksaval.com",asunto:"BORRADOR RENTA",nota:""},
+  {id:15,fecha:"2026-04-23",hora:"21:18",remitente:"LAURA CHALA",email:"subgerenciaeds@ksaval.com",asunto:"CERTIFICADO TRIBUTARIO 2025 GERARDO JAVIER ALVARADO",nota:"Se da a conocer a Andrea"},
+  {id:16,fecha:"2026-04-23",hora:"21:23",remitente:"LAURA CHALA",email:"subgerenciaeds@ksaval.com",asunto:"REPORTE DE VENTAS - K-SAVAL ABRRGY SAS",nota:""},
+  {id:17,fecha:"2026-04-23",hora:"23:00",remitente:"LAURA CHALA",email:"subgerenciaeds@ksaval.com",asunto:"VISITA EDS LAS MONEDAS MANUEL LARA",nota:""},
+  {id:18,fecha:"2026-04-23",hora:"23:10",remitente:"LAURA CHALA",email:"subgerenciaeds@ksaval.com",asunto:"CONSULTA TRATAMIENTO CONTABLE Y FISCAL - MOVIMIENTOS ACCIONISTA NO LEGALIZADOS",nota:""},
+  {id:19,fecha:"2026-04-24",hora:"09:02",remitente:"YESSICA",email:"direccionempresas.sas@gmail.com",asunto:"REPORTE DIARIO DE SALDOS BANCARIOS 24/04/2026",nota:""},
+  {id:20,fecha:"2026-04-26",hora:"17:17",remitente:"AVIANCA (e-ticket)",email:"eticket@avianca.com",asunto:"MONICA MARIA BOCANEGRA RICO, 03MAY/0905/ SAN ANDRES ISLAND",nota:"Pendiente respuesta Señora Monica"},
+  {id:21,fecha:"2026-04-26",hora:"17:18",remitente:"AVIANCA (e-ticket)",email:"eticket@avianca.com",asunto:"GERARDO JAVIER ALVARADO CUBILLOS, 03MAY/0905/SAN ANDRES ISLAND",nota:""},
+  {id:22,fecha:"2026-04-26",hora:"17:18",remitente:"AVIANCA",email:"",asunto:"GERARDO JAVIER ALVARADO CUBILLOS - DETALLES DE TU RESERVA ADZ - IBE",nota:""},
+  {id:23,fecha:"2026-04-26",hora:"20:09",remitente:"ANDREA ARIAS",email:"andreariasaquite@gmail.com",asunto:"INFORMACION ANGELICA - CONTRATO DE ACCIONES",nota:""},
+  {id:24,fecha:"2026-04-27",hora:"08:44",remitente:"FENALCO TOLIMA",email:"",asunto:"INVITACION EMPRESARIAL - JUEVES 30 ABRIL 2 A 5 PM AUDITORIO CAMARA DE COMERCIO IBAGUE",nota:"Informacion a Don Gerardo"},
+  {id:25,fecha:"2026-04-27",hora:"09:08",remitente:"BBVA",email:"",asunto:"ENVIO SOPORTES EXTRACTOS LEASING A LOS CLIENTES",nota:"Remitido a gerencia ksaval"},
+  {id:26,fecha:"2026-04-27",hora:"09:26",remitente:"LAURA CHALA",email:"subgerenciaeds@ksaval.com",asunto:"PAGA TU IMPUESTO PREDIAL - No hay vehiculos en Ibague, ya se pago impuestos vehiculos e ICA",nota:""},
+  {id:27,fecha:"2026-04-27",hora:"09:26",remitente:"LAURA CHALA",email:"subgerenciaeds@ksaval.com",asunto:"REUNION ENER 27/04/2025",nota:""},
+  {id:28,fecha:"2026-04-27",hora:"11:23",remitente:"ENERGY FALCON",email:"falconenergy7@gmail.com",asunto:"ORDEN DE FACTURACION CONTRATO 33214 CLIENTE K-SAVAL ENERGY SAS",nota:""},
+  {id:29,fecha:"2026-04-27",hora:"11:25",remitente:"EDER MAURICIO RUGELES SERRATO",email:"eder.rugeles@terpel.com",asunto:"COMUNICADO GESTION CONTROL FLOTA",nota:"Remitido a gerencia ksaval"},
+  {id:30,fecha:"2026-04-27",hora:"12:13",remitente:"EDER MAURICIO RUGELES SERRATO",email:"eder.rugeles@terpel.com",asunto:"FICHA DE DATOS DE SEGURIDAD COMBUSTIBLE",nota:"Remitido a gerencia ksaval"},
+  {id:31,fecha:"2026-04-27",hora:"12:32",remitente:"MARITZA LORENA COLORADO BARAJAS",email:"lorena.colorado@inalde.edu.co",asunto:"INALDE - DIRECTORIO PROGRAMA ENFOCADO EN JUNTAS DIRECTIVAS",nota:"Informacion a Don Gerardo"},
+  {id:32,fecha:"2026-04-27",hora:"14:21",remitente:"LAURA CHALA",email:"subgerenciaeds@ksaval.com",asunto:"INFORMACION ENEL REUNION 27/04/2026",nota:""},
+  {id:33,fecha:"2026-04-27",hora:"14:55",remitente:"LAURA CHALA",email:"subgerenciaeds@ksaval.com",asunto:"BORRADOR ACTA JUSTIFICACION DE INGRESOS 2025",nota:""},
+  {id:34,fecha:"2026-04-28",hora:"05:08",remitente:"EDES MAURICIO RUGELES SERRATO",email:"eder.rugeles@terpel.com",asunto:"SIGNIFICADO CERTIFICACION ICONTEC EN MEDIDA Y CALIDAD",nota:""},
+  {id:35,fecha:"2026-04-28",hora:"08:42",remitente:"DIRECCION EMPRESAS",email:"direccionempresas.sas@gmail.com",asunto:"REPORTE DIARIO DE SALDOS BANCARIOS 28/04/2026",nota:""},
+  {id:36,fecha:"2026-04-28",hora:"09:04",remitente:"COMUNICACIONES SANBONI",email:"mensajeria2@sanboni.edu.co",asunto:"PROCESO DE ADMISION 2027 - INICIO DE INSCRIPCIONES Y CARACTERIZACION",nota:""},
+  {id:37,fecha:"2026-04-28",hora:"09:42",remitente:"LAURA CHALA",email:"subgerenciaeds@ksaval.com",asunto:"RE: BORRADOR RENTA",nota:""},
+  {id:38,fecha:"2026-04-28",hora:"11:28",remitente:"BLANCA INCER CASALLAS",email:"blanca.casallas@amarilo.com",asunto:"INCUMPLIMIENTO CIERRE FINANCIERO (AMARILO)",nota:""},
+  {id:39,fecha:"2026-04-28",hora:"12:02",remitente:"CORPORACION COLEGIO SAN BONIFACION DE LAS LANZAS",email:"",asunto:"CORPORACION COLEGIO SAN BONIFACION DE LAS LANZAS (PENSION)",nota:"Informacion a Don Gerardo"},
+  {id:40,fecha:"2026-04-28",hora:"12:02",remitente:"CORPORACION COLEGIO SAN BONIFACION DE LAS LANZAS",email:"",asunto:"CORPORACION COLEGIO SAN BONIFACION DE LAS LANZAS (SERVICIO ALIMENTACION)",nota:"Informacion a Don Gerardo"},
+  {id:41,fecha:"2026-04-28",hora:"17:24",remitente:"EDES MAURICIO RUGELES SERRATO",email:"eder.rugeles@terpel.com",asunto:"RV: BOLETIN N.96 EL CASO DE LOS 999 GALONES",nota:""},
+  {id:42,fecha:"2026-04-29",hora:"09:19",remitente:"BBVA",email:"",asunto:"ENVIO SOPORTES EXTRACTOS LEASING A LOS CLIENTES",nota:""},
+  {id:43,fecha:"2026-04-29",hora:"09:29",remitente:"DIRECCION EMPRESAS",email:"direccionempresas.sas@gmail.com",asunto:"REPORTE DIARIO DE SALDOS BANCARIOS 29/04/2026",nota:""},
+  {id:44,fecha:"2026-04-29",hora:"09:38",remitente:"DIRECCION EMPRESAS",email:"direccionempresas.sas@gmail.com",asunto:"DEBITO CUENTA CORRIENTE BANCOLOMBIA 068-764422-91",nota:""},
+  {id:45,fecha:"2026-04-29",hora:"13:19",remitente:"LUCIO ANDRES ORDOÑEZ",email:"lucio.ordonez.ext@terpel.com",asunto:"VENTANA DE MANTENIMIENTO CONEXIÓN WIFI",nota:""},
+  {id:46,fecha:"2026-04-29",hora:"14:07",remitente:"CUENTAS POR COBRAR",email:"pagos.combustibles@primax.com.co",asunto:"GESTION DE COBRO PRE-CIERRE DE MES",nota:""},
+  {id:47,fecha:"2026-04-29",hora:"14:16",remitente:"CUENTAS POR COBRAR",email:"pagos.combustibles@primax.com.co",asunto:"GESTION PREVENTIVA - ESTADO DE CUENTA",nota:""},
+  {id:48,fecha:"2026-04-29",hora:"14:47",remitente:"BANCOLOMBIA",email:"",asunto:"CORREGIMOS EL PLAZO DE TU AMPLIACION CON TARJETA DE CREDITO",nota:""}
+];
+
+/* ════════ FIREBASE SAVE ════════ */
+function saveA(){
+  syncStart();
+  db.collection('gjac').doc('agendaState')
+    .set({tareas,papelera:papeleraData,archivados:archivadosA})
+    .then(syncOk).catch(syncErr);
+}
+function saveDir(){
+  syncStart();
+  db.collection('gjac').doc('directorio')
+    .set({items:directorio}).then(syncOk).catch(syncErr);
+}
+function saveCuentas(){
+  syncStart();
+  db.collection('gjac').doc('cuentas')
+    .set({items:cuentas}).then(syncOk).catch(syncErr);
+}
+function saveCorreos(){
+  syncStart();
+  db.collection('gjac').doc('correos')
+    .set({items:correos}).then(syncOk).catch(syncErr);
 }
 
-function mostrarViewer(user){
-  esAdmin = false;
-  document.getElementById('loginScreen').classList.remove('show');
-  document.getElementById('globalNav').style.display='none';
-  document.getElementById('syncBadge').style.display='flex';
-  document.getElementById('viewerScreen').classList.add('show');
-  document.getElementById('viewerUserName').textContent = user.displayName || user.email;
-  setupViewerListener();
-}
-
-/* ══ FIREBASE INIT ══ */
-async function initApp(){
-  firebase.initializeApp(firebaseConfig);
-  db = firebase.firestore();
-  auth = firebase.auth();
-
-  // Seed data si es primera vez
-  const agendaDoc = await db.collection('gjac').doc('agendaState').get();
-  if(!agendaDoc.exists){
-    await Promise.all([
-      db.collection('gjac').doc('agendaState').set({tareas:[],papelera:[],archivados:[]}),
-      db.collection('gjac').doc('directorio').set({items:DIR_DEFAULT}),
-      db.collection('gjac').doc('cuentas').set({items:CUENTAS_DEFAULT}),
-      db.collection('gjac').doc('correos').set({items:CORREOS_DEFAULT}),
-    ]);
-  }
-
-  // Escuchar cambios de autenticación
-  auth.onAuthStateChanged(user=>{
-    document.getElementById('loadingScreen').classList.add('hidden');
-    if(!user){
-      document.getElementById('loginScreen').classList.add('show');
-      document.getElementById('syncBadge').style.display='none';
-    } else if(user.email === ADMIN_EMAIL){
-      mostrarAdmin(user);
-    } else {
-      mostrarViewer(user);
-    }
-  });
-}
-
-/* ══ LISTENERS TIEMPO REAL ══ */
+/* ════════ LISTENERS EN TIEMPO REAL ════════ */
 function setupListeners(){
+  // Agenda (tareas + papelera + archivados)
   db.collection('gjac').doc('agendaState').onSnapshot(doc=>{
-    if(doc.exists){const d=doc.data();tareas=d.tareas||[];papeleraData=d.papelera||[];archivadosA=d.archivados||[];}
+    if(doc.exists){
+      const d=doc.data();
+      tareas=d.tareas||[];
+      papeleraData=d.papelera||[];
+      archivadosA=d.archivados||[];
+    }
+    hideLoading();
     render();
-  },()=>syncErr());
+  }, err=>{console.error(err);syncErr();});
+
+  // Directorio
   db.collection('gjac').doc('directorio').onSnapshot(doc=>{
     directorio=doc.exists?(doc.data().items||[]):[];
     if(document.getElementById('page-directorio').classList.contains('active'))renderDir();
   });
+
+  // Cuentas
   db.collection('gjac').doc('cuentas').onSnapshot(doc=>{
     cuentas=doc.exists?(doc.data().items||[]):[];
     if(document.getElementById('page-cuentas').classList.contains('active'))renderCuentas();
   });
+
+  // Correos
   db.collection('gjac').doc('correos').onSnapshot(doc=>{
     correos=doc.exists?(doc.data().items||[]):[];
     if(document.getElementById('page-correo').classList.contains('active'))renderCorreo();
   });
 }
 
-function setupViewerListener(){
-  db.collection('gjac').doc('agendaState').onSnapshot(doc=>{
-    if(doc.exists){const d=doc.data();tareas=d.tareas||[];papeleraData=d.papelera||[];archivadosA=d.archivados||[];}
-    renderViewer();
-  },()=>syncErr());
+/* ════════ INICIALIZACIÓN ════════ */
+async function initApp(){
+  // Verificar si el usuario configuró Firebase
+  if(firebaseConfig.apiKey==='PEGA_AQUI_TU_apiKey'){
+    showLoadError(`
+      ⚠️ Falta configurar Firebase.<br><br>
+      Sigue las instrucciones del documento <strong>INSTRUCCIONES.txt</strong>
+      que viene junto con este archivo, luego abre el archivo en un editor de texto,
+      busca la sección <code>CONFIGURACIÓN FIREBASE</code> y pega tus datos ahí.
+    `);
+    return;
+  }
+
+  try{
+    firebase.initializeApp(firebaseConfig);
+    db=firebase.firestore();
+
+    setLoadMsg('Revisando base de datos…');
+
+    // Primera vez: poblar con datos por defecto
+    const agendaDoc=await db.collection('gjac').doc('agendaState').get();
+    if(!agendaDoc.exists){
+      setLoadMsg('Primera vez: cargando datos…');
+      await Promise.all([
+        db.collection('gjac').doc('agendaState').set({tareas:[],papelera:[],archivados:[]}),
+        db.collection('gjac').doc('directorio').set({items:DIR_DEFAULT}),
+        db.collection('gjac').doc('cuentas').set({items:CUENTAS_DEFAULT}),
+        db.collection('gjac').doc('correos').set({items:CORREOS_DEFAULT}),
+      ]);
+    }
+
+    // Migrar datos viejos de localStorage si existen
+    const oldTareas=localStorage.getItem('tareas');
+    if(oldTareas&&JSON.parse(oldTareas).length>0&&!agendaDoc.exists){
+      try{
+        const t=JSON.parse(oldTareas||'[]');
+        const p=JSON.parse(localStorage.getItem('papelera')||'[]');
+        const a=JSON.parse(localStorage.getItem('archivados')||'[]');
+        if(t.length>0){
+          await db.collection('gjac').doc('agendaState').set({tareas:t,papelera:p,archivados:a});
+        }
+      }catch(e){console.log('No hay datos locales para migrar');}
+    }
+
+    setLoadMsg('Conectando en tiempo real…');
+    setupListeners();
+    document.getElementById('fecha').valueAsDate=nowCO();
+
+  }catch(err){
+    showLoadError(`
+      ❌ Error al conectar con Firebase.<br><br>
+      Revisa que los datos de configuración estén bien copiados.<br>
+      Error técnico: <code>${err.message}</code>
+    `);
+    console.error(err);
+  }
 }
 
-/* ══ GUARDAR FIREBASE ══ */
-function saveA(){syncStart();db.collection('gjac').doc('agendaState').set({tareas,papelera:papeleraData,archivados:archivadosA}).then(syncOk).catch(syncErr);}
-function saveDir(){syncStart();db.collection('gjac').doc('directorio').set({items:directorio}).then(syncOk).catch(syncErr);}
-function saveCuentas(){syncStart();db.collection('gjac').doc('cuentas').set({items:cuentas}).then(syncOk).catch(syncErr);}
-function saveCorreos(){syncStart();db.collection('gjac').doc('correos').set({items:correos}).then(syncOk).catch(syncErr);}
-
-/* ══ NAV ══ */
+/* ════════ NAV ════════ */
 function showPage(name,btn){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
@@ -638,177 +654,173 @@ function showPage(name,btn){
   if(name==='correo')renderCorreo();
 }
 
-/* ══ VIEWER (solo lectura) ══ */
-function limpiarVw(){['vwDesde','vwHasta','vwNombre'].forEach(id=>document.getElementById(id).value='');renderViewer();}
-function cerrarPendienteViewer(id){
-  // El viewer también puede cerrar pendientes
-  let t=tareas.find(x=>x.id===id);if(!t)return;
-  archivadosA.push({...t,done:true});tareas=tareas.filter(x=>x.id!==id);
-  saveA();renderViewer();
-}
-function renderViewer(){
-  let desde=document.getElementById('vwDesde').value;
-  let hasta=document.getElementById('vwHasta').value;
-  let nombre=document.getElementById('vwNombre').value.toLowerCase().trim();
-  let data=tareas.filter(t=>{
-    if(nombre&&!(t.persona||'').toLowerCase().includes(nombre)&&!t.tema.toLowerCase().includes(nombre))return false;
-    if(desde&&t.fecha<desde)return false;
-    if(hasta&&t.fecha>hasta)return false;
-    return true;
-  }).sort((a,b)=>a.fecha===b.fecha?a.hora.localeCompare(b.hora):a.fecha.localeCompare(b.fecha));
-  let prior=data.filter(t=>t.prioridad==='prioritario').length;
-  let imp=data.filter(t=>t.prioridad==='importante').length;
-  let seg=data.filter(t=>t.prioridad==='seguimiento').length;
-  document.getElementById('vwKpis').innerHTML=`
-    <div class="vw-kpi"><div class="vw-kpi-val" style="color:#e5e7eb;">${data.length}</div><div class="vw-kpi-lbl">Total</div></div>
-    <div class="vw-kpi"><div class="vw-kpi-val kpi-red">${prior}</div><div class="vw-kpi-lbl">Prioritarios</div></div>
-    <div class="vw-kpi"><div class="vw-kpi-val kpi-amber">${imp}</div><div class="vw-kpi-lbl">Importantes</div></div>
-    <div class="vw-kpi"><div class="vw-kpi-val kpi-blue">${seg}</div><div class="vw-kpi-lbl">Seguimiento</div></div>`;
-  document.getElementById('vwTitle').textContent=`PENDIENTES ACTIVOS — ${data.length} resultado${data.length!==1?'s':''}`;
-  let lista=document.getElementById('vwLista');lista.innerHTML='';
-  if(!data.length){lista.innerHTML='<div class="vw-empty">✅ No hay pendientes activos.</div>';return;}
-  data.forEach(t=>{
-    let[y,m,d]=t.fecha.split('-');
-    let fl=new Date(y,m-1,d).toLocaleDateString('es-CO',{weekday:'short',day:'numeric',month:'short'});
-    let card=document.createElement('div');card.className=`vw-card e-${t.prioridad}`;
-    card.innerHTML=`
-      <div><div class="vw-time">${t.hora}</div><div class="vw-time-date">${fl}</div></div>
-      <div>
-        <div class="vw-persona">${t.persona||'—'}</div>
-        <div class="vw-tema">${t.tema}</div>
-        <span class="vw-badge e-badge-${t.prioridad}">${t.prioridad}</span>
-        ${t.observacion?`<div class="vw-obs">💬 ${t.observacion}</div>`:''}
-      </div>
-      <div><button class="vw-close-btn" onclick="cerrarPendienteViewer(${t.id})">✔ Cerrar</button></div>`;
-    lista.appendChild(card);
-  });
-}
-
-/* ══ AGENDA (admin) ══ */
-function nowCO(){return new Date(new Date().toLocaleString('en-US',{timeZone:'America/Bogota'}));}
-function format(d){return d.toISOString().split('T')[0];}
+/* ════════ AGENDA ════════ */
+function nowCO(){return new Date(new Date().toLocaleString("en-US",{timeZone:"America/Bogota"}));}
+function format(d){return d.toISOString().split("T")[0];}
 function guardar(){
-  let fecha=document.getElementById('fecha').value,hora=document.getElementById('hora').value,persona=document.getElementById('persona').value.trim(),tema=document.getElementById('tema').value.trim(),prioridad=document.getElementById('prioridad').value,obs=document.getElementById('observacion').value.trim();
-  if(!fecha||!hora||!tema){alert('Completa fecha, hora y tema');return;}
+  let fecha=document.getElementById("fecha").value,hora=document.getElementById("hora").value,persona=document.getElementById("persona").value.trim(),tema=document.getElementById("tema").value.trim(),prioridad=document.getElementById("prioridad").value,obs=document.getElementById("observacion").value.trim();
+  if(!fecha||!hora||!tema){alert("Completa fecha, hora y tema");return;}
   tareas.push({id:Date.now(),fecha,hora,persona,tema,prioridad,observacion:obs,done:false});
-  document.getElementById('fecha').valueAsDate=nowCO();
-  ['hora','persona','tema','observacion'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('prioridad').value='prioritario';
+  document.getElementById("fecha").valueAsDate=nowCO();
+  ["hora","persona","tema","observacion"].forEach(id=>document.getElementById(id).value="");
+  document.getElementById("prioridad").value="prioritario";
   saveA();render();
 }
-function editar(t){document.getElementById('editId').value=t.id;document.getElementById('editFecha').value=t.fecha;document.getElementById('editHora').value=t.hora;document.getElementById('editPersona').value=t.persona||'';document.getElementById('editTema').value=t.tema;document.getElementById('editObservacion').value=t.observacion||'';document.getElementById('editPrioridad').value=t.prioridad;document.getElementById('modalEditar').classList.add('open');}
-function cerrarModalEditar(){document.getElementById('modalEditar').classList.remove('open');}
-function guardarEdicion(){let id=Number(document.getElementById('editId').value),fecha=document.getElementById('editFecha').value,hora=document.getElementById('editHora').value,persona=document.getElementById('editPersona').value.trim(),tema=document.getElementById('editTema').value.trim(),obs=document.getElementById('editObservacion').value.trim(),prioridad=document.getElementById('editPrioridad').value;if(!fecha||!hora||!tema){alert('Completa fecha, hora y tema');return;}tareas=tareas.map(t=>t.id===id?{...t,fecha,hora,persona,tema,observacion:obs,prioridad}:t);cerrarModalEditar();saveA();render();}
-document.getElementById('modalEditar').addEventListener('click',function(e){if(e.target===this)cerrarModalEditar();});
+function editar(t){document.getElementById("editId").value=t.id;document.getElementById("editFecha").value=t.fecha;document.getElementById("editHora").value=t.hora;document.getElementById("editPersona").value=t.persona||"";document.getElementById("editTema").value=t.tema;document.getElementById("editObservacion").value=t.observacion||"";document.getElementById("editPrioridad").value=t.prioridad;document.getElementById("modalEditar").classList.add("open");}
+function cerrarModalEditar(){document.getElementById("modalEditar").classList.remove("open");}
+function guardarEdicion(){let id=Number(document.getElementById("editId").value),fecha=document.getElementById("editFecha").value,hora=document.getElementById("editHora").value,persona=document.getElementById("editPersona").value.trim(),tema=document.getElementById("editTema").value.trim(),obs=document.getElementById("editObservacion").value.trim(),prioridad=document.getElementById("editPrioridad").value;if(!fecha||!hora||!tema){alert("Completa fecha, hora y tema");return;}tareas=tareas.map(t=>t.id===id?{...t,fecha,hora,persona,tema,observacion:obs,prioridad}:t);cerrarModalEditar();saveA();render();}
+document.getElementById("modalEditar").addEventListener("click",function(e){if(e.target===this)cerrarModalEditar();});
 function toggleDone(id){let t=tareas.find(x=>x.id===id);if(t){archivadosA.push({...t,done:true});tareas=tareas.filter(x=>x.id!==id);saveA();render();}}
 function eliminar(id){let t=tareas.find(x=>x.id===id);if(t){papeleraData.push(t);tareas=tareas.filter(x=>x.id!==id);saveA();render();}}
 function restaurar(id){let t=papeleraData.find(x=>x.id===id);if(t){tareas.push(t);papeleraData=papeleraData.filter(x=>x.id!==id);saveA();render();}}
-function vaciarPapelera(){if(confirm('¿Vaciar papelera?')){papeleraData.splice(0);saveA();render();}}
+function vaciarPapelera(){if(confirm("¿Vaciar papelera?")){papeleraData.splice(0);saveA();render();}}
 function desarchivar(id){let t=archivadosA.find(x=>x.id===id);if(t){t.done=false;tareas.push(t);archivadosA=archivadosA.filter(x=>x.id!==id);saveA();render();}}
-function verObs(id){let t=tareas.find(x=>x.id===id)||archivadosA.find(x=>x.id===id);if(!t||!t.observacion)return;document.getElementById('contenidoObs').innerText=t.observacion;document.getElementById('modalObs').classList.add('open');}
-function cerrarObs(){document.getElementById('modalObs').classList.remove('open');}
-function toggleArchivados(){let el=document.getElementById('archivados'),a=document.getElementById('arrowArchivados');el.style.display=el.style.display==='none'?'block':'none';a.innerText=el.style.display==='none'?'⬇️':'⬆️';}
-function togglePapelera(){let el=document.getElementById('papelera'),a=document.getElementById('arrowPapelera');el.style.display=el.style.display==='none'?'block':'none';a.innerText=el.style.display==='none'?'⬇️':'⬆️';}
-function exportarWhatsApp(){let fecha=document.getElementById('buscarFecha').value;if(!fecha){alert('Selecciona una fecha');return;}let lista=tareas.filter(t=>t.fecha===fecha);if(!lista.length){alert('No hay tareas para esa fecha');return;}let txt='📅 Agenda del día\n\n';lista.forEach(t=>{txt+=`• ${t.hora} - ${t.persona||''}\n${t.tema}\n(${t.prioridad})\n\n`;});window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank');}
-function cardHTML(t){return `<strong>${t.hora}</strong> — ${t.persona||''}<br>${t.tema}<br>📅 ${t.fecha}<br><span class="badge bad-${t.prioridad}">${t.prioridad.toUpperCase()}</span><br><div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;"><button onclick="toggleDone(${t.id})">✔</button><button class="edit" onclick='editar(${JSON.stringify(t)})'>✏️ Editar</button><button class="delete" onclick="eliminar(${t.id})">🗑</button><button onclick="verObs(${t.id})" ${t.observacion?'':'disabled'}>📝 Obs</button></div>`;}
+function verObs(id){let t=tareas.find(x=>x.id===id)||archivadosA.find(x=>x.id===id);if(!t||!t.observacion)return;document.getElementById("contenidoObs").innerText=t.observacion;document.getElementById("modalObs").classList.add("open");}
+function cerrarObs(){document.getElementById("modalObs").classList.remove("open");}
+function toggleArchivados(){let el=document.getElementById("archivados"),a=document.getElementById("arrowArchivados");el.style.display=el.style.display==="none"?"block":"none";a.innerText=el.style.display==="none"?"⬇️":"⬆️";}
+function togglePapelera(){let el=document.getElementById("papelera"),a=document.getElementById("arrowPapelera");el.style.display=el.style.display==="none"?"block":"none";a.innerText=el.style.display==="none"?"⬇️":"⬆️";}
+function exportarWhatsApp(){let fecha=document.getElementById("buscarFecha").value;if(!fecha){alert("Selecciona una fecha");return;}let lista=tareas.filter(t=>t.fecha===fecha);if(!lista.length){alert("No hay tareas para esa fecha");return;}let txt="📅 Agenda del día\n\n";lista.forEach(t=>{txt+=`• ${t.hora} - ${t.persona||""}\n${t.tema}\n(${t.prioridad})\n\n`;});window.open("https://wa.me/?text="+encodeURIComponent(txt),"_blank");}
+function cardHTML(t){return `<strong>${t.hora}</strong> — ${t.persona||""}<br>${t.tema}<br>📅 ${t.fecha}<br><span class="badge bad-${t.prioridad}">${t.prioridad.toUpperCase()}</span><br><div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;"><button onclick="toggleDone(${t.id})">✔</button><button class="edit" onclick='editar(${JSON.stringify(t)})'>✏️ Editar</button><button class="delete" onclick="eliminar(${t.id})">🗑</button><button onclick="verObs(${t.id})" ${t.observacion?"":"disabled"}>📝 Obs</button></div>`;}
 function render(){
-  let texto=document.getElementById('buscarTexto').value.toLowerCase(),fechaFiltro=document.getElementById('buscarFecha').value;
-  let headers=document.querySelectorAll('.acenter h3');
-  if(!fechaFiltro&&headers.length>=3){headers[0].innerText='📌 Hoy';headers[1].innerText='📆 Mañana';headers[2].innerText='⏳ Atrasados';}
+  let texto=document.getElementById("buscarTexto").value.toLowerCase(),fechaFiltro=document.getElementById("buscarFecha").value;
+  let headers=document.querySelectorAll(".acenter h3");
+  if(!fechaFiltro&&headers.length>=3){headers[0].innerText="📌 Hoy";headers[1].innerText="📆 Mañana";headers[2].innerText="⏳ Atrasados";}
   let now=nowCO(),hoy=format(now),md=new Date(now);md.setDate(md.getDate()+1);let manana=format(md);
   let mesActual=now.getMonth(),añoActual=now.getFullYear();
-  ['hoy','manana','atrasados','mes','meses','papelera','archivados'].forEach(id=>document.getElementById(id).innerHTML='');
-  let data=tareas.filter(t=>(!texto||(t.persona||'').toLowerCase().includes(texto)||t.tema.toLowerCase().includes(texto))&&(!fechaFiltro||t.fecha===fechaFiltro));
-  if(fechaFiltro){if(headers.length)headers[0].innerText='📅 '+fechaFiltro;let items=[];data.forEach(t=>{let[y,m,d]=t.fecha.split('-');let div=document.createElement('div');div.className='task '+t.prioridad+(t.done?' done':'');div.innerHTML=cardHTML(t);items.push({fechaT:new Date(y,m-1,d),hora:t.hora,el:div});});items.sort((a,b)=>a.fechaT-b.fechaT||a.hora.localeCompare(b.hora));items.forEach(i=>document.getElementById('hoy').appendChild(i.el));renderMetricas(data);return;}
+  ["hoy","manana","atrasados","mes","meses","papelera","archivados"].forEach(id=>document.getElementById(id).innerHTML="");
+  let data=tareas.filter(t=>(!texto||(t.persona||"").toLowerCase().includes(texto)||t.tema.toLowerCase().includes(texto))&&(!fechaFiltro||t.fecha===fechaFiltro));
+  if(fechaFiltro){if(headers.length)headers[0].innerText="📅 "+fechaFiltro;let items=[];data.forEach(t=>{let[y,m,d]=t.fecha.split("-");let div=document.createElement("div");div.className="task "+t.prioridad+(t.done?" done":"");div.innerHTML=cardHTML(t);items.push({fechaT:new Date(y,m-1,d),hora:t.hora,el:div});});items.sort((a,b)=>a.fechaT-b.fechaT||a.hora.localeCompare(b.hora));items.forEach(i=>document.getElementById("hoy").appendChild(i.el));renderMetricas(data);return;}
   let hoyI=[],manI=[],atrI=[],mesI=[],meses={},total=0,done=0;
-  data.forEach(t=>{total++;if(t.done)done++;let[y,m,d]=t.fecha.split('-');let ft=new Date(y,m-1,d);let div=document.createElement('div');div.className='task '+t.prioridad+(t.done?' done':'');div.innerHTML=cardHTML(t);
-    if(t.fecha===hoy)hoyI.push({fechaT:ft,hora:t.hora,el:div});else if(t.fecha===manana)manI.push({fechaT:ft,hora:t.hora,el:div});else if(ft<now)atrI.push({fechaT:ft,hora:t.hora,el:div});else if(ft.getMonth()===mesActual&&ft.getFullYear()===añoActual)mesI.push({fechaT:ft,hora:t.hora,el:div});else{let k=ft.getFullYear()+'-'+ft.getMonth();if(!meses[k])meses[k]={fecha:ft,items:[]};meses[k].items.push({fechaT:ft,hora:t.hora,el:div});}
+  data.forEach(t=>{total++;if(t.done)done++;let[y,m,d]=t.fecha.split("-");let ft=new Date(y,m-1,d);let div=document.createElement("div");div.className="task "+t.prioridad+(t.done?" done":"");div.innerHTML=cardHTML(t);
+    if(t.fecha===hoy)hoyI.push({fechaT:ft,hora:t.hora,el:div});else if(t.fecha===manana)manI.push({fechaT:ft,hora:t.hora,el:div});else if(ft<now)atrI.push({fechaT:ft,hora:t.hora,el:div});else if(ft.getMonth()===mesActual&&ft.getFullYear()===añoActual)mesI.push({fechaT:ft,hora:t.hora,el:div});else{let k=ft.getFullYear()+"-"+ft.getMonth();if(!meses[k])meses[k]={fecha:ft,items:[]};meses[k].items.push({fechaT:ft,hora:t.hora,el:div});}
   });
   let srt=arr=>arr.sort((a,b)=>a.fechaT-b.fechaT||a.hora.localeCompare(b.hora));
-  srt(hoyI).forEach(i=>document.getElementById('hoy').appendChild(i.el));srt(manI).forEach(i=>document.getElementById('manana').appendChild(i.el));srt(atrI).forEach(i=>document.getElementById('atrasados').appendChild(i.el));srt(mesI).forEach(i=>document.getElementById('mes').appendChild(i.el));
-  Object.values(meses).sort((a,b)=>a.fecha-b.fecha).forEach(g=>{let t2=document.createElement('div');t2.innerHTML=`<strong style="color:#60a5fa;">📅 ${g.fecha.toLocaleString('es',{month:'long',year:'numeric'})}</strong>`;document.getElementById('meses').appendChild(t2);srt(g.items).forEach(o=>document.getElementById('meses').appendChild(o.el));});
-  archivadosA.forEach(t=>{let div=document.createElement('div');div.className='task done';div.innerHTML=`${t.fecha} - ${t.tema}<br><button onclick="desarchivar(${t.id})">↩ Desarchivar</button>`;document.getElementById('archivados').appendChild(div);});
-  papeleraData.forEach(t=>{let div=document.createElement('div');div.className='task';div.innerHTML=`${t.fecha} - ${t.tema}<br><button class="restore" onclick="restaurar(${t.id})">Recuperar</button>`;document.getElementById('papelera').appendChild(div);});
+  srt(hoyI).forEach(i=>document.getElementById("hoy").appendChild(i.el));srt(manI).forEach(i=>document.getElementById("manana").appendChild(i.el));srt(atrI).forEach(i=>document.getElementById("atrasados").appendChild(i.el));srt(mesI).forEach(i=>document.getElementById("mes").appendChild(i.el));
+  Object.values(meses).sort((a,b)=>a.fecha-b.fecha).forEach(g=>{let t2=document.createElement("div");t2.innerHTML=`<strong style="color:#60a5fa;">📅 ${g.fecha.toLocaleString('es',{month:'long',year:'numeric'})}</strong>`;document.getElementById("meses").appendChild(t2);srt(g.items).forEach(o=>document.getElementById("meses").appendChild(o.el));});
+  archivadosA.forEach(t=>{let div=document.createElement("div");div.className="task done";div.innerHTML=`${t.fecha} - ${t.tema}<br><button onclick="desarchivar(${t.id})">↩ Desarchivar</button>`;document.getElementById("archivados").appendChild(div);});
+  papeleraData.forEach(t=>{let div=document.createElement("div");div.className="task";div.innerHTML=`${t.fecha} - ${t.tema}<br><button class="restore" onclick="restaurar(${t.id})">Recuperar</button>`;document.getElementById("papelera").appendChild(div);});
   renderMetricas({length:total,done});
 }
-function renderMetricas(data){let total=Array.isArray(data)?data.length:data.length||0,done=Array.isArray(data)?data.filter(t=>t.done).length:data.done||0,pct=total?Math.round(done/total*100):0;document.getElementById('metricas').innerHTML=`<div>📊 Total: <strong>${total}</strong></div><div style="margin-top:5px;">✅ Cumplimiento: <strong>${pct}%</strong></div>`;}
-function abrirVistaEjecutiva(){document.getElementById('vistaEjecutiva').classList.add('open');renderExec();}
-function cerrarVistaEjecutiva(){document.getElementById('vistaEjecutiva').classList.remove('open');}
-function limpiarFiltrosExec(){['execFechaDesde','execFechaHasta','execBuscarNombre'].forEach(id=>document.getElementById(id).value='');renderExec();}
+function renderMetricas(data){let total=Array.isArray(data)?data.length:data.length||0,done=Array.isArray(data)?data.filter(t=>t.done).length:data.done||0,pct=total?Math.round(done/total*100):0;document.getElementById("metricas").innerHTML=`<div>📊 Total: <strong>${total}</strong></div><div style="margin-top:5px;">✅ Cumplimiento: <strong>${pct}%</strong></div>`;}
+function abrirVistaEjecutiva(){document.getElementById("vistaEjecutiva").classList.add("open");renderExec();}
+function cerrarVistaEjecutiva(){document.getElementById("vistaEjecutiva").classList.remove("open");}
+function limpiarFiltrosExec(){["execFechaDesde","execFechaHasta","execBuscarNombre"].forEach(id=>document.getElementById(id).value="");renderExec();}
 function cerrarPendienteExec(id){let t=tareas.find(x=>x.id===id);if(!t)return;archivadosA.push({...t,done:true});tareas=tareas.filter(x=>x.id!==id);saveA();render();renderExec();}
 function renderExec(){
-  let desde=document.getElementById('execFechaDesde').value,hasta=document.getElementById('execFechaHasta').value,nombre=document.getElementById('execBuscarNombre').value.toLowerCase().trim();
-  let data=tareas.filter(t=>{if(nombre&&!(t.persona||'').toLowerCase().includes(nombre)&&!t.tema.toLowerCase().includes(nombre))return false;if(desde&&t.fecha<desde)return false;if(hasta&&t.fecha>hasta)return false;return true;}).sort((a,b)=>a.fecha===b.fecha?a.hora.localeCompare(b.hora):a.fecha.localeCompare(b.fecha));
-  let prior=data.filter(t=>t.prioridad==='prioritario').length,imp=data.filter(t=>t.prioridad==='importante').length,seg=data.filter(t=>t.prioridad==='seguimiento').length,obs=data.filter(t=>t.observacion).length;
-  document.getElementById('execKpis').innerHTML=`<div class="exec-kpi"><div class="exec-kpi-val" style="color:#e5e7eb;">${data.length}</div><div class="exec-kpi-lbl">Total</div></div><div class="exec-kpi"><div class="exec-kpi-val kpi-red">${prior}</div><div class="exec-kpi-lbl">Prioritarios</div></div><div class="exec-kpi"><div class="exec-kpi-val kpi-amber">${imp}</div><div class="exec-kpi-lbl">Importantes</div></div><div class="exec-kpi"><div class="exec-kpi-val kpi-blue">${seg}</div><div class="exec-kpi-lbl">Seguimiento</div></div><div class="exec-kpi"><div class="exec-kpi-val kpi-green">${obs}</div><div class="exec-kpi-lbl">Con obs.</div></div>`;
-  document.getElementById('execSecTitle').innerText=`PENDIENTES ACTIVOS — ${data.length} resultado${data.length!==1?'s':''}`;
-  let lista=document.getElementById('execLista');lista.innerHTML='';
+  let desde=document.getElementById("execFechaDesde").value,hasta=document.getElementById("execFechaHasta").value,nombre=document.getElementById("execBuscarNombre").value.toLowerCase().trim();
+  let data=tareas.filter(t=>{if(nombre&&!(t.persona||"").toLowerCase().includes(nombre)&&!t.tema.toLowerCase().includes(nombre))return false;if(desde&&t.fecha<desde)return false;if(hasta&&t.fecha>hasta)return false;return true;}).sort((a,b)=>a.fecha===b.fecha?a.hora.localeCompare(b.hora):a.fecha.localeCompare(b.fecha));
+  let prior=data.filter(t=>t.prioridad==="prioritario").length,imp=data.filter(t=>t.prioridad==="importante").length,seg=data.filter(t=>t.prioridad==="seguimiento").length,obs=data.filter(t=>t.observacion).length;
+  document.getElementById("execKpis").innerHTML=`<div class="exec-kpi"><div class="exec-kpi-val" style="color:#e5e7eb;">${data.length}</div><div class="exec-kpi-lbl">Total</div></div><div class="exec-kpi"><div class="exec-kpi-val kpi-red">${prior}</div><div class="exec-kpi-lbl">Prioritarios</div></div><div class="exec-kpi"><div class="exec-kpi-val kpi-amber">${imp}</div><div class="exec-kpi-lbl">Importantes</div></div><div class="exec-kpi"><div class="exec-kpi-val kpi-blue">${seg}</div><div class="exec-kpi-lbl">Seguimiento</div></div><div class="exec-kpi"><div class="exec-kpi-val kpi-green">${obs}</div><div class="exec-kpi-lbl">Con obs.</div></div>`;
+  document.getElementById("execSecTitle").innerText=`PENDIENTES ACTIVOS — ${data.length} resultado${data.length!==1?"s":""}`;
+  let lista=document.getElementById("execLista");lista.innerHTML="";
   if(!data.length){lista.innerHTML=`<div class="exec-empty"><div class="exec-empty-icon">✅</div>No hay pendientes.</div>`;return;}
-  data.forEach(t=>{let[y,m,d]=t.fecha.split('-');let fl=new Date(y,m-1,d).toLocaleDateString('es-CO',{weekday:'short',day:'numeric',month:'short'});let card=document.createElement('div');card.className=`exec-card e-${t.prioridad}`;card.innerHTML=`<div><div class="exec-time">${t.hora}</div><div class="exec-time-date">${fl}</div></div><div><div class="exec-body-persona">${t.persona||'—'}</div><div class="exec-body-tema">${t.tema}</div><span class="exec-badge e-badge-${t.prioridad}">${t.prioridad}</span>${t.observacion?`<div class="exec-body-obs">💬 ${t.observacion}</div>`:''}</div><div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;"><button class="exec-close-btn" onclick="cerrarPendienteExec(${t.id})">✔ Cerrar</button></div>`;lista.appendChild(card);});
+  data.forEach(t=>{let[y,m,d]=t.fecha.split("-");let fl=new Date(y,m-1,d).toLocaleDateString("es-CO",{weekday:"short",day:"numeric",month:"short"});let card=document.createElement("div");card.className=`exec-card e-${t.prioridad}`;card.innerHTML=`<div><div class="exec-time">${t.hora}</div><div class="exec-time-date">${fl}</div></div><div><div class="exec-body-persona">${t.persona||"—"}</div><div class="exec-body-tema">${t.tema}</div><span class="exec-badge e-badge-${t.prioridad}">${t.prioridad}</span>${t.observacion?`<div class="exec-body-obs">💬 ${t.observacion}</div>`:""}</div><div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;"><button class="exec-close-btn" onclick="cerrarPendienteExec(${t.id})">✔ Cerrar</button></div>`;lista.appendChild(card);});
 }
 
-/* ══ DIRECTORIO ══ */
-const espColorMap={'ORTOPEDISTA':'tag-blue','CARDIÓLOGO':'tag-red','BARIÁTRICO':'tag-purple','OPTÓMETRA':'tag-green','OFTALMÓLOGO':'tag-blue','REUMATÓLOGO':'tag-amber','URÓLOGO':'tag-purple','NEURÓLOGO':'tag-amber','NEUROFISIOLOGÍA':'tag-amber','MEDICINA ESTÉTICA':'tag-purple','DERMATÓLOGA':'tag-green','LABORATORIO CLÍNICO':'tag-blue','CHEQUEO EJECUTIVO':'tag-teal','INTERNISTA':'tag-blue'};
+/* ════════ DIRECTORIO MÉDICO ════════ */
+const espColorMap={"ORTOPEDISTA":"tag-blue","CARDIÓLOGO":"tag-red","BARIÁTRICO":"tag-purple","OPTÓMETRA":"tag-green","OFTALMÓLOGO":"tag-blue","REUMATÓLOGO":"tag-amber","URÓLOGO":"tag-purple","NEURÓLOGO":"tag-amber","NEUROFISIOLOGÍA":"tag-amber","MEDICINA ESTÉTICA":"tag-purple","DERMATÓLOGA":"tag-green","LABORATORIO CLÍNICO":"tag-blue","CHEQUEO EJECUTIVO":"tag-teal","INTERNISTA":"tag-blue"};
 function renderDir(){
-  let buscar=document.getElementById('dirBuscar').value.toLowerCase(),filtroEsp=document.getElementById('dirFiltroEsp').value;
+  let buscar=document.getElementById("dirBuscar").value.toLowerCase();
+  let filtroEsp=document.getElementById("dirFiltroEsp").value;
   let esps=[...new Set(directorio.map(d=>d.esp))].sort();
-  let sel=document.getElementById('dirFiltroEsp'),cur=sel.value;
-  sel.innerHTML='<option value="">Todas las especialidades</option>'+esps.map(e=>`<option value="${e}"${e===cur?' selected':''}>${e}</option>`).join('');
+  let sel=document.getElementById("dirFiltroEsp"),cur=sel.value;
+  sel.innerHTML='<option value="">Todas las especialidades</option>'+esps.map(e=>`<option value="${e}"${e===cur?" selected":""}>${e}</option>`).join("");
   let data=directorio.filter(d=>(!filtroEsp||d.esp===filtroEsp)&&(!buscar||JSON.stringify(d).toLowerCase().includes(buscar)));
-  document.getElementById('dirCount').textContent=data.length+' especialista'+(data.length!==1?'s':'');
-  let grid=document.getElementById('dirGrid');grid.innerHTML='';
+  document.getElementById("dirCount").textContent=data.length+" especialista"+(data.length!==1?"s":"");
+  let grid=document.getElementById("dirGrid");grid.innerHTML="";
   if(!data.length){grid.innerHTML='<div class="dir-empty">🔍 No se encontraron resultados.</div>';return;}
-  data.forEach(d=>{let card=document.createElement('div');card.className='dir-card';card.innerHTML=`<div class="dir-card-esp"><span class="tag ${espColorMap[d.esp]||'tag-blue'}">${d.esp}</span></div><div class="dir-card-nombre">${d.nombre}</div>${d.tel?`<div class="dir-card-row"><span class="dir-card-ico">📞</span><span class="dir-card-val"><a href="tel:${d.tel}">${d.tel}</a></span></div>`:''} ${d.cel?`<div class="dir-card-row"><span class="dir-card-ico">📱</span><span class="dir-card-val"><a href="tel:${d.cel}">${d.cel}</a></span></div>`:''} ${d.ciudad?`<div class="dir-card-row"><span class="dir-card-ico">📍</span><span class="dir-card-val">${d.ciudad}${d.cons&&d.cons!=='-'?' · Cons. '+d.cons:''}</span></div>`:''} ${d.dir?`<div class="dir-card-row"><span class="dir-card-ico">🏢</span><span class="dir-card-val">${d.dir}</span></div>`:''} ${d.correo?`<div class="dir-card-row"><span class="dir-card-ico">✉️</span><span class="dir-card-val"><a href="mailto:${d.correo}">${d.correo}</a></span></div>`:''} ${d.cita&&d.cita!=='-'?`<div class="dir-card-cita">📅 ${d.cita}</div>`:''}<div class="dir-card-actions"><button class="edit" onclick="editarDir(${d.id})">✏️ Editar</button><button class="delete" onclick="eliminarDir(${d.id})">🗑 Eliminar</button></div>`;grid.appendChild(card);});
+  data.forEach(d=>{
+    let card=document.createElement("div");card.className="dir-card";
+    card.innerHTML=`
+      <div class="dir-card-esp"><span class="tag ${espColorMap[d.esp]||'tag-blue'}">${d.esp}</span></div>
+      <div class="dir-card-nombre">${d.nombre}</div>
+      ${d.tel?`<div class="dir-card-row"><span class="dir-card-ico">📞</span><span class="dir-card-val"><a href="tel:${d.tel}">${d.tel}</a></span></div>`:''}
+      ${d.cel?`<div class="dir-card-row"><span class="dir-card-ico">📱</span><span class="dir-card-val"><a href="tel:${d.cel}">${d.cel}</a></span></div>`:''}
+      ${d.ciudad?`<div class="dir-card-row"><span class="dir-card-ico">📍</span><span class="dir-card-val">${d.ciudad}${d.cons&&d.cons!=='-'?' · Cons. '+d.cons:''}</span></div>`:''}
+      ${d.dir?`<div class="dir-card-row"><span class="dir-card-ico">🏢</span><span class="dir-card-val">${d.dir}</span></div>`:''}
+      ${d.correo?`<div class="dir-card-row"><span class="dir-card-ico">✉️</span><span class="dir-card-val"><a href="mailto:${d.correo}">${d.correo}</a></span></div>`:''}
+      ${d.cita&&d.cita!=='-'?`<div class="dir-card-cita">📅 ${d.cita}</div>`:''}
+      <div class="dir-card-actions">
+        <button class="edit" onclick="editarDir(${d.id})">✏️ Editar</button>
+        <button class="delete" onclick="eliminarDir(${d.id})">🗑 Eliminar</button>
+      </div>`;
+    grid.appendChild(card);
+  });
 }
-function abrirModalDir(){document.getElementById('dirEditId').value='';document.getElementById('modalDirTitle').textContent='➕ Agregar especialista';['dirEsp','dirNombre','dirTel','dirCel','dirCiudad','dirDir','dirCons','dirCorreo','dirCita'].forEach(id=>document.getElementById(id).value='');document.getElementById('modalDir').classList.add('open');}
-function cerrarModalDir(){document.getElementById('modalDir').classList.remove('open');}
-document.getElementById('modalDir').addEventListener('click',function(e){if(e.target===this)cerrarModalDir();});
-function editarDir(id){let d=directorio.find(x=>x.id===id);if(!d)return;document.getElementById('dirEditId').value=d.id;document.getElementById('modalDirTitle').textContent='✏️ Editar especialista';document.getElementById('dirEsp').value=d.esp;document.getElementById('dirNombre').value=d.nombre;document.getElementById('dirTel').value=d.tel;document.getElementById('dirCel').value=d.cel;document.getElementById('dirCiudad').value=d.ciudad;document.getElementById('dirDir').value=d.dir;document.getElementById('dirCons').value=d.cons;document.getElementById('dirCorreo').value=d.correo;document.getElementById('dirCita').value=d.cita;document.getElementById('modalDir').classList.add('open');}
-function guardarDir(){let esp=document.getElementById('dirEsp').value.trim(),nombre=document.getElementById('dirNombre').value.trim();if(!esp||!nombre){alert('Especialidad y Nombre son requeridos');return;}let obj={esp,nombre,tel:document.getElementById('dirTel').value.trim(),cel:document.getElementById('dirCel').value.trim(),ciudad:document.getElementById('dirCiudad').value.trim(),dir:document.getElementById('dirDir').value.trim(),cons:document.getElementById('dirCons').value.trim(),correo:document.getElementById('dirCorreo').value.trim(),cita:document.getElementById('dirCita').value.trim()};let eid=document.getElementById('dirEditId').value;if(eid){directorio=directorio.map(d=>d.id===Number(eid)?{...obj,id:Number(eid)}:d);}else{obj.id=Date.now();directorio.push(obj);}saveDir();cerrarModalDir();renderDir();}
+function abrirModalDir(){document.getElementById("dirEditId").value="";document.getElementById("modalDirTitle").textContent="➕ Agregar especialista";["dirEsp","dirNombre","dirTel","dirCel","dirCiudad","dirDir","dirCons","dirCorreo","dirCita"].forEach(id=>document.getElementById(id).value="");document.getElementById("modalDir").classList.add("open");}
+function cerrarModalDir(){document.getElementById("modalDir").classList.remove("open");}
+document.getElementById("modalDir").addEventListener("click",function(e){if(e.target===this)cerrarModalDir();});
+function editarDir(id){let d=directorio.find(x=>x.id===id);if(!d)return;document.getElementById("dirEditId").value=d.id;document.getElementById("modalDirTitle").textContent="✏️ Editar especialista";document.getElementById("dirEsp").value=d.esp;document.getElementById("dirNombre").value=d.nombre;document.getElementById("dirTel").value=d.tel;document.getElementById("dirCel").value=d.cel;document.getElementById("dirCiudad").value=d.ciudad;document.getElementById("dirDir").value=d.dir;document.getElementById("dirCons").value=d.cons;document.getElementById("dirCorreo").value=d.correo;document.getElementById("dirCita").value=d.cita;document.getElementById("modalDir").classList.add("open");}
+function guardarDir(){let esp=document.getElementById("dirEsp").value.trim(),nombre=document.getElementById("dirNombre").value.trim();if(!esp||!nombre){alert("Especialidad y Nombre son requeridos");return;}let obj={esp,nombre,tel:document.getElementById("dirTel").value.trim(),cel:document.getElementById("dirCel").value.trim(),ciudad:document.getElementById("dirCiudad").value.trim(),dir:document.getElementById("dirDir").value.trim(),cons:document.getElementById("dirCons").value.trim(),correo:document.getElementById("dirCorreo").value.trim(),cita:document.getElementById("dirCita").value.trim()};let eid=document.getElementById("dirEditId").value;if(eid){directorio=directorio.map(d=>d.id===Number(eid)?{...obj,id:Number(eid)}:d);}else{obj.id=Date.now();directorio.push(obj);}saveDir();cerrarModalDir();renderDir();}
 function eliminarDir(id){let d=directorio.find(x=>x.id===id);if(!d)return;if(!confirm(`¿Eliminar a ${d.nombre}?`))return;directorio=directorio.filter(x=>x.id!==id);saveDir();renderDir();}
 
-/* ══ CUENTAS ══ */
-const bankColorMap={'BANCOLOMBIA':'tag-amber','NEQUI':'tag-purple','DAVIVIENDA':'tag-red','BBVA':'tag-blue','AV VILLAS':'tag-green'};
+/* ════════ CUENTAS BANCARIAS ════════ */
+const bankColorMap={"BANCOLOMBIA":"tag-amber","NEQUI":"tag-purple","DAVIVIENDA":"tag-red","BBVA":"tag-blue","AV VILLAS":"tag-green"};
 function renderCuentas(){
-  let buscar=document.getElementById('cuentaBuscar').value.toLowerCase(),filtroBanco=document.getElementById('cuentaFiltroBanco').value;
+  let buscar=document.getElementById("cuentaBuscar").value.toLowerCase();
+  let filtroBanco=document.getElementById("cuentaFiltroBanco").value;
   let bancos=[...new Set(cuentas.map(c=>c.banco))].sort();
-  let sel=document.getElementById('cuentaFiltroBanco'),cur=sel.value;
-  sel.innerHTML='<option value="">Todos los bancos</option>'+bancos.map(b=>`<option value="${b}"${b===cur?' selected':''}>${b}</option>`).join('');
+  let sel=document.getElementById("cuentaFiltroBanco"),cur=sel.value;
+  sel.innerHTML='<option value="">Todos los bancos</option>'+bancos.map(b=>`<option value="${b}"${b===cur?" selected":""}>${b}</option>`).join("");
   let data=cuentas.filter(c=>(!filtroBanco||c.banco===filtroBanco)&&(!buscar||JSON.stringify(c).toLowerCase().includes(buscar)));
-  document.getElementById('cuentaCount').textContent=data.length+' cuenta'+(data.length!==1?'s':'');
-  document.getElementById('cuentaBody').innerHTML=data.map(c=>`<tr><td><span class="tag ${bankColorMap[c.banco]||'tag-blue'}">${c.banco}</span></td><td style="font-family:monospace;font-size:12px;color:#93c5fd;">${c.num||'—'}</td><td><span class="tag tag-green" style="font-size:10px;">${c.tipo||'—'}</span></td><td><strong>${c.titular||'<span style="color:#4b5563;font-weight:400;">Sin titular</span>'}</strong></td><td style="color:#6b7280;font-size:12px;font-family:monospace;">${c.cc||'—'}</td><td><div class="row-actions"><button class="edit" onclick="editarCuenta(${c.id})">✏️</button><button class="delete" onclick="eliminarCuenta(${c.id})">🗑</button></div></td></tr>`).join('');
+  document.getElementById("cuentaCount").textContent=data.length+" cuenta"+(data.length!==1?"s":"");
+  document.getElementById("cuentaBody").innerHTML=data.map(c=>`<tr>
+    <td><span class="tag ${bankColorMap[c.banco]||'tag-blue'}">${c.banco}</span></td>
+    <td style="font-family:monospace;font-size:12px;color:#93c5fd;">${c.num||"—"}</td>
+    <td><span class="tag tag-green" style="font-size:10px;">${c.tipo||"—"}</span></td>
+    <td><strong>${c.titular||'<span style="color:#4b5563;font-weight:400;">Sin titular</span>'}</strong></td>
+    <td style="color:#6b7280;font-size:12px;font-family:monospace;">${c.cc||"—"}</td>
+    <td><div class="row-actions"><button class="edit" onclick="editarCuenta(${c.id})">✏️</button><button class="delete" onclick="eliminarCuenta(${c.id})">🗑</button></div></td>
+  </tr>`).join("");
 }
-function abrirModalCuenta(){document.getElementById('cuentaEditId').value='';document.getElementById('modalCuentaTitle').textContent='➕ Agregar cuenta bancaria';['cuentaBanco','cuentaNum','cuentaTipo','cuentaTitular','cuentaCC'].forEach(id=>document.getElementById(id).value='');document.getElementById('modalCuenta').classList.add('open');}
-function cerrarModalCuenta(){document.getElementById('modalCuenta').classList.remove('open');}
-document.getElementById('modalCuenta').addEventListener('click',function(e){if(e.target===this)cerrarModalCuenta();});
-function editarCuenta(id){let c=cuentas.find(x=>x.id===id);if(!c)return;document.getElementById('cuentaEditId').value=c.id;document.getElementById('modalCuentaTitle').textContent='✏️ Editar cuenta bancaria';document.getElementById('cuentaBanco').value=c.banco;document.getElementById('cuentaNum').value=c.num;document.getElementById('cuentaTipo').value=c.tipo;document.getElementById('cuentaTitular').value=c.titular;document.getElementById('cuentaCC').value=c.cc;document.getElementById('modalCuenta').classList.add('open');}
-function guardarCuenta(){let banco=document.getElementById('cuentaBanco').value.trim().toUpperCase(),num=document.getElementById('cuentaNum').value.trim();if(!banco||!num){alert('Banco y número son requeridos');return;}let obj={banco,num,tipo:document.getElementById('cuentaTipo').value.trim().toUpperCase(),titular:document.getElementById('cuentaTitular').value.trim().toUpperCase(),cc:document.getElementById('cuentaCC').value.trim()};let eid=document.getElementById('cuentaEditId').value;if(eid){cuentas=cuentas.map(c=>c.id===Number(eid)?{...obj,id:Number(eid)}:c);}else{obj.id=Date.now();cuentas.push(obj);}saveCuentas();cerrarModalCuenta();renderCuentas();}
+function abrirModalCuenta(){document.getElementById("cuentaEditId").value="";document.getElementById("modalCuentaTitle").textContent="➕ Agregar cuenta bancaria";["cuentaBanco","cuentaNum","cuentaTipo","cuentaTitular","cuentaCC"].forEach(id=>document.getElementById(id).value="");document.getElementById("modalCuenta").classList.add("open");}
+function cerrarModalCuenta(){document.getElementById("modalCuenta").classList.remove("open");}
+document.getElementById("modalCuenta").addEventListener("click",function(e){if(e.target===this)cerrarModalCuenta();});
+function editarCuenta(id){let c=cuentas.find(x=>x.id===id);if(!c)return;document.getElementById("cuentaEditId").value=c.id;document.getElementById("modalCuentaTitle").textContent="✏️ Editar cuenta bancaria";document.getElementById("cuentaBanco").value=c.banco;document.getElementById("cuentaNum").value=c.num;document.getElementById("cuentaTipo").value=c.tipo;document.getElementById("cuentaTitular").value=c.titular;document.getElementById("cuentaCC").value=c.cc;document.getElementById("modalCuenta").classList.add("open");}
+function guardarCuenta(){let banco=document.getElementById("cuentaBanco").value.trim().toUpperCase(),num=document.getElementById("cuentaNum").value.trim();if(!banco||!num){alert("Banco y número son requeridos");return;}let obj={banco,num,tipo:document.getElementById("cuentaTipo").value.trim().toUpperCase(),titular:document.getElementById("cuentaTitular").value.trim().toUpperCase(),cc:document.getElementById("cuentaCC").value.trim()};let eid=document.getElementById("cuentaEditId").value;if(eid){cuentas=cuentas.map(c=>c.id===Number(eid)?{...obj,id:Number(eid)}:c);}else{obj.id=Date.now();cuentas.push(obj);}saveCuentas();cerrarModalCuenta();renderCuentas();}
 function eliminarCuenta(id){let c=cuentas.find(x=>x.id===id);if(!c)return;if(!confirm(`¿Eliminar cuenta de ${c.titular||c.num}?`))return;cuentas=cuentas.filter(x=>x.id!==id);saveCuentas();renderCuentas();}
 
-/* ══ CORREO ══ */
+/* ════════ CORREO PERSONAL ════════ */
 function renderCorreo(){
-  let buscar=document.getElementById('correoBuscar').value.toLowerCase(),fechaFiltro=document.getElementById('correoFechaFiltro').value;
+  let buscar=document.getElementById("correoBuscar").value.toLowerCase();
+  let fechaFiltro=document.getElementById("correoFechaFiltro").value;
   let data=correos.filter(c=>{if(fechaFiltro&&c.fecha!==fechaFiltro)return false;if(buscar&&!JSON.stringify(c).toLowerCase().includes(buscar))return false;return true;});
   data.sort((a,b)=>a.fecha===b.fecha?a.hora.localeCompare(b.hora):a.fecha.localeCompare(b.fecha));
-  document.getElementById('correoCount').textContent=data.length+' correo'+(data.length!==1?'s':'');
-  let container=document.getElementById('correoContainer');container.innerHTML='';
+  document.getElementById("correoCount").textContent=data.length+" correo"+(data.length!==1?"s":"");
+  let container=document.getElementById("correoContainer");container.innerHTML="";
   if(!data.length){container.innerHTML='<div class="mail-empty">📭 No se encontraron correos.</div>';return;}
   let grupos={};data.forEach(c=>{if(!grupos[c.fecha])grupos[c.fecha]=[];grupos[c.fecha].push(c);});
-  Object.keys(grupos).sort().forEach(fecha=>{let[y,m,d]=fecha.split('-');let label=new Date(y,m-1,d).toLocaleDateString('es-CO',{weekday:'long',year:'numeric',month:'long',day:'numeric'}).toUpperCase();let sec=document.createElement('div');let h=document.createElement('div');h.className='mail-section-date';h.textContent='📅 '+label;sec.appendChild(h);let grid=document.createElement('div');grid.className='mail-grid';grupos[fecha].forEach(c=>{let card=document.createElement('div');card.className='mail-card';card.innerHTML=`<div class="mail-card-top"><span class="mail-card-hora">🕐 ${c.hora}</span><span class="tag tag-purple" style="font-size:10px;">${c.fecha}</span></div><div class="mail-card-remitente">${c.remitente||'(sin remitente)'}</div>${c.email?`<div class="mail-card-email">✉️ ${c.email}</div>`:''}<div class="mail-card-asunto">${c.asunto}</div>${c.nota?`<div class="mail-card-nota">📌 ${c.nota}</div>`:''}<div class="mail-card-actions"><button class="edit" onclick="editarCorreo(${c.id})">✏️ Editar</button><button class="delete" onclick="eliminarCorreo(${c.id})">🗑 Eliminar</button></div>`;grid.appendChild(card);});sec.appendChild(grid);container.appendChild(sec);});
+  Object.keys(grupos).sort().forEach(fecha=>{
+    let[y,m,d]=fecha.split("-");
+    let label=new Date(y,m-1,d).toLocaleDateString("es-CO",{weekday:"long",year:"numeric",month:"long",day:"numeric"}).toUpperCase();
+    let sec=document.createElement("div");
+    let h=document.createElement("div");h.className="mail-section-date";h.textContent="📅 "+label;sec.appendChild(h);
+    let grid=document.createElement("div");grid.className="mail-grid";
+    grupos[fecha].forEach(c=>{
+      let card=document.createElement("div");card.className="mail-card";
+      card.innerHTML=`
+        <div class="mail-card-top"><span class="mail-card-hora">🕐 ${c.hora}</span><span class="tag tag-purple" style="font-size:10px;">${c.fecha}</span></div>
+        <div class="mail-card-remitente">${c.remitente||"(sin remitente)"}</div>
+        ${c.email?`<div class="mail-card-email">✉️ ${c.email}</div>`:""}
+        <div class="mail-card-asunto">${c.asunto}</div>
+        ${c.nota?`<div class="mail-card-nota">📌 ${c.nota}</div>`:""}
+        <div class="mail-card-actions">
+          <button class="edit" onclick="editarCorreo(${c.id})">✏️ Editar</button>
+          <button class="delete" onclick="eliminarCorreo(${c.id})">🗑 Eliminar</button>
+        </div>`;
+      grid.appendChild(card);
+    });
+    sec.appendChild(grid);container.appendChild(sec);
+  });
 }
-function abrirModalCorreo(){document.getElementById('correoEditId').value='';document.getElementById('modalCorreoTitle').textContent='➕ Agregar correo';['correoFecha','correoHora','correoRemitente','correoEmail','correoAsunto','correoNota'].forEach(id=>document.getElementById(id).value='');document.getElementById('modalCorreo').classList.add('open');}
-function cerrarModalCorreo(){document.getElementById('modalCorreo').classList.remove('open');}
-document.getElementById('modalCorreo').addEventListener('click',function(e){if(e.target===this)cerrarModalCorreo();});
-function editarCorreo(id){let c=correos.find(x=>x.id===id);if(!c)return;document.getElementById('correoEditId').value=c.id;document.getElementById('modalCorreoTitle').textContent='✏️ Editar correo';document.getElementById('correoFecha').value=c.fecha;document.getElementById('correoHora').value=c.hora;document.getElementById('correoRemitente').value=c.remitente;document.getElementById('correoEmail').value=c.email;document.getElementById('correoAsunto').value=c.asunto;document.getElementById('correoNota').value=c.nota;document.getElementById('modalCorreo').classList.add('open');}
-function guardarCorreo(){let fecha=document.getElementById('correoFecha').value,hora=document.getElementById('correoHora').value,asunto=document.getElementById('correoAsunto').value.trim();if(!fecha||!hora||!asunto){alert('Fecha, hora y asunto son requeridos');return;}let obj={fecha,hora,remitente:document.getElementById('correoRemitente').value.trim(),email:document.getElementById('correoEmail').value.trim(),asunto,nota:document.getElementById('correoNota').value.trim()};let eid=document.getElementById('correoEditId').value;if(eid){correos=correos.map(c=>c.id===Number(eid)?{...obj,id:Number(eid)}:c);}else{obj.id=Date.now();correos.push(obj);}saveCorreos();cerrarModalCorreo();renderCorreo();}
-function eliminarCorreo(id){let c=correos.find(x=>x.id===id);if(!c)return;if(!confirm('¿Eliminar este correo?'))return;correos=correos.filter(x=>x.id!==id);saveCorreos();renderCorreo();}
+function abrirModalCorreo(){document.getElementById("correoEditId").value="";document.getElementById("modalCorreoTitle").textContent="➕ Agregar correo";["correoFecha","correoHora","correoRemitente","correoEmail","correoAsunto","correoNota"].forEach(id=>document.getElementById(id).value="");document.getElementById("modalCorreo").classList.add("open");}
+function cerrarModalCorreo(){document.getElementById("modalCorreo").classList.remove("open");}
+document.getElementById("modalCorreo").addEventListener("click",function(e){if(e.target===this)cerrarModalCorreo();});
+function editarCorreo(id){let c=correos.find(x=>x.id===id);if(!c)return;document.getElementById("correoEditId").value=c.id;document.getElementById("modalCorreoTitle").textContent="✏️ Editar correo";document.getElementById("correoFecha").value=c.fecha;document.getElementById("correoHora").value=c.hora;document.getElementById("correoRemitente").value=c.remitente;document.getElementById("correoEmail").value=c.email;document.getElementById("correoAsunto").value=c.asunto;document.getElementById("correoNota").value=c.nota;document.getElementById("modalCorreo").classList.add("open");}
+function guardarCorreo(){let fecha=document.getElementById("correoFecha").value,hora=document.getElementById("correoHora").value,asunto=document.getElementById("correoAsunto").value.trim();if(!fecha||!hora||!asunto){alert("Fecha, hora y asunto son requeridos");return;}let obj={fecha,hora,remitente:document.getElementById("correoRemitente").value.trim(),email:document.getElementById("correoEmail").value.trim(),asunto,nota:document.getElementById("correoNota").value.trim()};let eid=document.getElementById("correoEditId").value;if(eid){correos=correos.map(c=>c.id===Number(eid)?{...obj,id:Number(eid)}:c);}else{obj.id=Date.now();correos.push(obj);}saveCorreos();cerrarModalCorreo();renderCorreo();}
+function eliminarCorreo(id){let c=correos.find(x=>x.id===id);if(!c)return;if(!confirm("¿Eliminar este correo?"))return;correos=correos.filter(x=>x.id!==id);saveCorreos();renderCorreo();}
 
-/* ══ DATOS POR DEFECTO ══ */
-const DIR_DEFAULT=[{id:1,esp:"ORTOPEDISTA",nombre:"EDWIN MIGUEL TOVAR TORRES",tel:"6082747555",cel:"3046035555",ciudad:"IBAGUÉ",dir:"COMPLEJO MÉDICO LA SAMARIA",cons:"605",correo:"migueltovarortopedista@gmail.com",cita:"PROGRAMAR APROX. 10 Julio/2026"},{id:2,esp:"CARDIÓLOGO",nombre:"ALEJANDRO MIGUEL SANTOS ZAVALA",tel:"6082798643",cel:"3165709731",ciudad:"IBAGUÉ",dir:"VÍA AEROPUERTO NUEVA CLÍNICA MEDICADIZ",cons:"204",correo:"dralejandrosantos@gmail.com",cita:"PROGRAMAR APROX. 24 Sept/2026"},{id:3,esp:"BARIÁTRICO",nombre:"CARLOS FELIPE CHAUX MOSQUERA",tel:"6017033872",cel:"3126162182",ciudad:"BOGOTÁ",dir:"CALLE 83 No.16A-44 EDIFICIO CIMA",cons:"304 A",correo:"programacioncirugia@ucomcolombia.com",cita:"-"},{id:4,esp:"OPTÓMETRA",nombre:"AGUSTIN VIDALLER NIETO",tel:"6012187077",cel:"",ciudad:"BOGOTÁ",dir:"AVENIDA 100 No.18a-51 CLÍNICA BARRAQUER",cons:"103",correo:"",cita:"-"},{id:5,esp:"OFTALMÓLOGO",nombre:"LUIS MIGUEL SALAZAR AMATURE",tel:"6012187077",cel:"3188018671",ciudad:"BOGOTÁ",dir:"AVENIDA 100 No.18a-51 CLÍNICA BARRAQUER",cons:"322",correo:"LMSALAZARA@BARRAQUER.COM.CO",cita:"-"},{id:6,esp:"REUMATÓLOGO",nombre:"SEBASTIAN MOLINA RIOS",tel:"6014824488",cel:"",ciudad:"BOGOTÁ",dir:"FUNDACIÓN SANTA FE BOGOTÁ · CALLE 119 # 7-80 PISO 3",cons:"305",correo:"",cita:"22 Abril/2026 a las 2:40PM"},{id:7,esp:"URÓLOGO",nombre:"MAURICIO ANDRÉS LÓPEZ GUERRERO",tel:"6082596447",cel:"3168333134",ciudad:"IBAGUÉ",dir:"UROTOL - 3 PISO CLÍNICA MEDICADIZ VIA AEROPUERTO",cons:"",correo:"urotol@hotmail.com",cita:"PDTE HACERSE EXÁMENES"},{id:8,esp:"NEURÓLOGO",nombre:"ORLANDO LÓPEZ CARVAJAL",tel:"6082771186",cel:"",ciudad:"IBAGUÉ",dir:"CRA 5 No.31-114 CADIZ",cons:"910",correo:"",cita:"PDTE PROGRAMAR CITA POLISOMNOGRAFÍA"},{id:9,esp:"NEUROFISIOLOGÍA",nombre:"CENTRAL DE ESPECIALISTAS",tel:"",cel:"3161095388",ciudad:"IBAGUÉ",dir:"CRA 4BIS # 35-72 BRR CADIZ",cons:"1",correo:"atencion@centralespecialistascolombia.com",cita:""},{id:10,esp:"NEUROFISIOLOGÍA",nombre:"FUNDACIÓN SANTA FE",tel:"6014824488",cel:"",ciudad:"BOGOTÁ",dir:"CALLE 119 # 7-14 PISO 2",cons:"1",correo:"",cita:"CITA POLISOMNOGRAFÍA 13 Mayo/2026 a las 8PM"},{id:11,esp:"MEDICINA ESTÉTICA",nombre:"ANDREA DEL PILAR CARDONA OLMOS",tel:"6082632262",cel:"3102386611",ciudad:"IBAGUÉ",dir:"CALLE 6 No.5-82 BRR LA POLA",cons:"",correo:"ipsandreacardona@gmail.com",cita:"2 Mayo/2026 a las 10AM"},{id:12,esp:"DERMATÓLOGA",nombre:"MONICA HERNANDEZ BULLA",tel:"",cel:"3178559081",ciudad:"IBAGUÉ",dir:"WORD TRADE CENTER, AQUA POWER CENTER, AV. GUABINAL #57-15",cons:"807",correo:"",cita:"-"},{id:13,esp:"LABORATORIO CLÍNICO",nombre:"ANALICEMOS",tel:"6082772036",cel:"3219612486",ciudad:"IBAGUÉ",dir:"SEDE 1: CRA 4H No.34-83 | SEDE 2: CALLE 32 No.4K-27 | SEDE 3: TORRE MÉDICA MEDICADIZ CONS.909",cons:"-",correo:"recepcion@analicemoslaboratorio.com",cita:"-"},{id:14,esp:"CHEQUEO EJECUTIVO",nombre:"CLÍNICA PABLO TOBÓN URIBE",tel:"6044459000",cel:"3147751125",ciudad:"MEDELLÍN",dir:"CL 78B No.69-240 PISO 7 - TORRE B CORDOBA",cons:"-",correo:"chequeos@hptu.org.co",cita:"-"},{id:15,esp:"INTERNISTA",nombre:"ANTONIO JOSÉ OVIEDO LEONEL",tel:"",cel:"3102823544",ciudad:"IBAGUÉ",dir:"",cons:"",correo:"",cita:"-"},{id:16,esp:"OFTALMÓLOGO",nombre:"PAOLO SOLANO LEAL",tel:"6082553855",cel:"3186912279",ciudad:"IBAGUÉ",dir:"CLÍNICA MEDICADIZ - NAZAR GRUPO OFTALMOLÓGICO",cons:"302",correo:"info@nazaroftalmologos.com",cita:"-"}];
-const CUENTAS_DEFAULT=[{id:1,banco:"BANCOLOMBIA",num:"7973987644",tipo:"AHORROS",titular:"GERARDO JAVIER ALVARADO CUBILLOS",cc:"86059446"},{id:2,banco:"BANCOLOMBIA",num:"079782612-34",tipo:"AHORROS",titular:"SARITA ALVARADO",cc:""},{id:3,banco:"BANCOLOMBIA",num:"86948258562",tipo:"AHORROS",titular:"EDNA LORENA MURILLO RODRIGUEZ",cc:"38211759"},{id:4,banco:"BANCOLOMBIA",num:"06881006039",tipo:"AHORROS",titular:"SANDRA LILIANA NIETO CASTRILLON",cc:"39565280"},{id:5,banco:"NEQUI",num:"320 3770085",tipo:"DEP. ELECTRÓNICO",titular:"OLIVER LA TORRE CAPERA",cc:"12134257"},{id:6,banco:"BANCOLOMBIA",num:"38341300581",tipo:"AHORROS",titular:"",cc:""},{id:7,banco:"BANCOLOMBIA",num:"079000494-41",tipo:"AHORROS",titular:"DANNY FABIAN SALAZAR CAMACHO",cc:"1110525870"},{id:8,banco:"BANCOLOMBIA",num:"29993077613",tipo:"AHORROS",titular:"SERGIO BODENSIEK",cc:"1026259624"},{id:9,banco:"NEQUI",num:"3204612987",tipo:"DEP. ELECTRÓNICO",titular:"ARQUITECTO NICOLAS (JAIME FORERO)",cc:""},{id:10,banco:"NEQUI",num:"3176635775",tipo:"DEP. ELECTRÓNICO",titular:"MANUEL POLLO (MANUEL CORREA)",cc:"86065449"}];
-const CORREOS_DEFAULT=[{id:1,fecha:"2026-04-22",hora:"08:59",remitente:"DIRECCION EMPRESAS",email:"direccionempresas.sas@gmail.com",asunto:"REPORTE DIARIO DE SALDOS BANCARIOS 22/04/2026",nota:""},{id:2,fecha:"2026-04-22",hora:"09:04",remitente:"NOTIFICACIONES MOVILGAS",email:"notificaciones@mileniumgas.com",asunto:"ACTA NO.45 JUNTA GENERAL ORDINARIA MOVILGAS LTDA 27 MARZO 2026",nota:""},{id:3,fecha:"2026-04-22",hora:"09:11",remitente:"NOTIFICACIONES MOVILGAS",email:"notificaciones@mileniumgas.com",asunto:"ACTA NO.31 JUNTA GENERAL ORDINARIA MOVILGAS LTDA 28 MARZO 2026",nota:""},{id:4,fecha:"2026-04-22",hora:"11:16",remitente:"LAURA CHALA",email:"subgerenciaeds@ksaval.com",asunto:"AUSENCIA LAURA CHALA MARTES DE 7AM A 11AM",nota:""},{id:5,fecha:"2026-04-22",hora:"11:26",remitente:"CORPORACION COLEGIO SAN BONIFACION DE LAS LANZAS",email:"",asunto:"CORPORACION COLEGIO SAN BONIFACION DE LAS LANZAS",nota:""},{id:6,fecha:"2026-04-22",hora:"13:35",remitente:"LAURA CHALA",email:"subgerenciaeds@ksaval.com",asunto:"BORRADOR ACTA N.4: ESTADO DE PENDIENTES REUNION VIERNES 17",nota:""},{id:7,fecha:"2026-04-22",hora:"15:00",remitente:"CORRESPONDENCIA",email:"correspondencia@millanyasociados.com",asunto:"29195 - KSAVAL INFORME SAGRILAFT Y PTEE 2025",nota:""},{id:8,fecha:"2026-04-23",hora:"07:25",remitente:"HAROLD CASTRO CASTILLO",email:"haroldcastrocastillo@yahoo.com",asunto:"REVISION 2020-2024",nota:""},{id:9,fecha:"2026-04-23",hora:"08:06",remitente:"SERGIO BODENSIEK",email:"sergiobodensiek12@gmail.com",asunto:"SOLICITUD REEMBOLSO GASTOS DE VIAJE",nota:""},{id:10,fecha:"2026-04-23",hora:"08:45",remitente:"DIRECCION EMPRESAS",email:"direccionempresas.sas@gmail.com",asunto:"REPORTE DIARIO DE SALDOS BANCARIOS 23/04/2026",nota:""},{id:11,fecha:"2026-04-23",hora:"09:14",remitente:"BANCOLOMBIA",email:"",asunto:"¡TOC-TOC! LLEGO TU EXTRACTO DEL MES (MARZO)",nota:""},{id:12,fecha:"2026-04-23",hora:"15:01",remitente:"BANCOLOMBIA",email:"",asunto:"PAGA TU IMPUESTO PREDIAL",nota:"Se remite a gerente ksaval"},{id:13,fecha:"2026-04-23",hora:"17:14",remitente:"MONICA SOFIA ALARCON ALARCON",email:"monica.alarcon@informacion.terpel.com",asunto:"REPORTE PAGOS A PROVEEDORES_20260423",nota:"Se remite a Yessica"},{id:14,fecha:"2026-04-23",hora:"20:47",remitente:"LAURA CHALA",email:"subgerenciaeds@ksaval.com",asunto:"BORRADOR RENTA",nota:""},{id:15,fecha:"2026-04-23",hora:"21:18",remitente:"LAURA CHALA",email:"subgerenciaeds@ksaval.com",asunto:"CERTIFICADO TRIBUTARIO 2025 GERARDO JAVIER ALVARADO",nota:"Se da a conocer a Andrea"},{id:16,fecha:"2026-04-23",hora:"21:23",remitente:"LAURA CHALA",email:"subgerenciaeds@ksaval.com",asunto:"REPORTE DE VENTAS - K-SAVAL ABRRGY SAS",nota:""},{id:17,fecha:"2026-04-23",hora:"23:00",remitente:"LAURA CHALA",email:"subgerenciaeds@ksaval.com",asunto:"VISITA EDS LAS MONEDAS MANUEL LARA",nota:""},{id:18,fecha:"2026-04-23",hora:"23:10",remitente:"LAURA CHALA",email:"subgerenciaeds@ksaval.com",asunto:"CONSULTA TRATAMIENTO CONTABLE Y FISCAL - MOVIMIENTOS ACCIONISTA NO LEGALIZADOS",nota:""},{id:19,fecha:"2026-04-24",hora:"09:02",remitente:"YESSICA",email:"direccionempresas.sas@gmail.com",asunto:"REPORTE DIARIO DE SALDOS BANCARIOS 24/04/2026",nota:""},{id:20,fecha:"2026-04-26",hora:"17:17",remitente:"AVIANCA (e-ticket)",email:"eticket@avianca.com",asunto:"MONICA MARIA BOCANEGRA RICO, 03MAY/0905/ SAN ANDRES ISLAND",nota:"Pendiente respuesta Señora Monica"},{id:21,fecha:"2026-04-26",hora:"17:18",remitente:"AVIANCA (e-ticket)",email:"eticket@avianca.com",asunto:"GERARDO JAVIER ALVARADO CUBILLOS, 03MAY/0905/SAN ANDRES ISLAND",nota:""},{id:22,fecha:"2026-04-26",hora:"17:18",remitente:"AVIANCA",email:"",asunto:"GERARDO JAVIER ALVARADO CUBILLOS - DETALLES DE TU RESERVA ADZ - IBE",nota:""},{id:23,fecha:"2026-04-26",hora:"20:09",remitente:"ANDREA ARIAS",email:"andreariasaquite@gmail.com",asunto:"INFORMACION ANGELICA - CONTRATO DE ACCIONES",nota:""},{id:24,fecha:"2026-04-27",hora:"08:44",remitente:"FENALCO TOLIMA",email:"",asunto:"INVITACION EMPRESARIAL - JUEVES 30 ABRIL 2 A 5 PM AUDITORIO CAMARA DE COMERCIO IBAGUE",nota:"Informacion a Don Gerardo"},{id:25,fecha:"2026-04-27",hora:"09:08",remitente:"BBVA",email:"",asunto:"ENVIO SOPORTES EXTRACTOS LEASING A LOS CLIENTES",nota:"Remitido a gerencia ksaval"},{id:26,fecha:"2026-04-27",hora:"09:26",remitente:"LAURA CHALA",email:"subgerenciaeds@ksaval.com",asunto:"IMPUESTO PREDIAL - No hay vehiculos en Ibague, ya se pago impuestos vehiculos e ICA",nota:""},{id:27,fecha:"2026-04-27",hora:"09:26",remitente:"LAURA CHALA",email:"subgerenciaeds@ksaval.com",asunto:"REUNION ENER 27/04/2025",nota:""},{id:28,fecha:"2026-04-27",hora:"11:23",remitente:"ENERGY FALCON",email:"falconenergy7@gmail.com",asunto:"ORDEN DE FACTURACION CONTRATO 33214 CLIENTE K-SAVAL ENERGY SAS",nota:""},{id:29,fecha:"2026-04-27",hora:"11:25",remitente:"EDER MAURICIO RUGELES SERRATO",email:"eder.rugeles@terpel.com",asunto:"COMUNICADO GESTION CONTROL FLOTA",nota:"Remitido a gerencia ksaval"},{id:30,fecha:"2026-04-27",hora:"12:13",remitente:"EDER MAURICIO RUGELES SERRATO",email:"eder.rugeles@terpel.com",asunto:"FICHA DE DATOS DE SEGURIDAD COMBUSTIBLE",nota:"Remitido a gerencia ksaval"},{id:31,fecha:"2026-04-27",hora:"12:32",remitente:"MARITZA LORENA COLORADO BARAJAS",email:"lorena.colorado@inalde.edu.co",asunto:"INALDE - DIRECTORIO PROGRAMA ENFOCADO EN JUNTAS DIRECTIVAS",nota:"Informacion a Don Gerardo"},{id:32,fecha:"2026-04-27",hora:"14:21",remitente:"LAURA CHALA",email:"subgerenciaeds@ksaval.com",asunto:"INFORMACION ENEL REUNION 27/04/2026",nota:""},{id:33,fecha:"2026-04-27",hora:"14:55",remitente:"LAURA CHALA",email:"subgerenciaeds@ksaval.com",asunto:"BORRADOR ACTA JUSTIFICACION DE INGRESOS 2025",nota:""},{id:34,fecha:"2026-04-28",hora:"05:08",remitente:"EDES MAURICIO RUGELES SERRATO",email:"eder.rugeles@terpel.com",asunto:"SIGNIFICADO CERTIFICACION ICONTEC EN MEDIDA Y CALIDAD",nota:""},{id:35,fecha:"2026-04-28",hora:"08:42",remitente:"DIRECCION EMPRESAS",email:"direccionempresas.sas@gmail.com",asunto:"REPORTE DIARIO DE SALDOS BANCARIOS 28/04/2026",nota:""},{id:36,fecha:"2026-04-28",hora:"09:04",remitente:"COMUNICACIONES SANBONI",email:"mensajeria2@sanboni.edu.co",asunto:"PROCESO DE ADMISION 2027 - INICIO DE INSCRIPCIONES Y CARACTERIZACION",nota:""},{id:37,fecha:"2026-04-28",hora:"09:42",remitente:"LAURA CHALA",email:"subgerenciaeds@ksaval.com",asunto:"RE: BORRADOR RENTA",nota:""},{id:38,fecha:"2026-04-28",hora:"11:28",remitente:"BLANCA INCER CASALLAS",email:"blanca.casallas@amarilo.com",asunto:"INCUMPLIMIENTO CIERRE FINANCIERO (AMARILO)",nota:""},{id:39,fecha:"2026-04-28",hora:"12:02",remitente:"CORPORACION COLEGIO SAN BONIFACION DE LAS LANZAS",email:"",asunto:"CORPORACION COLEGIO SAN BONIFACION DE LAS LANZAS (PENSION)",nota:"Informacion a Don Gerardo"},{id:40,fecha:"2026-04-28",hora:"12:02",remitente:"CORPORACION COLEGIO SAN BONIFACION DE LAS LANZAS",email:"",asunto:"CORPORACION COLEGIO SAN BONIFACION DE LAS LANZAS (SERVICIO ALIMENTACION)",nota:"Informacion a Don Gerardo"},{id:41,fecha:"2026-04-28",hora:"17:24",remitente:"EDES MAURICIO RUGELES SERRATO",email:"eder.rugeles@terpel.com",asunto:"RV: BOLETIN N.96 EL CASO DE LOS 999 GALONES",nota:""},{id:42,fecha:"2026-04-29",hora:"09:19",remitente:"BBVA",email:"",asunto:"ENVIO SOPORTES EXTRACTOS LEASING A LOS CLIENTES",nota:""},{id:43,fecha:"2026-04-29",hora:"09:29",remitente:"DIRECCION EMPRESAS",email:"direccionempresas.sas@gmail.com",asunto:"REPORTE DIARIO DE SALDOS BANCARIOS 29/04/2026",nota:""},{id:44,fecha:"2026-04-29",hora:"09:38",remitente:"DIRECCION EMPRESAS",email:"direccionempresas.sas@gmail.com",asunto:"DEBITO CUENTA CORRIENTE BANCOLOMBIA 068-764422-91",nota:""},{id:45,fecha:"2026-04-29",hora:"13:19",remitente:"LUCIO ANDRES ORDOÑEZ",email:"lucio.ordonez.ext@terpel.com",asunto:"VENTANA DE MANTENIMIENTO CONEXIÓN WIFI",nota:""},{id:46,fecha:"2026-04-29",hora:"14:07",remitente:"CUENTAS POR COBRAR",email:"pagos.combustibles@primax.com.co",asunto:"GESTION DE COBRO PRE-CIERRE DE MES",nota:""},{id:47,fecha:"2026-04-29",hora:"14:16",remitente:"CUENTAS POR COBRAR",email:"pagos.combustibles@primax.com.co",asunto:"GESTION PREVENTIVA - ESTADO DE CUENTA",nota:""},{id:48,fecha:"2026-04-29",hora:"14:47",remitente:"BANCOLOMBIA",email:"",asunto:"CORREGIMOS EL PLAZO DE TU AMPLIACION CON TARJETA DE CREDITO",nota:""}];
-
-/* ══ ARRANCAR ══ */
+/* ── ARRANCAR ── */
 initApp();
 </script>
 </body>
