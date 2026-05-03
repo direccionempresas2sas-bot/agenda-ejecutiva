@@ -603,7 +603,7 @@ function renderViewer(){
   document.getElementById('vwTitle').textContent=`PENDIENTES ACTIVOS — ${data.length} resultado${data.length!==1?'s':''}`;
   let lista=document.getElementById('vwLista');lista.innerHTML='';
   if(!data.length){lista.innerHTML='<div class="vw-empty">✅ No hay pendientes activos.</div>';return;}
-  data.forEach(t=>{let[y,m,d]=t.fecha.split('-');let fl=new Date(y,m-1,d).toLocaleDateString('es-CO',{weekday:'short',day:'numeric',month:'short'});let card=document.createElement('div');card.className=`vw-card e-${t.prioridad}`;card.innerHTML=`<div><div class="vw-time">${t.hora}</div><div class="vw-time-date">${fl}</div></div><div><div class="vw-persona">${t.persona||'—'}</div><div class="vw-tema">${t.tema}</div><span class="vw-badge e-badge-${t.prioridad}">${t.prioridad}</span>${t.observacion?`<div class="vw-obs">💬 ${t.observacion}</div>`:''}</div><div><button class="vw-close-btn" onclick="cerrarPendienteViewer(${t.id})">✔ Cerrar</button></div>`;lista.appendChild(card);});
+  data.forEach(t=>{let[y,m,d]=t.fecha.split('-');let fl=new Date(y,m-1,d).toLocaleDateString('es-CO',{weekday:'short',day:'numeric',month:'short'});let card=document.createElement('div');card.className=`vw-card e-${t.prioridad}`;card.innerHTML=`<div><div class="vw-time">${t.hora}</div><div class="vw-time-date">${fl}</div></div><div><div class="vw-persona">${t.persona||'—'}</div><div class="vw-tema">${t.tema}</div><span class="vw-badge e-badge-${t.prioridad}">${t.prioridad}</span>${t.observacion?`<div class="vw-obs">💬 ${t.observacion}</div>`:''}</div><div></div>`;lista.appendChild(card);});
 }
 
 /* AGENDA */
