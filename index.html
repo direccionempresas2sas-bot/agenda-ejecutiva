@@ -449,6 +449,11 @@ button{padding:6px 10px;margin-top:5px;border:none;border-radius:5px;cursor:poin
     <label>Prioridad</label>
     <select id="editPrioridad"><option value="prioritario">Prioritario</option><option value="importante">Importante</option><option value="seguimiento">Seguimiento</option></select>
     <div class="modal-actions"><button class="btn-cancel" onclick="cerrarModalEditar()">Cancelar</button><button class="save" onclick="guardarEdicion()">💾 Guardar</button></div>
+    <div style="margin-top:12px;border-top:1px solid #374151;padding-top:12px;">
+      <div id="editDocBtn" style="display:none;">
+        <button onclick="abrirFotosDesdeEdicion()" style="background:#1e3a5f;border:1px solid #2563eb;color:#93c5fd;width:100%;padding:9px;border-radius:8px;font-size:13px;">📎 Ver / Gestionar archivos adjuntos</button>
+      </div>
+    </div>
   </div>
 </div>
 <div id="modalObs">
@@ -575,25 +580,33 @@ async function initApp(){
   db=firebase.firestore();
   auth=firebase.auth();
 
-  // Seed si es primera vez
+  // Seed cada coleccion de forma INDEPENDIENTE — nunca sobreescribe datos existentes
   try{
-    const agendaDoc=await db.collection('gjac').doc('agendaState').get();
-    if(!agendaDoc.exists){
-      await Promise.all([
-        db.collection('gjac').doc('agendaState').set({tareas:[],papelera:[],archivados:[]}),
-        db.collection('gjac').doc('directorio').set({items:DIR_DEFAULT}),
-        db.collection('gjac').doc('cuentas').set({items:CUENTAS_DEFAULT}),
-        db.collection('gjac').doc('correos').set({items:CORREOS_DEFAULT}),
-      ]);
-    }
-  }catch(e){console.log(e);}
+    const [agendaDoc,dirDoc,cuentasDoc,correosDoc,fotosDoc]=await Promise.all([
+      db.collection('gjac').doc('agendaState').get(),
+      db.collection('gjac').doc('directorio').get(),
+      db.collection('gjac').doc('cuentas').get(),
+      db.collection('gjac').doc('correos').get(),
+      db.collection('gjac').doc('fotos').get(),
+    ]);
+    const seeds=[];
+    if(!agendaDoc.exists) seeds.push(db.collection('gjac').doc('agendaState').set({tareas:[],papelera:[],archivados:[]}));
+    // Solo hacer seed de directorio/cuentas/correos si NO existen O si están vacíos
+    if(!dirDoc.exists || !(dirDoc.data().items||[]).length)
+      seeds.push(db.collection('gjac').doc('directorio').set({items:DIR_DEFAULT}));
+    if(!cuentasDoc.exists || !(cuentasDoc.data().items||[]).length)
+      seeds.push(db.collection('gjac').doc('cuentas').set({items:CUENTAS_DEFAULT}));
+    if(!correosDoc.exists || !(correosDoc.data().items||[]).length)
+      seeds.push(db.collection('gjac').doc('correos').set({items:CORREOS_DEFAULT}));
+    if(!fotosDoc.exists) seeds.push(db.collection('gjac').doc('fotos').set({items:{}}));
+    if(seeds.length) await Promise.all(seeds);
+  }catch(e){console.warn('Seed error:',e);}
 
   auth.onAuthStateChanged(user=>{
     document.getElementById('loadingScreen').classList.add('hidden');
     if(user && user.email===ADMIN_EMAIL){
       mostrarAdmin(user);
     } else {
-      // Si hay sesión de otro usuario, cerrarla y mostrar viewer
       if(user) auth.signOut();
       mostrarViewer();
     }
@@ -612,11 +625,15 @@ function setupListeners(){
   db.collection('gjac').doc('correos').onSnapshot(doc=>{correos=doc.exists?(doc.data().items||[]):[];if(document.getElementById('page-correo').classList.contains('active'))renderCorreo();});
 }
 function setupViewerListener(){
-  db.collection('gjac').doc('fotos').onSnapshot(doc=>{fotosPorTarea=doc.exists?(doc.data().items||{}):{};});
+  db.collection('gjac').doc('fotos').onSnapshot(doc=>{fotosPorTarea=doc.exists?(doc.data().items||{}):{};renderViewer();});
   db.collection('gjac').doc('agendaState').onSnapshot(doc=>{
     if(doc.exists){const d=doc.data();tareas=d.tareas||[];papeleraData=d.papelera||[];archivadosA=d.archivados||[];}
     renderViewer();
   },()=>syncErr());
+  // También cargar las demás colecciones para que el viewer siempre tenga datos frescos
+  db.collection('gjac').doc('directorio').onSnapshot(doc=>{directorio=doc.exists?(doc.data().items||[]):[];});
+  db.collection('gjac').doc('cuentas').onSnapshot(doc=>{cuentas=doc.exists?(doc.data().items||[]):[];});
+  db.collection('gjac').doc('correos').onSnapshot(doc=>{correos=doc.exists?(doc.data().items||[]):[];});
 }
 
 /* SAVE */
@@ -652,15 +669,17 @@ function renderViewer(){
   let lista=document.getElementById('vwLista');lista.innerHTML='';
   if(!data.length){lista.innerHTML='<div class="vw-empty">✅ No hay pendientes activos.</div>';return;}
   data.forEach(t=>{let[y,m,d]=t.fecha.split('-');let fl=new Date(y,m-1,d).toLocaleDateString('es-CO',{weekday:'short',day:'numeric',month:'short'});let card=document.createElement('div');card.className=`vw-card e-${t.prioridad}`;let vf=(fotosPorTarea[t.id]||[]).slice().reverse().slice(0,4);
-    let vfh=vf.length?`<div class="vw-fotos">${vf.map(f=>`<img class="vw-foto-thumb" src="${f.base64}" onclick="abrirLightbox(this.src)" title="${f.fecha} ${f.hora}">`).join('')}</div>`:'';
-    card.innerHTML=`<div><div class="vw-time">${t.hora}</div><div class="vw-time-date">${fl}</div></div><div><div class="vw-persona">${t.persona||'—'}</div><div class="vw-tema">${t.tema}</div><span class="vw-badge e-badge-${t.prioridad}">${t.prioridad}</span>${t.observacion?`<div class="vw-obs">💬 ${t.observacion}</div>`:''}${vfh}</div><div></div>`;lista.appendChild(card);});
+    let vfh=vf.length?`<div class="vw-fotos">${vf.map(f=>f.tipo&&f.tipo.startsWith('image/')?`<img class="vw-foto-thumb" src="${f.base64}" onclick="abrirLightbox('${f.base64}')" title="${f.nombre||''} ${f.fecha} ${f.hora}">`:``).filter(x=>x).join('')}${vf.filter(f=>!f.tipo||!f.tipo.startsWith('image/')).length?`<span class="foto-badge" style="align-self:center;">📎 ${vf.filter(f=>!f.tipo||!f.tipo.startsWith('image/')).length} doc</span>`:''}</div>`:'';    card.innerHTML=`<div><div class="vw-time">${t.hora}</div><div class="vw-time-date">${fl}</div></div><div><div class="vw-persona">${t.persona||'—'}</div><div class="vw-tema">${t.tema}</div><span class="vw-badge e-badge-${t.prioridad}">${t.prioridad}</span>${t.observacion?`<div class="vw-obs">💬 ${t.observacion}</div>`:''}${vfh}</div><div></div>`;lista.appendChild(card);});
 }
 
 /* AGENDA */
 function nowCO(){return new Date(new Date().toLocaleString('en-US',{timeZone:'America/Bogota'}));}
 function format(d){return d.toISOString().split('T')[0];}
 function guardar(){let fecha=document.getElementById('fecha').value,hora=document.getElementById('hora').value,persona=document.getElementById('persona').value.trim(),tema=document.getElementById('tema').value.trim(),prioridad=document.getElementById('prioridad').value,obs=document.getElementById('observacion').value.trim();if(!fecha||!hora||!tema){alert('Completa fecha, hora y tema');return;}tareas.push({id:Date.now(),fecha,hora,persona,tema,prioridad,observacion:obs,done:false});document.getElementById('fecha').valueAsDate=nowCO();['hora','persona','tema','observacion'].forEach(id=>document.getElementById(id).value='');document.getElementById('prioridad').value='prioritario';saveA();render();}
-function editar(t){document.getElementById('editId').value=t.id;document.getElementById('editFecha').value=t.fecha;document.getElementById('editHora').value=t.hora;document.getElementById('editPersona').value=t.persona||'';document.getElementById('editTema').value=t.tema;document.getElementById('editObservacion').value=t.observacion||'';document.getElementById('editPrioridad').value=t.prioridad;document.getElementById('modalEditar').classList.add('open');}
+function editar(t){document.getElementById('editId').value=t.id;document.getElementById('editFecha').value=t.fecha;document.getElementById('editHora').value=t.hora;document.getElementById('editPersona').value=t.persona||'';document.getElementById('editTema').value=t.tema;document.getElementById('editObservacion').value=t.observacion||'';document.getElementById('editPrioridad').value=t.prioridad;document.getElementById('editDocBtn').style.display='block';currentEditId=t.id;document.getElementById('modalEditar').classList.add('open');}
+let currentEditId=null;
+function abrirFotosDesdeEdicion(){let id=currentEditId;if(!id)return;let tema=document.getElementById('editTema').value.substring(0,35);cerrarModalEditar();abrirFotos(id,tema);}
+
 function cerrarModalEditar(){document.getElementById('modalEditar').classList.remove('open');}
 function guardarEdicion(){let id=Number(document.getElementById('editId').value),fecha=document.getElementById('editFecha').value,hora=document.getElementById('editHora').value,persona=document.getElementById('editPersona').value.trim(),tema=document.getElementById('editTema').value.trim(),obs=document.getElementById('editObservacion').value.trim(),prioridad=document.getElementById('editPrioridad').value;if(!fecha||!hora||!tema){alert('Completa fecha, hora y tema');return;}tareas=tareas.map(t=>t.id===id?{...t,fecha,hora,persona,tema,observacion:obs,prioridad}:t);cerrarModalEditar();saveA();render();}
 document.getElementById('modalEditar').addEventListener('click',function(e){if(e.target===this)cerrarModalEditar();});
@@ -676,8 +695,8 @@ function togglePapelera(){let el=document.getElementById('papelera'),a=document.
 function exportarWhatsApp(){let fecha=document.getElementById('buscarFecha').value;if(!fecha){alert('Selecciona una fecha');return;}let lista=tareas.filter(t=>t.fecha===fecha);if(!lista.length){alert('No hay tareas para esa fecha');return;}let txt='📅 Agenda del día\n\n';lista.forEach(t=>{txt+=`• ${t.hora} - ${t.persona||''}\n${t.tema}\n(${t.prioridad})\n\n`;});window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank');}
 function cardHTML(t){
   let fc=(fotosPorTarea[t.id]||[]).length;
-  let fb=fc>0?`<span class="foto-badge">📷 ${fc}</span>`:'';
-  return `<strong>${t.hora}</strong> — ${t.persona||''}<br>${t.tema} ${fb}<br>📅 ${t.fecha}<br><span class="badge bad-${t.prioridad}">${t.prioridad.toUpperCase()}</span><br><div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;"><button onclick="toggleDone(${t.id})">✔</button><button class="edit" onclick='editar(${JSON.stringify(t)})'>✏️ Editar</button><button class="delete" onclick="eliminar(${t.id})">🗑</button><button onclick="verObs(${t.id})" ${t.observacion?'':'disabled'}>📝 Obs</button><button onclick="abrirFotos(${t.id},\`${(t.tema||'').replace(/\`/g,"'").substring(0,35)}\`)" style="background:#1e3a5f;border:1px solid #2563eb;color:#93c5fd;">📷 Fotos</button></div>`;
+  let fb=fc>0?`<span class="foto-badge">📎 ${fc} archivo${fc!==1?'s':''}</span>`:'';
+  return `<strong>${t.hora}</strong> — ${t.persona||''}<br>${t.tema} ${fb}<br>📅 ${t.fecha}<br><span class="badge bad-${t.prioridad}">${t.prioridad.toUpperCase()}</span><br><div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;"><button onclick="toggleDone(${t.id})">✔</button><button class="edit" onclick='editar(${JSON.stringify(t)})'>✏️ Editar</button><button class="delete" onclick="eliminar(${t.id})">🗑</button><button onclick="verObs(${t.id})" ${t.observacion?'':'disabled'}>📝 Obs</button><button onclick="abrirFotos(${t.id},\`${(t.tema||'').replace(/\`/g,"'").substring(0,35)}\`)" style="background:#1e3a5f;border:1px solid #2563eb;color:#93c5fd;">📎 Archivos${fc>0?' ('+fc+')':''}</button></div>`;
 }
 function render(){
   let texto=document.getElementById('buscarTexto').value.toLowerCase(),fechaFiltro=document.getElementById('buscarFecha').value;
@@ -713,8 +732,7 @@ function renderExec(){
   let lista=document.getElementById('execLista');lista.innerHTML='';
   if(!data.length){lista.innerHTML=`<div class="exec-empty"><div class="exec-empty-icon">✅</div>No hay pendientes.</div>`;return;}
   data.forEach(t=>{let[y,m,d]=t.fecha.split('-');let fl=new Date(y,m-1,d).toLocaleDateString('es-CO',{weekday:'short',day:'numeric',month:'short'});let card=document.createElement('div');card.className=`exec-card e-${t.prioridad}`;let ef=(fotosPorTarea[t.id]||[]).slice().reverse().slice(0,4);
-    let efh=ef.length?`<div class="vw-fotos">${ef.map(f=>`<img class="vw-foto-thumb" src="${f.base64}" onclick="abrirLightbox(this.src)" title="${f.fecha} ${f.hora}">`).join('')}</div>`:'';
-    card.innerHTML=`<div><div class="exec-time">${t.hora}</div><div class="exec-time-date">${fl}</div></div><div><div class="exec-body-persona">${t.persona||'—'}</div><div class="exec-body-tema">${t.tema}</div><span class="exec-badge e-badge-${t.prioridad}">${t.prioridad}</span>${t.observacion?`<div class="exec-body-obs">💬 ${t.observacion}</div>`:''}${efh}</div><div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;"><button class="exec-close-btn" onclick="cerrarPendienteExec(${t.id})">✔ Cerrar</button></div>`;lista.appendChild(card);});
+    let efh=ef.length?`<div class="vw-fotos">${ef.map(f=>f.tipo&&f.tipo.startsWith('image/')?`<img class="vw-foto-thumb" src="${f.base64}" onclick="abrirLightbox('${f.base64}')" title="${f.nombre||''} ${f.fecha} ${f.hora}">`:``).filter(x=>x).join('')}${ef.filter(f=>!f.tipo||!f.tipo.startsWith('image/')).length?`<span class="foto-badge" style="align-self:center;">📎 ${ef.filter(f=>!f.tipo||!f.tipo.startsWith('image/')).length} doc</span>`:''}</div>`:'';    card.innerHTML=`<div><div class="exec-time">${t.hora}</div><div class="exec-time-date">${fl}</div></div><div><div class="exec-body-persona">${t.persona||'—'}</div><div class="exec-body-tema">${t.tema}</div><span class="exec-badge e-badge-${t.prioridad}">${t.prioridad}</span>${t.observacion?`<div class="exec-body-obs">💬 ${t.observacion}</div>`:''}${efh}</div><div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;"><button class="exec-close-btn" onclick="cerrarPendienteExec(${t.id})">✔ Cerrar</button></div>`;lista.appendChild(card);});
 }
 
 /* DIRECTORIO */
@@ -752,24 +770,131 @@ const CUENTAS_DEFAULT=[{id:1,banco:"BANCOLOMBIA",num:"7973987644",tipo:"AHORROS"
 const CORREOS_DEFAULT=[{id:1,fecha:"2026-04-22",hora:"08:59",remitente:"DIRECCION EMPRESAS",email:"direccionempresas.sas@gmail.com",asunto:"REPORTE DIARIO DE SALDOS BANCARIOS 22/04/2026",nota:""},{id:2,fecha:"2026-04-22",hora:"09:04",remitente:"NOTIFICACIONES MOVILGAS",email:"notificaciones@mileniumgas.com",asunto:"ACTA NO.45 JUNTA GENERAL ORDINARIA MOVILGAS LTDA 27 MARZO 2026",nota:""},{id:3,fecha:"2026-04-22",hora:"09:11",remitente:"NOTIFICACIONES MOVILGAS",email:"notificaciones@mileniumgas.com",asunto:"ACTA NO.31 JUNTA GENERAL ORDINARIA MOVILGAS LTDA 28 MARZO 2026",nota:""},{id:4,fecha:"2026-04-22",hora:"11:16",remitente:"LAURA CHALA",email:"subgerenciaeds@ksaval.com",asunto:"AUSENCIA LAURA CHALA MARTES DE 7AM A 11AM",nota:""},{id:5,fecha:"2026-04-22",hora:"11:26",remitente:"CORPORACION COLEGIO SAN BONIFACION DE LAS LANZAS",email:"",asunto:"CORPORACION COLEGIO SAN BONIFACION DE LAS LANZAS",nota:""},{id:6,fecha:"2026-04-22",hora:"13:35",remitente:"LAURA CHALA",email:"subgerenciaeds@ksaval.com",asunto:"BORRADOR ACTA N.4: ESTADO DE PENDIENTES REUNION VIERNES 17",nota:""},{id:7,fecha:"2026-04-22",hora:"15:00",remitente:"CORRESPONDENCIA",email:"correspondencia@millanyasociados.com",asunto:"29195 - KSAVAL INFORME SAGRILAFT Y PTEE 2025",nota:""},{id:8,fecha:"2026-04-23",hora:"07:25",remitente:"HAROLD CASTRO CASTILLO",email:"haroldcastrocastillo@yahoo.com",asunto:"REVISION 2020-2024",nota:""},{id:9,fecha:"2026-04-23",hora:"08:06",remitente:"SERGIO BODENSIEK",email:"sergiobodensiek12@gmail.com",asunto:"SOLICITUD REEMBOLSO GASTOS DE VIAJE",nota:""},{id:10,fecha:"2026-04-23",hora:"08:45",remitente:"DIRECCION EMPRESAS",email:"direccionempresas.sas@gmail.com",asunto:"REPORTE DIARIO DE SALDOS BANCARIOS 23/04/2026",nota:""},{id:11,fecha:"2026-04-23",hora:"09:14",remitente:"BANCOLOMBIA",email:"",asunto:"¡TOC-TOC! LLEGO TU EXTRACTO DEL MES (MARZO)",nota:""},{id:12,fecha:"2026-04-23",hora:"15:01",remitente:"BANCOLOMBIA",email:"",asunto:"PAGA TU IMPUESTO PREDIAL",nota:"Se remite a gerente ksaval"},{id:13,fecha:"2026-04-23",hora:"17:14",remitente:"MONICA SOFIA ALARCON ALARCON",email:"monica.alarcon@informacion.terpel.com",asunto:"REPORTE PAGOS A PROVEEDORES_20260423",nota:"Se remite a Yessica"},{id:14,fecha:"2026-04-23",hora:"20:47",remitente:"LAURA CHALA",email:"subgerenciaeds@ksaval.com",asunto:"BORRADOR RENTA",nota:""},{id:15,fecha:"2026-04-23",hora:"21:18",remitente:"LAURA CHALA",email:"subgerenciaeds@ksaval.com",asunto:"CERTIFICADO TRIBUTARIO 2025 GERARDO JAVIER ALVARADO",nota:"Se da a conocer a Andrea"},{id:16,fecha:"2026-04-23",hora:"21:23",remitente:"LAURA CHALA",email:"subgerenciaeds@ksaval.com",asunto:"REPORTE DE VENTAS - K-SAVAL ABRRGY SAS",nota:""},{id:17,fecha:"2026-04-23",hora:"23:00",remitente:"LAURA CHALA",email:"subgerenciaeds@ksaval.com",asunto:"VISITA EDS LAS MONEDAS MANUEL LARA",nota:""},{id:18,fecha:"2026-04-23",hora:"23:10",remitente:"LAURA CHALA",email:"subgerenciaeds@ksaval.com",asunto:"CONSULTA TRATAMIENTO CONTABLE Y FISCAL - MOVIMIENTOS ACCIONISTA NO LEGALIZADOS",nota:""},{id:19,fecha:"2026-04-24",hora:"09:02",remitente:"YESSICA",email:"direccionempresas.sas@gmail.com",asunto:"REPORTE DIARIO DE SALDOS BANCARIOS 24/04/2026",nota:""},{id:20,fecha:"2026-04-26",hora:"17:17",remitente:"AVIANCA (e-ticket)",email:"eticket@avianca.com",asunto:"MONICA MARIA BOCANEGRA RICO, 03MAY/0905/ SAN ANDRES ISLAND",nota:"Pendiente respuesta Señora Monica"},{id:21,fecha:"2026-04-26",hora:"17:18",remitente:"AVIANCA (e-ticket)",email:"eticket@avianca.com",asunto:"GERARDO JAVIER ALVARADO CUBILLOS, 03MAY/0905/SAN ANDRES ISLAND",nota:""},{id:22,fecha:"2026-04-26",hora:"17:18",remitente:"AVIANCA",email:"",asunto:"GERARDO JAVIER ALVARADO CUBILLOS - DETALLES DE TU RESERVA ADZ - IBE",nota:""},{id:23,fecha:"2026-04-26",hora:"20:09",remitente:"ANDREA ARIAS",email:"andreariasaquite@gmail.com",asunto:"INFORMACION ANGELICA - CONTRATO DE ACCIONES",nota:""},{id:24,fecha:"2026-04-27",hora:"08:44",remitente:"FENALCO TOLIMA",email:"",asunto:"INVITACION EMPRESARIAL - JUEVES 30 ABRIL AUDITORIO CAMARA DE COMERCIO IBAGUE",nota:"Informacion a Don Gerardo"},{id:25,fecha:"2026-04-27",hora:"09:08",remitente:"BBVA",email:"",asunto:"ENVIO SOPORTES EXTRACTOS LEASING A LOS CLIENTES",nota:"Remitido a gerencia ksaval"},{id:26,fecha:"2026-04-27",hora:"09:26",remitente:"LAURA CHALA",email:"subgerenciaeds@ksaval.com",asunto:"IMPUESTO PREDIAL - No hay vehiculos en Ibague, ya se pago impuestos vehiculos e ICA",nota:""},{id:27,fecha:"2026-04-27",hora:"09:26",remitente:"LAURA CHALA",email:"subgerenciaeds@ksaval.com",asunto:"REUNION ENER 27/04/2025",nota:""},{id:28,fecha:"2026-04-27",hora:"11:23",remitente:"ENERGY FALCON",email:"falconenergy7@gmail.com",asunto:"ORDEN DE FACTURACION CONTRATO 33214 CLIENTE K-SAVAL ENERGY SAS",nota:""},{id:29,fecha:"2026-04-27",hora:"11:25",remitente:"EDER MAURICIO RUGELES SERRATO",email:"eder.rugeles@terpel.com",asunto:"COMUNICADO GESTION CONTROL FLOTA",nota:"Remitido a gerencia ksaval"},{id:30,fecha:"2026-04-27",hora:"12:13",remitente:"EDER MAURICIO RUGELES SERRATO",email:"eder.rugeles@terpel.com",asunto:"FICHA DE DATOS DE SEGURIDAD COMBUSTIBLE",nota:"Remitido a gerencia ksaval"},{id:31,fecha:"2026-04-27",hora:"12:32",remitente:"MARITZA LORENA COLORADO BARAJAS",email:"lorena.colorado@inalde.edu.co",asunto:"INALDE - DIRECTORIO PROGRAMA ENFOCADO EN JUNTAS DIRECTIVAS",nota:"Informacion a Don Gerardo"},{id:32,fecha:"2026-04-27",hora:"14:21",remitente:"LAURA CHALA",email:"subgerenciaeds@ksaval.com",asunto:"INFORMACION ENEL REUNION 27/04/2026",nota:""},{id:33,fecha:"2026-04-27",hora:"14:55",remitente:"LAURA CHALA",email:"subgerenciaeds@ksaval.com",asunto:"BORRADOR ACTA JUSTIFICACION DE INGRESOS 2025",nota:""},{id:34,fecha:"2026-04-28",hora:"05:08",remitente:"EDES MAURICIO RUGELES SERRATO",email:"eder.rugeles@terpel.com",asunto:"SIGNIFICADO CERTIFICACION ICONTEC EN MEDIDA Y CALIDAD",nota:""},{id:35,fecha:"2026-04-28",hora:"08:42",remitente:"DIRECCION EMPRESAS",email:"direccionempresas.sas@gmail.com",asunto:"REPORTE DIARIO DE SALDOS BANCARIOS 28/04/2026",nota:""},{id:36,fecha:"2026-04-28",hora:"09:04",remitente:"COMUNICACIONES SANBONI",email:"mensajeria2@sanboni.edu.co",asunto:"PROCESO DE ADMISION 2027 - INICIO DE INSCRIPCIONES Y CARACTERIZACION",nota:""},{id:37,fecha:"2026-04-28",hora:"09:42",remitente:"LAURA CHALA",email:"subgerenciaeds@ksaval.com",asunto:"RE: BORRADOR RENTA",nota:""},{id:38,fecha:"2026-04-28",hora:"11:28",remitente:"BLANCA INCER CASALLAS",email:"blanca.casallas@amarilo.com",asunto:"INCUMPLIMIENTO CIERRE FINANCIERO (AMARILO)",nota:""},{id:39,fecha:"2026-04-28",hora:"12:02",remitente:"CORPORACION COLEGIO SAN BONIFACION DE LAS LANZAS",email:"",asunto:"CORPORACION COLEGIO SAN BONIFACION DE LAS LANZAS (PENSION)",nota:"Informacion a Don Gerardo"},{id:40,fecha:"2026-04-28",hora:"12:02",remitente:"CORPORACION COLEGIO SAN BONIFACION DE LAS LANZAS",email:"",asunto:"CORPORACION COLEGIO SAN BONIFACION DE LAS LANZAS (SERVICIO ALIMENTACION)",nota:"Informacion a Don Gerardo"},{id:41,fecha:"2026-04-28",hora:"17:24",remitente:"EDES MAURICIO RUGELES SERRATO",email:"eder.rugeles@terpel.com",asunto:"RV: BOLETIN N.96 EL CASO DE LOS 999 GALONES",nota:""},{id:42,fecha:"2026-04-29",hora:"09:19",remitente:"BBVA",email:"",asunto:"ENVIO SOPORTES EXTRACTOS LEASING A LOS CLIENTES",nota:""},{id:43,fecha:"2026-04-29",hora:"09:29",remitente:"DIRECCION EMPRESAS",email:"direccionempresas.sas@gmail.com",asunto:"REPORTE DIARIO DE SALDOS BANCARIOS 29/04/2026",nota:""},{id:44,fecha:"2026-04-29",hora:"09:38",remitente:"DIRECCION EMPRESAS",email:"direccionempresas.sas@gmail.com",asunto:"DEBITO CUENTA CORRIENTE BANCOLOMBIA 068-764422-91",nota:""},{id:45,fecha:"2026-04-29",hora:"13:19",remitente:"LUCIO ANDRES ORDOÑEZ",email:"lucio.ordonez.ext@terpel.com",asunto:"VENTANA DE MANTENIMIENTO CONEXIÓN WIFI",nota:""},{id:46,fecha:"2026-04-29",hora:"14:07",remitente:"CUENTAS POR COBRAR",email:"pagos.combustibles@primax.com.co",asunto:"GESTION DE COBRO PRE-CIERRE DE MES",nota:""},{id:47,fecha:"2026-04-29",hora:"14:16",remitente:"CUENTAS POR COBRAR",email:"pagos.combustibles@primax.com.co",asunto:"GESTION PREVENTIVA - ESTADO DE CUENTA",nota:""},{id:48,fecha:"2026-04-29",hora:"14:47",remitente:"BANCOLOMBIA",email:"",asunto:"CORREGIMOS EL PLAZO DE TU AMPLIACION CON TARJETA DE CREDITO",nota:""}];
 
 initApp();
+
+/* ═══════ FOTOS / ARCHIVOS ADJUNTOS ═══════ */
+let fotosPorTarea={};
+let currentFotoTareaId=null;
+
+function setupFotosListener(){
+  db.collection('gjac').doc('fotos').onSnapshot(doc=>{
+    fotosPorTarea=doc.exists?(doc.data().items||{}):{};
+    render();
+  });
+}
+
+function saveFotos(){
+  syncStart();
+  db.collection('gjac').doc('fotos').set({items:fotosPorTarea}).then(syncOk).catch(syncErr);
+}
+
+function abrirFotos(tareaId,tema){
+  currentFotoTareaId=tareaId;
+  document.getElementById('fotoLabel').textContent=tema||'';
+  renderFotoGrid();
+  document.getElementById('modalFotos').classList.add('open');
+}
+
+function cerrarModalFotos(){
+  document.getElementById('modalFotos').classList.remove('open');
+  currentFotoTareaId=null;
+  document.getElementById('fotoInput').value='';
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  const mf=document.getElementById('modalFotos');
+  if(mf) mf.addEventListener('click',function(e){if(e.target===this)cerrarModalFotos();});
+});
+
+function renderFotoGrid(){
+  const archivos=(fotosPorTarea[currentFotoTareaId]||[]);
+  const grid=document.getElementById('fotoGrid');
+  const empty=document.getElementById('fotoEmpty');
+  grid.innerHTML='';
+  if(!archivos.length){empty.style.display='block';return;}
+  empty.style.display='none';
+  archivos.slice().reverse().forEach((f,rIdx)=>{
+    const realIdx=archivos.length-1-rIdx;
+    const isImg=f.tipo&&f.tipo.startsWith('image/');
+    const item=document.createElement('div');
+    item.className='foto-item';
+    if(isImg){
+      item.innerHTML=`
+        <img src="${f.base64}" onclick="abrirLightbox('${f.base64}')" title="${f.nombre||''}">
+        <div class="foto-meta"><div class="foto-fecha">${f.nombre||'Imagen'}</div><div class="foto-hora">${f.fecha||''} ${f.hora||''}</div></div>
+        <button class="foto-del" onclick="eliminarArchivo(${realIdx})">✕</button>`;
+    } else {
+      const icon=f.tipo&&f.tipo.includes('pdf')?'📄':f.tipo&&f.tipo.includes('word')?'📝':f.tipo&&f.tipo.includes('excel')||f.tipo&&f.tipo.includes('spreadsheet')?'📊':'📎';
+      item.innerHTML=`
+        <div style="padding:14px 10px;text-align:center;">
+          <div style="font-size:36px;">${icon}</div>
+          <div style="font-size:11px;color:#93c5fd;word-break:break-all;margin-top:6px;">${f.nombre||'Archivo'}</div>
+          <div style="font-size:10px;color:#374151;margin-top:4px;">${f.fecha||''} ${f.hora||''}</div>
+          <a href="${f.base64}" download="${f.nombre||'archivo'}" style="display:inline-block;margin-top:8px;background:#1e3a5f;color:#93c5fd;border:1px solid #2563eb;border-radius:6px;padding:4px 10px;font-size:11px;text-decoration:none;">⬇ Descargar</a>
+        </div>
+        <button class="foto-del" onclick="eliminarArchivo(${realIdx})">✕</button>`;
+    }
+    grid.appendChild(item);
+  });
+}
+
+function eliminarArchivo(idx){
+  if(!currentFotoTareaId)return;
+  if(!confirm('¿Eliminar este archivo?'))return;
+  const arr=fotosPorTarea[currentFotoTareaId]||[];
+  arr.splice(idx,1);
+  fotosPorTarea[currentFotoTareaId]=arr;
+  saveFotos();
+  renderFotoGrid();
+  render();
+}
+
+function subirFotos(event){
+  const files=Array.from(event.target.files);
+  if(!files.length||!currentFotoTareaId)return;
+  const MAX=5*1024*1024;
+  let pending=files.length;
+  files.forEach(file=>{
+    if(file.size>MAX){alert(`"${file.name}" supera 5 MB. No se subió.`);pending--;if(!pending){document.getElementById('fotoInput').value='';render();}return;}
+    const reader=new FileReader();
+    reader.onload=e=>{
+      const now=nowCO();
+      const entry={base64:e.target.result,nombre:file.name,tipo:file.type,fecha:format(now),hora:now.toTimeString().slice(0,5)};
+      if(!fotosPorTarea[currentFotoTareaId])fotosPorTarea[currentFotoTareaId]=[];
+      fotosPorTarea[currentFotoTareaId].push(entry);
+      pending--;
+      if(!pending){saveFotos();renderFotoGrid();document.getElementById('fotoInput').value='';render();}
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function abrirLightbox(src){
+  document.getElementById('lightboxImg').src=src;
+  document.getElementById('lightbox').classList.add('open');
+}
+function cerrarLightbox(){
+  document.getElementById('lightbox').classList.remove('open');
+  document.getElementById('lightboxImg').src='';
+}
+
 </script>
 
-<!-- MODAL FOTOS -->
+<!-- MODAL ARCHIVOS ADJUNTOS -->
 <div id="modalFotos">
   <div class="foto-box">
     <div class="foto-box-head">
-      <h3>📷 Registro Fotográfico</h3>
+      <h3>📎 Archivos Adjuntos</h3>
       <span id="fotoLabel"></span>
     </div>
     <div class="foto-scroll">
       <div class="foto-grid" id="fotoGrid"></div>
-      <div id="fotoEmpty" class="foto-empty" style="display:none;">📷 Sin fotos aún. Agrega la primera abajo.</div>
+      <div id="fotoEmpty" class="foto-empty" style="display:none;">📎 Sin archivos aún. Agrega el primero abajo.</div>
     </div>
     <div class="foto-upload" onclick="document.getElementById('fotoInput').click()">
       <div style="font-size:26px;">📎</div>
-      <p>Haz clic aquí para agregar foto(s)</p>
-      <small>JPG · PNG · Máx. 5 MB por foto</small>
-      <input type="file" id="fotoInput" accept="image/*" multiple onchange="subirFotos(event)">
+      <p>Haz clic aquí para agregar archivo(s)</p>
+      <small>Imágenes · PDF · Word · Excel · Cualquier tipo · Máx. 5 MB por archivo</small>
+      <input type="file" id="fotoInput" accept="*/*" multiple onchange="subirFotos(event)">
     </div>
     <div class="foto-box-foot">
       <button onclick="cerrarModalFotos()" style="background:#374151;color:#fff;width:100%;padding:9px;border-radius:8px;">Cerrar</button>
