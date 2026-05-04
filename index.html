@@ -130,13 +130,7 @@ button{padding:6px 10px;margin-top:5px;border:none;border-radius:5px;cursor:poin
 .btn-cancel{background:#374151;color:#fff;}
 #modalObs{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:10001;align-items:center;justify-content:center;}
 #modalObs.open{display:flex;}
-.obs-box{background:#111827;border-radius:14px;width:580px;max-width:95vw;max-height:85vh;display:flex;flex-direction:column;border:1px solid #374151;box-shadow:0 20px 60px rgba(0,0,0,.7);overflow:hidden;}
-.obs-box-title{font-size:16px;border-bottom:1px solid #374151;padding:20px 24px 14px;flex-shrink:0;font-family:'DM Serif Display',serif;}
-.obs-scroll{overflow-y:auto;flex:1;padding:16px 24px;}
-.obs-scroll::-webkit-scrollbar{width:5px;}
-.obs-scroll::-webkit-scrollbar-track{background:#0d1526;}
-.obs-scroll::-webkit-scrollbar-thumb{background:#374151;border-radius:4px;}
-.obs-footer{flex-shrink:0;padding:12px 24px;border-top:1px solid #1f2937;}
+.obs-box{background:#111827;padding:24px;border-radius:12px;width:420px;max-width:90vw;border:1px solid #374151;}
 
 /* VISTA EJECUTIVA ADMIN */
 #vistaEjecutiva{display:none;position:fixed;inset:0;z-index:9998;background:#080e1a;overflow-y:auto;overflow-x:hidden;}
@@ -417,13 +411,9 @@ button{padding:6px 10px;margin-top:5px;border:none;border-radius:5px;cursor:poin
 </div>
 <div id="modalObs">
   <div class="obs-box">
-    <div class="obs-box-title">📝 Observación completa</div>
-    <div class="obs-scroll">
-      <div id="contenidoObs" style="white-space:pre-wrap;color:#d1d5db;line-height:1.75;font-size:14px;"></div>
-    </div>
-    <div class="obs-footer">
-      <button onclick="cerrarObs()" style="background:#ef4444;color:#fff;width:100%;padding:10px;border-radius:8px;font-size:14px;">Cerrar</button>
-    </div>
+    <h3>📝 Observación</h3>
+    <div id="contenidoObs" style="margin-top:10px;white-space:pre-wrap;color:#d1d5db;line-height:1.6;"></div>
+    <button onclick="cerrarObs()" style="margin-top:15px;background:#ef4444;color:#fff;">Cerrar</button>
   </div>
 </div>
 <div id="modalDir" class="modal-overlay">
@@ -469,36 +459,6 @@ button{padding:6px 10px;margin-top:5px;border:none;border-radius:5px;cursor:poin
       <button class="save" style="background:#7c3aed;" onclick="guardarCorreo()">💾 Guardar</button>
     </div>
   </div>
-</div>
-
-
-<!-- MODAL FOTOS -->
-<div id="modalFotos">
-  <div class="foto-box">
-    <div class="foto-box-header">
-      <h3>📷 Registro Fotográfico</h3>
-      <span id="fotoTareaLabel"></span>
-    </div>
-    <div class="foto-scroll">
-      <div class="foto-grid" id="fotoGrid"></div>
-      <div id="fotoEmpty" class="foto-empty" style="display:none;">📷 Aún no hay fotos para este pendiente.</div>
-    </div>
-    <div class="foto-upload-area" onclick="document.getElementById('fotoInput').click()">
-      <div style="font-size:28px;">📎</div>
-      <p>Haz clic aquí para agregar una foto</p>
-      <p style="font-size:11px;color:#374151;margin-top:4px;">JPG, PNG · Máx. 5MB por foto</p>
-      <input type="file" id="fotoInput" accept="image/*" multiple onchange="subirFotos(event)">
-    </div>
-    <div style="display:flex;gap:8px;margin-top:12px;">
-      <button onclick="cerrarModalFotos()" style="flex:1;background:#374151;color:#fff;padding:9px;border-radius:8px;">Cerrar</button>
-    </div>
-  </div>
-</div>
-
-<!-- LIGHTBOX -->
-<div id="lightbox" onclick="cerrarLightbox()">
-  <img id="lightboxImg" src="">
-  <button onclick="cerrarLightbox()">✕</button>
 </div>
 
 <!-- VISTA EJECUTIVA ADMIN -->
@@ -596,7 +556,6 @@ async function initApp(){
 
 /* LISTENERS */
 function setupListeners(){
-  setupFotosListener();
   db.collection('gjac').doc('agendaState').onSnapshot(doc=>{
     if(doc.exists){const d=doc.data();tareas=d.tareas||[];papeleraData=d.papelera||[];archivadosA=d.archivados||[];}
     render();
@@ -644,9 +603,7 @@ function renderViewer(){
   document.getElementById('vwTitle').textContent=`PENDIENTES ACTIVOS — ${data.length} resultado${data.length!==1?'s':''}`;
   let lista=document.getElementById('vwLista');lista.innerHTML='';
   if(!data.length){lista.innerHTML='<div class="vw-empty">✅ No hay pendientes activos.</div>';return;}
-  data.forEach(t=>{let[y,m,d]=t.fecha.split('-');let fl=new Date(y,m-1,d).toLocaleDateString('es-CO',{weekday:'short',day:'numeric',month:'short'});let card=document.createElement('div');card.className=`vw-card e-${t.prioridad}`;let vwFotos=(fotosPorTarea[t.id]||[]).slice(-4).reverse();
-    let vwFotoHtml=vwFotos.length?`<div class="vw-fotos">${vwFotos.map(f=>`<img class="vw-foto-thumb" src="${f.base64}" onclick="abrirLightbox('${f.base64}')" title="${f.fecha} ${f.hora}">`).join('')}<span style="font-size:11px;color:#4b5563;align-self:center;">${(fotosPorTarea[t.id]||[]).length} foto${(fotosPorTarea[t.id]||[]).length!==1?'s':''}</span></div>`:'';
-    card.innerHTML=`<div><div class="vw-time">${t.hora}</div><div class="vw-time-date">${fl}</div></div><div><div class="vw-persona">${t.persona||'—'}</div><div class="vw-tema">${t.tema}</div><span class="vw-badge e-badge-${t.prioridad}">${t.prioridad}</span>${t.observacion?`<div class="vw-obs">💬 ${t.observacion}</div>`:''}${vwFotoHtml}</div><div></div>`;lista.appendChild(card);});
+  data.forEach(t=>{let[y,m,d]=t.fecha.split('-');let fl=new Date(y,m-1,d).toLocaleDateString('es-CO',{weekday:'short',day:'numeric',month:'short'});let card=document.createElement('div');card.className=`vw-card e-${t.prioridad}`;card.innerHTML=`<div><div class="vw-time">${t.hora}</div><div class="vw-time-date">${fl}</div></div><div><div class="vw-persona">${t.persona||'—'}</div><div class="vw-tema">${t.tema}</div><span class="vw-badge e-badge-${t.prioridad}">${t.prioridad}</span>${t.observacion?`<div class="vw-obs">💬 ${t.observacion}</div>`:''}</div><div><button class="vw-close-btn" onclick="cerrarPendienteViewer(${t.id})">✔ Cerrar</button></div>`;lista.appendChild(card);});
 }
 
 /* AGENDA */
@@ -667,11 +624,7 @@ function cerrarObs(){document.getElementById('modalObs').classList.remove('open'
 function toggleArchivados(){let el=document.getElementById('archivados'),a=document.getElementById('arrowArchivados');el.style.display=el.style.display==='none'?'block':'none';a.innerText=el.style.display==='none'?'⬇️':'⬆️';}
 function togglePapelera(){let el=document.getElementById('papelera'),a=document.getElementById('arrowPapelera');el.style.display=el.style.display==='none'?'block':'none';a.innerText=el.style.display==='none'?'⬇️':'⬆️';}
 function exportarWhatsApp(){let fecha=document.getElementById('buscarFecha').value;if(!fecha){alert('Selecciona una fecha');return;}let lista=tareas.filter(t=>t.fecha===fecha);if(!lista.length){alert('No hay tareas para esa fecha');return;}let txt='📅 Agenda del día\n\n';lista.forEach(t=>{txt+=`• ${t.hora} - ${t.persona||''}\n${t.tema}\n(${t.prioridad})\n\n`;});window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank');}
-function cardHTML(t){
-  let fotoCnt=(fotosPorTarea[t.id]||[]).length;
-  let fotoBadge=fotoCnt>0?`<span class="foto-badge">📷 ${fotoCnt}</span>`:'';
-  return `<strong>${t.hora}</strong> — ${t.persona||''}<br>${t.tema} ${fotoBadge}<br>📅 ${t.fecha}<br><span class="badge bad-${t.prioridad}">${t.prioridad.toUpperCase()}</span><br><div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;"><button onclick="toggleDone(${t.id})">✔</button><button class="edit" onclick='editar(${JSON.stringify(t)})'>✏️ Editar</button><button class="delete" onclick="eliminar(${t.id})">🗑</button><button onclick="verObs(${t.id})" ${t.observacion?'':'disabled'}>📝 Obs</button><button onclick="abrirFotos(${t.id},'${(t.tema||'').replace(/'/g,'').substring(0,30)}')" style="background:#1e3a5f;border:1px solid #2563eb;color:#93c5fd;">📷 Fotos</button></div>`;
-}
+function cardHTML(t){return `<strong>${t.hora}</strong> — ${t.persona||''}<br>${t.tema}<br>📅 ${t.fecha}<br><span class="badge bad-${t.prioridad}">${t.prioridad.toUpperCase()}</span><br><div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;"><button onclick="toggleDone(${t.id})">✔</button><button class="edit" onclick='editar(${JSON.stringify(t)})'>✏️ Editar</button><button class="delete" onclick="eliminar(${t.id})">🗑</button><button onclick="verObs(${t.id})" ${t.observacion?'':'disabled'}>📝 Obs</button></div>`;}
 function render(){
   let texto=document.getElementById('buscarTexto').value.toLowerCase(),fechaFiltro=document.getElementById('buscarFecha').value;
   let headers=document.querySelectorAll('.acenter h3');
@@ -705,9 +658,7 @@ function renderExec(){
   document.getElementById('execSecTitle').innerText=`PENDIENTES ACTIVOS — ${data.length} resultado${data.length!==1?'s':''}`;
   let lista=document.getElementById('execLista');lista.innerHTML='';
   if(!data.length){lista.innerHTML=`<div class="exec-empty"><div class="exec-empty-icon">✅</div>No hay pendientes.</div>`;return;}
-  data.forEach(t=>{let[y,m,d]=t.fecha.split('-');let fl=new Date(y,m-1,d).toLocaleDateString('es-CO',{weekday:'short',day:'numeric',month:'short'});let card=document.createElement('div');card.className=`exec-card e-${t.prioridad}`;let exFotos=(fotosPorTarea[t.id]||[]).slice(-4).reverse();
-    let exFotoHtml=exFotos.length?`<div class="vw-fotos">${exFotos.map(f=>`<img class="vw-foto-thumb" src="${f.base64}" onclick="abrirLightbox('${f.base64}')" title="${f.fecha} ${f.hora}">`).join('')}</div>`:'';
-    card.innerHTML=`<div><div class="exec-time">${t.hora}</div><div class="exec-time-date">${fl}</div></div><div><div class="exec-body-persona">${t.persona||'—'}</div><div class="exec-body-tema">${t.tema}</div><span class="exec-badge e-badge-${t.prioridad}">${t.prioridad}</span>${t.observacion?`<div class="exec-body-obs">💬 ${t.observacion}</div>`:''}${exFotoHtml}</div><div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;"><button class="exec-close-btn" onclick="cerrarPendienteExec(${t.id})">✔ Cerrar</button></div>`;lista.appendChild(card);});
+  data.forEach(t=>{let[y,m,d]=t.fecha.split('-');let fl=new Date(y,m-1,d).toLocaleDateString('es-CO',{weekday:'short',day:'numeric',month:'short'});let card=document.createElement('div');card.className=`exec-card e-${t.prioridad}`;card.innerHTML=`<div><div class="exec-time">${t.hora}</div><div class="exec-time-date">${fl}</div></div><div><div class="exec-body-persona">${t.persona||'—'}</div><div class="exec-body-tema">${t.tema}</div><span class="exec-badge e-badge-${t.prioridad}">${t.prioridad}</span>${t.observacion?`<div class="exec-body-obs">💬 ${t.observacion}</div>`:''}</div><div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;"><button class="exec-close-btn" onclick="cerrarPendienteExec(${t.id})">✔ Cerrar</button></div>`;lista.appendChild(card);});
 }
 
 /* DIRECTORIO */
@@ -731,7 +682,7 @@ function guardarCuenta(){let banco=document.getElementById('cuentaBanco').value.
 function eliminarCuenta(id){let c=cuentas.find(x=>x.id===id);if(!c)return;if(!confirm(`¿Eliminar cuenta de ${c.titular||c.num}?`))return;cuentas=cuentas.filter(x=>x.id!==id);saveCuentas();renderCuentas();}
 
 /* CORREO */
-function renderCorreo(){let buscar=document.getElementById('correoBuscar').value.toLowerCase(),fechaFiltro=document.getElementById('correoFechaFiltro').value;let data=correos.filter(c=>{if(fechaFiltro&&c.fecha!==fechaFiltro)return false;if(buscar&&!JSON.stringify(c).toLowerCase().includes(buscar))return false;return true;});data.sort((a,b)=>a.fecha===b.fecha?a.hora.localeCompare(b.hora):a.fecha.localeCompare(b.fecha));document.getElementById('correoCount').textContent=data.length+' correo'+(data.length!==1?'s':'');let container=document.getElementById('correoContainer');container.innerHTML='';if(!data.length){container.innerHTML='<div class="mail-empty">📭 No se encontraron correos.</div>';return;}let grupos={};data.forEach(c=>{if(!grupos[c.fecha])grupos[c.fecha]=[];grupos[c.fecha].push(c);});Object.keys(grupos).sort().reverse().forEach(fecha=>{let[y,m,d]=fecha.split('-');let label=new Date(y,m-1,d).toLocaleDateString('es-CO',{weekday:'long',year:'numeric',month:'long',day:'numeric'}).toUpperCase();let sec=document.createElement('div');let h=document.createElement('div');h.className='mail-section-date';h.textContent='📅 '+label;sec.appendChild(h);let grid=document.createElement('div');grid.className='mail-grid';grupos[fecha].forEach(c=>{let card=document.createElement('div');card.className='mail-card';card.innerHTML=`<div class="mail-card-top"><span class="mail-card-hora">🕐 ${c.hora}</span><span class="tag tag-purple" style="font-size:10px;">${c.fecha}</span></div><div class="mail-card-remitente">${c.remitente||'(sin remitente)'}</div>${c.email?`<div class="mail-card-email">✉️ ${c.email}</div>`:''}<div class="mail-card-asunto">${c.asunto}</div>${c.nota?`<div class="mail-card-nota">📌 ${c.nota}</div>`:''}<div class="mail-card-actions"><button class="edit" onclick="editarCorreo(${c.id})">✏️ Editar</button><button class="delete" onclick="eliminarCorreo(${c.id})">🗑 Eliminar</button></div>`;grid.appendChild(card);});sec.appendChild(grid);container.appendChild(sec);});}
+function renderCorreo(){let buscar=document.getElementById('correoBuscar').value.toLowerCase(),fechaFiltro=document.getElementById('correoFechaFiltro').value;let data=correos.filter(c=>{if(fechaFiltro&&c.fecha!==fechaFiltro)return false;if(buscar&&!JSON.stringify(c).toLowerCase().includes(buscar))return false;return true;});data.sort((a,b)=>a.fecha===b.fecha?a.hora.localeCompare(b.hora):a.fecha.localeCompare(b.fecha));document.getElementById('correoCount').textContent=data.length+' correo'+(data.length!==1?'s':'');let container=document.getElementById('correoContainer');container.innerHTML='';if(!data.length){container.innerHTML='<div class="mail-empty">📭 No se encontraron correos.</div>';return;}let grupos={};data.forEach(c=>{if(!grupos[c.fecha])grupos[c.fecha]=[];grupos[c.fecha].push(c);});Object.keys(grupos).sort().forEach(fecha=>{let[y,m,d]=fecha.split('-');let label=new Date(y,m-1,d).toLocaleDateString('es-CO',{weekday:'long',year:'numeric',month:'long',day:'numeric'}).toUpperCase();let sec=document.createElement('div');let h=document.createElement('div');h.className='mail-section-date';h.textContent='📅 '+label;sec.appendChild(h);let grid=document.createElement('div');grid.className='mail-grid';grupos[fecha].forEach(c=>{let card=document.createElement('div');card.className='mail-card';card.innerHTML=`<div class="mail-card-top"><span class="mail-card-hora">🕐 ${c.hora}</span><span class="tag tag-purple" style="font-size:10px;">${c.fecha}</span></div><div class="mail-card-remitente">${c.remitente||'(sin remitente)'}</div>${c.email?`<div class="mail-card-email">✉️ ${c.email}</div>`:''}<div class="mail-card-asunto">${c.asunto}</div>${c.nota?`<div class="mail-card-nota">📌 ${c.nota}</div>`:''}<div class="mail-card-actions"><button class="edit" onclick="editarCorreo(${c.id})">✏️ Editar</button><button class="delete" onclick="eliminarCorreo(${c.id})">🗑 Eliminar</button></div>`;grid.appendChild(card);});sec.appendChild(grid);container.appendChild(sec);});}
 function abrirModalCorreo(){document.getElementById('correoEditId').value='';document.getElementById('modalCorreoTitle').textContent='➕ Agregar correo';['correoFecha','correoHora','correoRemitente','correoEmail','correoAsunto','correoNota'].forEach(id=>document.getElementById(id).value='');document.getElementById('modalCorreo').classList.add('open');}
 function cerrarModalCorreo(){document.getElementById('modalCorreo').classList.remove('open');}
 document.getElementById('modalCorreo').addEventListener('click',function(e){if(e.target===this)cerrarModalCorreo();});
