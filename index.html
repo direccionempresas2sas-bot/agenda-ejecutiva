@@ -582,12 +582,11 @@ async function initApp(){
 
   // Seed cada coleccion de forma INDEPENDIENTE — nunca sobreescribe datos existentes
   try{
-    const [agendaDoc,dirDoc,cuentasDoc,correosDoc,fotosDoc]=await Promise.all([
+    const [agendaDoc,dirDoc,cuentasDoc,correosDoc]=await Promise.all([
       db.collection('gjac').doc('agendaState').get(),
       db.collection('gjac').doc('directorio').get(),
       db.collection('gjac').doc('cuentas').get(),
       db.collection('gjac').doc('correos').get(),
-      db.collection('gjac').doc('fotos').get(),
     ]);
     const seeds=[];
     if(!agendaDoc.exists) seeds.push(db.collection('gjac').doc('agendaState').set({tareas:[],papelera:[],archivados:[]}));
@@ -598,7 +597,7 @@ async function initApp(){
       seeds.push(db.collection('gjac').doc('cuentas').set({items:CUENTAS_DEFAULT}));
     if(!correosDoc.exists || !(correosDoc.data().items||[]).length)
       seeds.push(db.collection('gjac').doc('correos').set({items:CORREOS_DEFAULT}));
-    if(!fotosDoc.exists) seeds.push(db.collection('gjac').doc('fotos').set({items:{}}));
+    // fotos: documentos individuales por tarea — no requieren seed global
     if(seeds.length) await Promise.all(seeds);
   }catch(e){console.warn('Seed error:',e);}
 
@@ -625,12 +624,14 @@ function setupListeners(){
   db.collection('gjac').doc('correos').onSnapshot(doc=>{correos=doc.exists?(doc.data().items||[]):[];if(document.getElementById('page-correo').classList.contains('active'))renderCorreo();});
 }
 function setupViewerListener(){
-  db.collection('gjac').doc('fotos').onSnapshot(doc=>{fotosPorTarea=doc.exists?(doc.data().items||{}):{};renderViewer();});
+  db.collection('gjac_fotos').onSnapshot(snap=>{
+    snap.forEach(doc=>{fotosPorTarea[Number(doc.id)]=doc.data().archivos||[];});
+    renderViewer();
+  },()=>{});
   db.collection('gjac').doc('agendaState').onSnapshot(doc=>{
     if(doc.exists){const d=doc.data();tareas=d.tareas||[];papeleraData=d.papelera||[];archivadosA=d.archivados||[];}
     renderViewer();
   },()=>syncErr());
-  // También cargar las demás colecciones para que el viewer siempre tenga datos frescos
   db.collection('gjac').doc('directorio').onSnapshot(doc=>{directorio=doc.exists?(doc.data().items||[]):[];});
   db.collection('gjac').doc('cuentas').onSnapshot(doc=>{cuentas=doc.exists?(doc.data().items||[]):[];});
   db.collection('gjac').doc('correos').onSnapshot(doc=>{correos=doc.exists?(doc.data().items||[]):[];});
@@ -668,8 +669,10 @@ function renderViewer(){
   document.getElementById('vwTitle').textContent=`PENDIENTES ACTIVOS — ${data.length} resultado${data.length!==1?'s':''}`;
   let lista=document.getElementById('vwLista');lista.innerHTML='';
   if(!data.length){lista.innerHTML='<div class="vw-empty">✅ No hay pendientes activos.</div>';return;}
-  data.forEach(t=>{let[y,m,d]=t.fecha.split('-');let fl=new Date(y,m-1,d).toLocaleDateString('es-CO',{weekday:'short',day:'numeric',month:'short'});let card=document.createElement('div');card.className=`vw-card e-${t.prioridad}`;let vf=(fotosPorTarea[t.id]||[]).slice().reverse().slice(0,4);
-    let vfh=vf.length?`<div class="vw-fotos">${vf.map(f=>f.tipo&&f.tipo.startsWith('image/')?`<img class="vw-foto-thumb" src="${f.base64}" onclick="abrirLightbox('${f.base64}')" title="${f.nombre||''} ${f.fecha} ${f.hora}">`:``).filter(x=>x).join('')}${vf.filter(f=>!f.tipo||!f.tipo.startsWith('image/')).length?`<span class="foto-badge" style="align-self:center;">📎 ${vf.filter(f=>!f.tipo||!f.tipo.startsWith('image/')).length} doc</span>`:''}</div>`:'';    card.innerHTML=`<div><div class="vw-time">${t.hora}</div><div class="vw-time-date">${fl}</div></div><div><div class="vw-persona">${t.persona||'—'}</div><div class="vw-tema">${t.tema}</div><span class="vw-badge e-badge-${t.prioridad}">${t.prioridad}</span>${t.observacion?`<div class="vw-obs">💬 ${t.observacion}</div>`:''}${vfh}</div><div></div>`;lista.appendChild(card);});
+  data.forEach(t=>{let[y,m,d]=t.fecha.split('-');let fl=new Date(y,m-1,d).toLocaleDateString('es-CO',{weekday:'short',day:'numeric',month:'short'});let card=document.createElement('div');card.className=`vw-card e-${t.prioridad}`;
+    let allArch=(fotosPorTarea[t.id]||[]);let imgs=allArch.filter(f=>f.tipo&&f.tipo.startsWith('image/'));let docs=allArch.filter(f=>!f.tipo||!f.tipo.startsWith('image/'));let total=allArch.length;
+    let adjHTML='';if(total>0){let thumbs=imgs.slice(-4).map(f=>`<img class="vw-foto-thumb" src="${f.base64}" onclick="abrirLightbox('${f.base64}')" title="${f.nombre||''}">`).join('');let docBadge=docs.length?`<span class="foto-badge" style="align-self:center;margin-left:4px;">📄 ${docs.length} doc${docs.length!==1?'s':''}</span>`:'';let totalBadge=`<span class="foto-badge" style="align-self:center;background:rgba(99,102,241,.18);color:#a5b4fc;border-color:rgba(99,102,241,.35);">📎 ${total} adjunto${total!==1?'s':''}</span>`;adjHTML=`<div class="vw-fotos" style="align-items:center;margin-top:10px;">${totalBadge}${thumbs}${docBadge}</div>`;}
+    card.innerHTML=`<div><div class="vw-time">${t.hora}</div><div class="vw-time-date">${fl}</div></div><div><div class="vw-persona">${t.persona||'—'}</div><div class="vw-tema">${t.tema}</div><span class="vw-badge e-badge-${t.prioridad}">${t.prioridad}</span>${t.observacion?`<div class="vw-obs">💬 ${t.observacion}</div>`:''}${adjHTML}</div><div></div>`;lista.appendChild(card);});
 }
 
 /* AGENDA */
@@ -731,8 +734,10 @@ function renderExec(){
   document.getElementById('execSecTitle').innerText=`PENDIENTES ACTIVOS — ${data.length} resultado${data.length!==1?'s':''}`;
   let lista=document.getElementById('execLista');lista.innerHTML='';
   if(!data.length){lista.innerHTML=`<div class="exec-empty"><div class="exec-empty-icon">✅</div>No hay pendientes.</div>`;return;}
-  data.forEach(t=>{let[y,m,d]=t.fecha.split('-');let fl=new Date(y,m-1,d).toLocaleDateString('es-CO',{weekday:'short',day:'numeric',month:'short'});let card=document.createElement('div');card.className=`exec-card e-${t.prioridad}`;let ef=(fotosPorTarea[t.id]||[]).slice().reverse().slice(0,4);
-    let efh=ef.length?`<div class="vw-fotos">${ef.map(f=>f.tipo&&f.tipo.startsWith('image/')?`<img class="vw-foto-thumb" src="${f.base64}" onclick="abrirLightbox('${f.base64}')" title="${f.nombre||''} ${f.fecha} ${f.hora}">`:``).filter(x=>x).join('')}${ef.filter(f=>!f.tipo||!f.tipo.startsWith('image/')).length?`<span class="foto-badge" style="align-self:center;">📎 ${ef.filter(f=>!f.tipo||!f.tipo.startsWith('image/')).length} doc</span>`:''}</div>`:'';    card.innerHTML=`<div><div class="exec-time">${t.hora}</div><div class="exec-time-date">${fl}</div></div><div><div class="exec-body-persona">${t.persona||'—'}</div><div class="exec-body-tema">${t.tema}</div><span class="exec-badge e-badge-${t.prioridad}">${t.prioridad}</span>${t.observacion?`<div class="exec-body-obs">💬 ${t.observacion}</div>`:''}${efh}</div><div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;"><button class="exec-close-btn" onclick="cerrarPendienteExec(${t.id})">✔ Cerrar</button></div>`;lista.appendChild(card);});
+  data.forEach(t=>{let[y,m,d]=t.fecha.split('-');let fl=new Date(y,m-1,d).toLocaleDateString('es-CO',{weekday:'short',day:'numeric',month:'short'});let card=document.createElement('div');card.className=`exec-card e-${t.prioridad}`;
+    let allArch=(fotosPorTarea[t.id]||[]);let imgs=allArch.filter(f=>f.tipo&&f.tipo.startsWith('image/'));let docs=allArch.filter(f=>!f.tipo||!f.tipo.startsWith('image/'));let total=allArch.length;
+    let adjHTML='';if(total>0){let thumbs=imgs.slice(-4).map(f=>`<img class="vw-foto-thumb" src="${f.base64}" onclick="abrirLightbox('${f.base64}')" title="${f.nombre||''}">`).join('');let docBadge=docs.length?`<span class="foto-badge" style="align-self:center;margin-left:4px;">📄 ${docs.length} doc${docs.length!==1?'s':''}</span>`:'';let totalBadge=`<span class="foto-badge" style="align-self:center;background:rgba(99,102,241,.18);color:#a5b4fc;border-color:rgba(99,102,241,.35);">📎 ${total} adjunto${total!==1?'s':''}</span>`;adjHTML=`<div class="vw-fotos" style="align-items:center;margin-top:10px;">${totalBadge}${thumbs}${docBadge}</div>`;}
+    card.innerHTML=`<div><div class="exec-time">${t.hora}</div><div class="exec-time-date">${fl}</div></div><div><div class="exec-body-persona">${t.persona||'—'}</div><div class="exec-body-tema">${t.tema}</div><span class="exec-badge e-badge-${t.prioridad}">${t.prioridad}</span>${t.observacion?`<div class="exec-body-obs">💬 ${t.observacion}</div>`:''}${adjHTML}</div><div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;"><button class="exec-close-btn" onclick="cerrarPendienteExec(${t.id})">✔ Cerrar</button></div>`;lista.appendChild(card);});
 }
 
 /* DIRECTORIO */
@@ -772,25 +777,55 @@ const CORREOS_DEFAULT=[{id:1,fecha:"2026-04-22",hora:"08:59",remitente:"DIRECCIO
 initApp();
 
 /* ═══════ FOTOS / ARCHIVOS ADJUNTOS ═══════ */
-let fotosPorTarea={};
+/* ═══════ ARCHIVOS ADJUNTOS — Firestore por tarea ═══════
+   Cada pendiente tiene su propio doc: gjac_fotos/{tareaId}
+   Imágenes: comprimidas a max 1200px, calidad 72%
+   Documentos: límite 400 KB
+   Límite Firestore por doc: ~900 KB → muy seguro con compresión
+═══════════════════════════════════════════════════════════ */
+let fotosPorTarea={};       // cache local: {tareaId: [archivos]}
+let fotosListeners={};      // listeners activos por tareaId
 let currentFotoTareaId=null;
+const MAX_IMG_PX=1200;
+const IMG_QUALITY=0.72;
+const MAX_DOC_BYTES=400*1024; // 400 KB para no-imágenes
 
+/* ── Listener global liviano: solo cuenta adjuntos por tarea ── */
 function setupFotosListener(){
-  db.collection('gjac').doc('fotos').onSnapshot(doc=>{
-    fotosPorTarea=doc.exists?(doc.data().items||{}):{};
+  // Escucha la colección gjac_fotos para saber qué tareas tienen archivos
+  db.collection('gjac_fotos').onSnapshot(snap=>{
+    snap.forEach(doc=>{
+      const id=Number(doc.id);
+      fotosPorTarea[id]=doc.data().archivos||[];
+    });
     render();
-  });
+  }, ()=>{});
 }
 
-function saveFotos(){
+/* ── Guardar archivos de UNA tarea en su propio documento ── */
+function saveFotosTarea(tareaId){
   syncStart();
-  db.collection('gjac').doc('fotos').set({items:fotosPorTarea}).then(syncOk).catch(syncErr);
+  const archivos=fotosPorTarea[tareaId]||[];
+  db.collection('gjac_fotos').doc(String(tareaId))
+    .set({archivos, tareaId, updatedAt: Date.now()})
+    .then(syncOk).catch(e=>{syncErr();console.error('saveFotos error:',e);});
 }
 
+/* ── Abrir modal de archivos ── */
 function abrirFotos(tareaId,tema){
   currentFotoTareaId=tareaId;
   document.getElementById('fotoLabel').textContent=tema||'';
-  renderFotoGrid();
+  // Si no tenemos los archivos en cache, cargarlos primero
+  if(!fotosPorTarea[tareaId]){
+    document.getElementById('fotoGrid').innerHTML='<div style="text-align:center;padding:30px;color:#4b5563;">Cargando…</div>';
+    document.getElementById('fotoEmpty').style.display='none';
+    db.collection('gjac_fotos').doc(String(tareaId)).get().then(doc=>{
+      fotosPorTarea[tareaId]=doc.exists?(doc.data().archivos||[]):[];
+      renderFotoGrid();
+    });
+  } else {
+    renderFotoGrid();
+  }
   document.getElementById('modalFotos').classList.add('open');
 }
 
@@ -805,6 +840,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   if(mf) mf.addEventListener('click',function(e){if(e.target===this)cerrarModalFotos();});
 });
 
+/* ── Renderizar grid de archivos ── */
 function renderFotoGrid(){
   const archivos=(fotosPorTarea[currentFotoTareaId]||[]);
   const grid=document.getElementById('fotoGrid');
@@ -823,7 +859,7 @@ function renderFotoGrid(){
         <div class="foto-meta"><div class="foto-fecha">${f.nombre||'Imagen'}</div><div class="foto-hora">${f.fecha||''} ${f.hora||''}</div></div>
         <button class="foto-del" onclick="eliminarArchivo(${realIdx})">✕</button>`;
     } else {
-      const icon=f.tipo&&f.tipo.includes('pdf')?'📄':f.tipo&&f.tipo.includes('word')?'📝':f.tipo&&f.tipo.includes('excel')||f.tipo&&f.tipo.includes('spreadsheet')?'📊':'📎';
+      const icon=f.tipo&&f.tipo.includes('pdf')?'📄':f.tipo&&(f.tipo.includes('word')||f.tipo.includes('msword'))?'📝':f.tipo&&(f.tipo.includes('excel')||f.tipo.includes('spreadsheet'))?'📊':'📎';
       item.innerHTML=`
         <div style="padding:14px 10px;text-align:center;">
           <div style="font-size:36px;">${icon}</div>
@@ -837,37 +873,76 @@ function renderFotoGrid(){
   });
 }
 
+/* ── Eliminar archivo ── */
 function eliminarArchivo(idx){
   if(!currentFotoTareaId)return;
   if(!confirm('¿Eliminar este archivo?'))return;
   const arr=fotosPorTarea[currentFotoTareaId]||[];
   arr.splice(idx,1);
   fotosPorTarea[currentFotoTareaId]=arr;
-  saveFotos();
+  saveFotosTarea(currentFotoTareaId);
   renderFotoGrid();
   render();
 }
 
-function subirFotos(event){
-  const files=Array.from(event.target.files);
-  if(!files.length||!currentFotoTareaId)return;
-  const MAX=5*1024*1024;
-  let pending=files.length;
-  files.forEach(file=>{
-    if(file.size>MAX){alert(`"${file.name}" supera 5 MB. No se subió.`);pending--;if(!pending){document.getElementById('fotoInput').value='';render();}return;}
+/* ── Comprimir imagen con Canvas ── */
+function comprimirImagen(file){
+  return new Promise((resolve,reject)=>{
     const reader=new FileReader();
     reader.onload=e=>{
-      const now=nowCO();
-      const entry={base64:e.target.result,nombre:file.name,tipo:file.type,fecha:format(now),hora:now.toTimeString().slice(0,5)};
-      if(!fotosPorTarea[currentFotoTareaId])fotosPorTarea[currentFotoTareaId]=[];
-      fotosPorTarea[currentFotoTareaId].push(entry);
-      pending--;
-      if(!pending){saveFotos();renderFotoGrid();document.getElementById('fotoInput').value='';render();}
+      const img=new Image();
+      img.onload=()=>{
+        let w=img.width,h=img.height;
+        if(w>MAX_IMG_PX||h>MAX_IMG_PX){
+          if(w>h){h=Math.round(h*MAX_IMG_PX/w);w=MAX_IMG_PX;}
+          else{w=Math.round(w*MAX_IMG_PX/h);h=MAX_IMG_PX;}
+        }
+        const canvas=document.createElement('canvas');
+        canvas.width=w;canvas.height=h;
+        canvas.getContext('2d').drawImage(img,0,0,w,h);
+        const b64=canvas.toDataURL('image/jpeg',IMG_QUALITY);
+        resolve(b64);
+      };
+      img.onerror=reject;
+      img.src=e.target.result;
     };
+    reader.onerror=reject;
     reader.readAsDataURL(file);
   });
 }
 
+/* ── Subir archivos ── */
+async function subirFotos(event){
+  const files=Array.from(event.target.files);
+  if(!files.length||!currentFotoTareaId)return;
+  document.getElementById('fotoGrid').innerHTML='<div style="text-align:center;padding:20px;color:#60a5fa;font-size:13px;">⏳ Procesando archivos…</div>';
+  document.getElementById('fotoEmpty').style.display='none';
+  if(!fotosPorTarea[currentFotoTareaId])fotosPorTarea[currentFotoTareaId]=[];
+  let errores=[];
+  for(const file of files){
+    const now=nowCO();
+    const meta={nombre:file.name,tipo:file.type,fecha:format(now),hora:now.toTimeString().slice(0,5)};
+    try{
+      if(file.type.startsWith('image/')){
+        const b64=await comprimirImagen(file);
+        // Verificar tamaño tras compresión (aprox bytes = b64.length * 0.75)
+        if(b64.length*0.75>900*1024){errores.push(`"${file.name}" es demasiado grande incluso comprimida.`);continue;}
+        fotosPorTarea[currentFotoTareaId].push({...meta,base64:b64});
+      } else {
+        if(file.size>MAX_DOC_BYTES){errores.push(`"${file.name}" supera 400 KB. Usa imágenes para archivos más grandes.`);continue;}
+        const b64=await new Promise((res,rej)=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.onerror=rej;r.readAsDataURL(file);});
+        fotosPorTarea[currentFotoTareaId].push({...meta,base64:b64});
+      }
+    }catch(e){errores.push(`Error procesando "${file.name}".`);}
+  }
+  saveFotosTarea(currentFotoTareaId);
+  renderFotoGrid();
+  document.getElementById('fotoInput').value='';
+  render();
+  if(errores.length)alert('Algunos archivos no se pudieron subir:\n'+errores.join('\n'));
+}
+
+/* ── Lightbox ── */
 function abrirLightbox(src){
   document.getElementById('lightboxImg').src=src;
   document.getElementById('lightbox').classList.add('open');
