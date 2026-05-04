@@ -128,15 +128,9 @@ button{padding:6px 10px;margin-top:5px;border:none;border-radius:5px;cursor:poin
 .modal-actions{display:flex;gap:8px;margin-top:18px;}
 .modal-actions button{flex:1;padding:9px;}
 .btn-cancel{background:#374151;color:#fff;}
-#modalObs{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:10001;align-items:center;justify-content:center;}
+#modalObs{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:10001;align-items:center;justify-content:center;}
 #modalObs.open{display:flex;}
-.obs-box{background:#111827;border-radius:14px;width:600px;max-width:95vw;max-height:85vh;display:flex;flex-direction:column;border:1px solid #374151;box-shadow:0 20px 60px rgba(0,0,0,.8);overflow:hidden;}
-.obs-box-head{font-size:16px;font-weight:700;padding:20px 24px 14px;border-bottom:1px solid #374151;flex-shrink:0;}
-.obs-scroll{overflow-y:auto;flex:1;padding:18px 24px;}
-.obs-scroll::-webkit-scrollbar{width:5px;}
-.obs-scroll::-webkit-scrollbar-track{background:#0d1526;}
-.obs-scroll::-webkit-scrollbar-thumb{background:#374151;border-radius:4px;}
-.obs-foot{flex-shrink:0;padding:12px 24px;border-top:1px solid #1f2937;}
+.obs-box{background:#111827;padding:24px;border-radius:12px;width:420px;max-width:90vw;border:1px solid #374151;}
 
 /* VISTA EJECUTIVA ADMIN */
 #vistaEjecutiva{display:none;position:fixed;inset:0;z-index:9998;background:#080e1a;overflow-y:auto;overflow-x:hidden;}
@@ -219,42 +213,6 @@ button{padding:6px 10px;margin-top:5px;border:none;border-radius:5px;cursor:poin
 .mod-table tbody tr:hover{background:#0d1526;}
 .mod-table tbody tr:last-child{border-bottom:none;}
 .mod-table td{padding:12px 14px;vertical-align:top;line-height:1.4;word-break:break-word;overflow-wrap:anywhere;}
-
-/* ── FOTOS ── */
-#modalFotos{display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:10002;align-items:center;justify-content:center;}
-#modalFotos.open{display:flex;}
-.foto-box{background:#111827;border:1px solid #374151;border-radius:14px;padding:0;width:680px;max-width:96vw;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.8);overflow:hidden;}
-.foto-box-head{display:flex;align-items:center;justify-content:space-between;padding:18px 22px 14px;border-bottom:1px solid #374151;flex-shrink:0;}
-.foto-box-head h3{font-size:15px;}
-.foto-box-head span{font-size:12px;color:#4b5563;max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.foto-scroll{overflow-y:auto;flex:1;padding:14px 16px;}
-.foto-scroll::-webkit-scrollbar{width:5px;}
-.foto-scroll::-webkit-scrollbar-track{background:#0d1526;}
-.foto-scroll::-webkit-scrollbar-thumb{background:#374151;border-radius:4px;}
-.foto-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;}
-.foto-item{background:#0d1526;border:1px solid #1e2d45;border-radius:10px;overflow:hidden;position:relative;}
-.foto-item img{width:100%;height:120px;object-fit:cover;display:block;cursor:pointer;}
-.foto-item img:hover{opacity:.82;}
-.foto-meta{padding:6px 8px;}
-.foto-fecha{font-size:10px;color:#60a5fa;font-weight:700;}
-.foto-hora{font-size:10px;color:#374151;}
-.foto-del{position:absolute;top:5px;right:5px;background:rgba(239,68,68,.88);border:none;color:#fff;border-radius:5px;padding:2px 6px;font-size:10px;cursor:pointer;font-family:'DM Sans',sans-serif;}
-.foto-empty{text-align:center;color:#374151;padding:36px 0;font-size:13px;}
-.foto-upload{border:2px dashed #1e2d45;border-radius:10px;padding:16px;text-align:center;cursor:pointer;transition:.2s;margin:0 16px 16px;flex-shrink:0;}
-.foto-upload:hover{border-color:#3b82f6;background:rgba(59,130,246,.04);}
-.foto-upload p{font-size:13px;color:#4b5563;margin-top:6px;}
-.foto-upload small{font-size:11px;color:#374151;}
-.foto-upload input{display:none;}
-.foto-box-foot{padding:10px 16px;border-top:1px solid #1f2937;flex-shrink:0;}
-.foto-badge{display:inline-flex;align-items:center;gap:3px;background:rgba(59,130,246,.15);color:#93c5fd;border:1px solid rgba(59,130,246,.3);border-radius:12px;padding:1px 7px;font-size:10px;font-weight:700;margin-left:5px;vertical-align:middle;}
-.vw-fotos{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px;}
-.vw-foto-thumb{width:68px;height:52px;object-fit:cover;border-radius:6px;cursor:pointer;border:1px solid #1e2d45;transition:.15s;}
-.vw-foto-thumb:hover{opacity:.8;border-color:#3b82f6;}
-#lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.94);z-index:99999;align-items:center;justify-content:center;cursor:zoom-out;}
-#lightbox.open{display:flex;}
-#lightboxImg{max-width:92vw;max-height:90vh;border-radius:8px;box-shadow:0 0 40px rgba(0,0,0,.9);}
-#lightCloseBtn{position:fixed;top:18px;right:22px;background:rgba(255,255,255,.12);border:none;color:#fff;font-size:24px;cursor:pointer;border-radius:6px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;}
-
 .mail-section-date{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#374151;padding:10px 0;border-bottom:1px solid #0d1526;margin-bottom:14px;}
 .mail-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin-bottom:28px;width:100%;}
 .mail-card{background:#0d1526;border:1px solid #1e2d45;border-radius:12px;padding:16px 18px;transition:.2s;word-break:break-word;overflow:hidden;}
@@ -453,13 +411,9 @@ button{padding:6px 10px;margin-top:5px;border:none;border-radius:5px;cursor:poin
 </div>
 <div id="modalObs">
   <div class="obs-box">
-    <div class="obs-box-head">📝 Observación</div>
-    <div class="obs-scroll">
-      <div id="contenidoObs" style="white-space:pre-wrap;color:#d1d5db;line-height:1.8;font-size:14px;"></div>
-    </div>
-    <div class="obs-foot">
-      <button onclick="cerrarObs()" style="background:#ef4444;color:#fff;width:100%;padding:10px;border-radius:8px;font-size:14px;">Cerrar</button>
-    </div>
+    <h3>📝 Observación</h3>
+    <div id="contenidoObs" style="margin-top:10px;white-space:pre-wrap;color:#d1d5db;line-height:1.6;"></div>
+    <button onclick="cerrarObs()" style="margin-top:15px;background:#ef4444;color:#fff;">Cerrar</button>
   </div>
 </div>
 <div id="modalDir" class="modal-overlay">
@@ -602,7 +556,6 @@ async function initApp(){
 
 /* LISTENERS */
 function setupListeners(){
-  setupFotosListener();
   db.collection('gjac').doc('agendaState').onSnapshot(doc=>{
     if(doc.exists){const d=doc.data();tareas=d.tareas||[];papeleraData=d.papelera||[];archivadosA=d.archivados||[];}
     render();
@@ -612,7 +565,6 @@ function setupListeners(){
   db.collection('gjac').doc('correos').onSnapshot(doc=>{correos=doc.exists?(doc.data().items||[]):[];if(document.getElementById('page-correo').classList.contains('active'))renderCorreo();});
 }
 function setupViewerListener(){
-  db.collection('gjac').doc('fotos').onSnapshot(doc=>{fotosPorTarea=doc.exists?(doc.data().items||{}):{};});
   db.collection('gjac').doc('agendaState').onSnapshot(doc=>{
     if(doc.exists){const d=doc.data();tareas=d.tareas||[];papeleraData=d.papelera||[];archivadosA=d.archivados||[];}
     renderViewer();
@@ -651,9 +603,7 @@ function renderViewer(){
   document.getElementById('vwTitle').textContent=`PENDIENTES ACTIVOS — ${data.length} resultado${data.length!==1?'s':''}`;
   let lista=document.getElementById('vwLista');lista.innerHTML='';
   if(!data.length){lista.innerHTML='<div class="vw-empty">✅ No hay pendientes activos.</div>';return;}
-  data.forEach(t=>{let[y,m,d]=t.fecha.split('-');let fl=new Date(y,m-1,d).toLocaleDateString('es-CO',{weekday:'short',day:'numeric',month:'short'});let card=document.createElement('div');card.className=`vw-card e-${t.prioridad}`;let vf=(fotosPorTarea[t.id]||[]).slice().reverse().slice(0,4);
-    let vfh=vf.length?`<div class="vw-fotos">${vf.map(f=>`<img class="vw-foto-thumb" src="${f.base64}" onclick="abrirLightbox(this.src)" title="${f.fecha} ${f.hora}">`).join('')}</div>`:'';
-    card.innerHTML=`<div><div class="vw-time">${t.hora}</div><div class="vw-time-date">${fl}</div></div><div><div class="vw-persona">${t.persona||'—'}</div><div class="vw-tema">${t.tema}</div><span class="vw-badge e-badge-${t.prioridad}">${t.prioridad}</span>${t.observacion?`<div class="vw-obs">💬 ${t.observacion}</div>`:''}${vfh}</div><div></div>`;lista.appendChild(card);});
+  data.forEach(t=>{let[y,m,d]=t.fecha.split('-');let fl=new Date(y,m-1,d).toLocaleDateString('es-CO',{weekday:'short',day:'numeric',month:'short'});let card=document.createElement('div');card.className=`vw-card e-${t.prioridad}`;card.innerHTML=`<div><div class="vw-time">${t.hora}</div><div class="vw-time-date">${fl}</div></div><div><div class="vw-persona">${t.persona||'—'}</div><div class="vw-tema">${t.tema}</div><span class="vw-badge e-badge-${t.prioridad}">${t.prioridad}</span>${t.observacion?`<div class="vw-obs">💬 ${t.observacion}</div>`:''}</div><div><button class="vw-close-btn" onclick="cerrarPendienteViewer(${t.id})">✔ Cerrar</button></div>`;lista.appendChild(card);});
 }
 
 /* AGENDA */
@@ -674,11 +624,7 @@ function cerrarObs(){document.getElementById('modalObs').classList.remove('open'
 function toggleArchivados(){let el=document.getElementById('archivados'),a=document.getElementById('arrowArchivados');el.style.display=el.style.display==='none'?'block':'none';a.innerText=el.style.display==='none'?'⬇️':'⬆️';}
 function togglePapelera(){let el=document.getElementById('papelera'),a=document.getElementById('arrowPapelera');el.style.display=el.style.display==='none'?'block':'none';a.innerText=el.style.display==='none'?'⬇️':'⬆️';}
 function exportarWhatsApp(){let fecha=document.getElementById('buscarFecha').value;if(!fecha){alert('Selecciona una fecha');return;}let lista=tareas.filter(t=>t.fecha===fecha);if(!lista.length){alert('No hay tareas para esa fecha');return;}let txt='📅 Agenda del día\n\n';lista.forEach(t=>{txt+=`• ${t.hora} - ${t.persona||''}\n${t.tema}\n(${t.prioridad})\n\n`;});window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank');}
-function cardHTML(t){
-  let fc=(fotosPorTarea[t.id]||[]).length;
-  let fb=fc>0?`<span class="foto-badge">📷 ${fc}</span>`:'';
-  return `<strong>${t.hora}</strong> — ${t.persona||''}<br>${t.tema} ${fb}<br>📅 ${t.fecha}<br><span class="badge bad-${t.prioridad}">${t.prioridad.toUpperCase()}</span><br><div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;"><button onclick="toggleDone(${t.id})">✔</button><button class="edit" onclick='editar(${JSON.stringify(t)})'>✏️ Editar</button><button class="delete" onclick="eliminar(${t.id})">🗑</button><button onclick="verObs(${t.id})" ${t.observacion?'':'disabled'}>📝 Obs</button><button onclick="abrirFotos(${t.id},\`${(t.tema||'').replace(/\`/g,"'").substring(0,35)}\`)" style="background:#1e3a5f;border:1px solid #2563eb;color:#93c5fd;">📷 Fotos</button></div>`;
-}
+function cardHTML(t){return `<strong>${t.hora}</strong> — ${t.persona||''}<br>${t.tema}<br>📅 ${t.fecha}<br><span class="badge bad-${t.prioridad}">${t.prioridad.toUpperCase()}</span><br><div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;"><button onclick="toggleDone(${t.id})">✔</button><button class="edit" onclick='editar(${JSON.stringify(t)})'>✏️ Editar</button><button class="delete" onclick="eliminar(${t.id})">🗑</button><button onclick="verObs(${t.id})" ${t.observacion?'':'disabled'}>📝 Obs</button></div>`;}
 function render(){
   let texto=document.getElementById('buscarTexto').value.toLowerCase(),fechaFiltro=document.getElementById('buscarFecha').value;
   let headers=document.querySelectorAll('.acenter h3');
@@ -712,9 +658,7 @@ function renderExec(){
   document.getElementById('execSecTitle').innerText=`PENDIENTES ACTIVOS — ${data.length} resultado${data.length!==1?'s':''}`;
   let lista=document.getElementById('execLista');lista.innerHTML='';
   if(!data.length){lista.innerHTML=`<div class="exec-empty"><div class="exec-empty-icon">✅</div>No hay pendientes.</div>`;return;}
-  data.forEach(t=>{let[y,m,d]=t.fecha.split('-');let fl=new Date(y,m-1,d).toLocaleDateString('es-CO',{weekday:'short',day:'numeric',month:'short'});let card=document.createElement('div');card.className=`exec-card e-${t.prioridad}`;let ef=(fotosPorTarea[t.id]||[]).slice().reverse().slice(0,4);
-    let efh=ef.length?`<div class="vw-fotos">${ef.map(f=>`<img class="vw-foto-thumb" src="${f.base64}" onclick="abrirLightbox(this.src)" title="${f.fecha} ${f.hora}">`).join('')}</div>`:'';
-    card.innerHTML=`<div><div class="exec-time">${t.hora}</div><div class="exec-time-date">${fl}</div></div><div><div class="exec-body-persona">${t.persona||'—'}</div><div class="exec-body-tema">${t.tema}</div><span class="exec-badge e-badge-${t.prioridad}">${t.prioridad}</span>${t.observacion?`<div class="exec-body-obs">💬 ${t.observacion}</div>`:''}${efh}</div><div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;"><button class="exec-close-btn" onclick="cerrarPendienteExec(${t.id})">✔ Cerrar</button></div>`;lista.appendChild(card);});
+  data.forEach(t=>{let[y,m,d]=t.fecha.split('-');let fl=new Date(y,m-1,d).toLocaleDateString('es-CO',{weekday:'short',day:'numeric',month:'short'});let card=document.createElement('div');card.className=`exec-card e-${t.prioridad}`;card.innerHTML=`<div><div class="exec-time">${t.hora}</div><div class="exec-time-date">${fl}</div></div><div><div class="exec-body-persona">${t.persona||'—'}</div><div class="exec-body-tema">${t.tema}</div><span class="exec-badge e-badge-${t.prioridad}">${t.prioridad}</span>${t.observacion?`<div class="exec-body-obs">💬 ${t.observacion}</div>`:''}</div><div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;"><button class="exec-close-btn" onclick="cerrarPendienteExec(${t.id})">✔ Cerrar</button></div>`;lista.appendChild(card);});
 }
 
 /* DIRECTORIO */
@@ -738,7 +682,7 @@ function guardarCuenta(){let banco=document.getElementById('cuentaBanco').value.
 function eliminarCuenta(id){let c=cuentas.find(x=>x.id===id);if(!c)return;if(!confirm(`¿Eliminar cuenta de ${c.titular||c.num}?`))return;cuentas=cuentas.filter(x=>x.id!==id);saveCuentas();renderCuentas();}
 
 /* CORREO */
-function renderCorreo(){let buscar=document.getElementById('correoBuscar').value.toLowerCase(),fechaFiltro=document.getElementById('correoFechaFiltro').value;let data=correos.filter(c=>{if(fechaFiltro&&c.fecha!==fechaFiltro)return false;if(buscar&&!JSON.stringify(c).toLowerCase().includes(buscar))return false;return true;});data.sort((a,b)=>a.fecha===b.fecha?a.hora.localeCompare(b.hora):a.fecha.localeCompare(b.fecha));document.getElementById('correoCount').textContent=data.length+' correo'+(data.length!==1?'s':'');let container=document.getElementById('correoContainer');container.innerHTML='';if(!data.length){container.innerHTML='<div class="mail-empty">📭 No se encontraron correos.</div>';return;}let grupos={};data.forEach(c=>{if(!grupos[c.fecha])grupos[c.fecha]=[];grupos[c.fecha].push(c);});Object.keys(grupos).sort().reverse().forEach(fecha=>{let[y,m,d]=fecha.split('-');let label=new Date(y,m-1,d).toLocaleDateString('es-CO',{weekday:'long',year:'numeric',month:'long',day:'numeric'}).toUpperCase();let sec=document.createElement('div');let h=document.createElement('div');h.className='mail-section-date';h.textContent='📅 '+label;sec.appendChild(h);let grid=document.createElement('div');grid.className='mail-grid';grupos[fecha].forEach(c=>{let card=document.createElement('div');card.className='mail-card';card.innerHTML=`<div class="mail-card-top"><span class="mail-card-hora">🕐 ${c.hora}</span><span class="tag tag-purple" style="font-size:10px;">${c.fecha}</span></div><div class="mail-card-remitente">${c.remitente||'(sin remitente)'}</div>${c.email?`<div class="mail-card-email">✉️ ${c.email}</div>`:''}<div class="mail-card-asunto">${c.asunto}</div>${c.nota?`<div class="mail-card-nota">📌 ${c.nota}</div>`:''}<div class="mail-card-actions"><button class="edit" onclick="editarCorreo(${c.id})">✏️ Editar</button><button class="delete" onclick="eliminarCorreo(${c.id})">🗑 Eliminar</button></div>`;grid.appendChild(card);});sec.appendChild(grid);container.appendChild(sec);});}
+function renderCorreo(){let buscar=document.getElementById('correoBuscar').value.toLowerCase(),fechaFiltro=document.getElementById('correoFechaFiltro').value;let data=correos.filter(c=>{if(fechaFiltro&&c.fecha!==fechaFiltro)return false;if(buscar&&!JSON.stringify(c).toLowerCase().includes(buscar))return false;return true;});data.sort((a,b)=>a.fecha===b.fecha?a.hora.localeCompare(b.hora):a.fecha.localeCompare(b.fecha));document.getElementById('correoCount').textContent=data.length+' correo'+(data.length!==1?'s':'');let container=document.getElementById('correoContainer');container.innerHTML='';if(!data.length){container.innerHTML='<div class="mail-empty">📭 No se encontraron correos.</div>';return;}let grupos={};data.forEach(c=>{if(!grupos[c.fecha])grupos[c.fecha]=[];grupos[c.fecha].push(c);});Object.keys(grupos).sort().forEach(fecha=>{let[y,m,d]=fecha.split('-');let label=new Date(y,m-1,d).toLocaleDateString('es-CO',{weekday:'long',year:'numeric',month:'long',day:'numeric'}).toUpperCase();let sec=document.createElement('div');let h=document.createElement('div');h.className='mail-section-date';h.textContent='📅 '+label;sec.appendChild(h);let grid=document.createElement('div');grid.className='mail-grid';grupos[fecha].forEach(c=>{let card=document.createElement('div');card.className='mail-card';card.innerHTML=`<div class="mail-card-top"><span class="mail-card-hora">🕐 ${c.hora}</span><span class="tag tag-purple" style="font-size:10px;">${c.fecha}</span></div><div class="mail-card-remitente">${c.remitente||'(sin remitente)'}</div>${c.email?`<div class="mail-card-email">✉️ ${c.email}</div>`:''}<div class="mail-card-asunto">${c.asunto}</div>${c.nota?`<div class="mail-card-nota">📌 ${c.nota}</div>`:''}<div class="mail-card-actions"><button class="edit" onclick="editarCorreo(${c.id})">✏️ Editar</button><button class="delete" onclick="eliminarCorreo(${c.id})">🗑 Eliminar</button></div>`;grid.appendChild(card);});sec.appendChild(grid);container.appendChild(sec);});}
 function abrirModalCorreo(){document.getElementById('correoEditId').value='';document.getElementById('modalCorreoTitle').textContent='➕ Agregar correo';['correoFecha','correoHora','correoRemitente','correoEmail','correoAsunto','correoNota'].forEach(id=>document.getElementById(id).value='');document.getElementById('modalCorreo').classList.add('open');}
 function cerrarModalCorreo(){document.getElementById('modalCorreo').classList.remove('open');}
 document.getElementById('modalCorreo').addEventListener('click',function(e){if(e.target===this)cerrarModalCorreo();});
@@ -753,35 +697,5 @@ const CORREOS_DEFAULT=[{id:1,fecha:"2026-04-22",hora:"08:59",remitente:"DIRECCIO
 
 initApp();
 </script>
-
-<!-- MODAL FOTOS -->
-<div id="modalFotos">
-  <div class="foto-box">
-    <div class="foto-box-head">
-      <h3>📷 Registro Fotográfico</h3>
-      <span id="fotoLabel"></span>
-    </div>
-    <div class="foto-scroll">
-      <div class="foto-grid" id="fotoGrid"></div>
-      <div id="fotoEmpty" class="foto-empty" style="display:none;">📷 Sin fotos aún. Agrega la primera abajo.</div>
-    </div>
-    <div class="foto-upload" onclick="document.getElementById('fotoInput').click()">
-      <div style="font-size:26px;">📎</div>
-      <p>Haz clic aquí para agregar foto(s)</p>
-      <small>JPG · PNG · Máx. 5 MB por foto</small>
-      <input type="file" id="fotoInput" accept="image/*" multiple onchange="subirFotos(event)">
-    </div>
-    <div class="foto-box-foot">
-      <button onclick="cerrarModalFotos()" style="background:#374151;color:#fff;width:100%;padding:9px;border-radius:8px;">Cerrar</button>
-    </div>
-  </div>
-</div>
-
-<!-- LIGHTBOX -->
-<div id="lightbox" onclick="cerrarLightbox()">
-  <img id="lightboxImg" src="" alt="">
-  <button id="lightCloseBtn" onclick="cerrarLightbox()">✕</button>
-</div>
-
 </body>
 </html>
