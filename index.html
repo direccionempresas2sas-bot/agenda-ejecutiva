@@ -856,7 +856,10 @@ function exportarWhatsApp(){let fecha=document.getElementById('buscarFecha').val
 function cardHTML(t){
   let fc=(fotosPorTarea[t.id]||[]).length;
   let fb=fc>0?`<span class="foto-badge">📎 ${fc} archivo${fc!==1?'s':''}</span>`:'';
-  return `<strong>${t.hora}</strong> — ${t.persona||''}<br>${t.tema} ${fb}<br>📅 ${t.fecha}<br><span class="badge bad-${t.prioridad}">${t.prioridad.toUpperCase()}</span><br><div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;"><button onclick="toggleDone(${t.id})">✔</button><button class="edit" onclick='editar(${JSON.stringify(t)})'>✏️ Editar</button><button class="delete" onclick="eliminar(${t.id})">🗑</button><button onclick="verObs(${t.id})" ${t.observacion?'':'disabled'}>📝 Obs</button><button onclick="abrirFotos(${t.id},\`${(t.tema||'').replace(/\`/g,"'").substring(0,35)}\`)" style="background:#1e3a5f;border:1px solid #2563eb;color:#93c5fd;">📎 Archivos${fc>0?' ('+fc+')':''}</button></div>`;
+  let[yy,mm,dd]=t.fecha.split('-');
+  let dias=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+  let diaSem=dias[new Date(yy,mm-1,dd).getDay()];
+  return `<strong>${t.hora}</strong> — ${t.persona||''}<br>${t.tema} ${fb}<br>📅 ${dd}/${mm}/${yy} <span style="color:#60a5fa;font-size:11px;font-weight:600;">${diaSem}</span><br><span class="badge bad-${t.prioridad}">${t.prioridad.toUpperCase()}</span><br><div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;"><button onclick="toggleDone(${t.id})">✔</button><button class="edit" onclick='editar(${JSON.stringify(t)})'>✏️ Editar</button><button class="delete" onclick="eliminar(${t.id})">🗑</button><button onclick="verObs(${t.id})" ${t.observacion?'':'disabled'}>📝 Obs</button><button onclick="abrirFotos(${t.id},\`${(t.tema||'').replace(/\`/g,"'").substring(0,35)}\`)" style="background:#1e3a5f;border:1px solid #2563eb;color:#93c5fd;">📎 Archivos${fc>0?' ('+fc+')':''}</button></div>`;
 }
 /* Helper: label de fecha con día de la semana */
 function fechaLabel(fechaStr){
