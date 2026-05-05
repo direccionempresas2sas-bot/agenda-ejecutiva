@@ -268,6 +268,88 @@ button{padding:6px 10px;margin-top:5px;border:none;border-radius:5px;cursor:poin
 .mail-card-actions{display:flex;gap:6px;margin-top:12px;}
 .mail-card-actions button{flex:1;padding:6px;font-size:12px;border-radius:7px;margin-top:0;}
 .mail-empty{text-align:center;color:#374151;padding:80px 0;font-size:14px;}
+
+/* ════════════════════════════════════════
+   MODO MÓVIL — App-like responsive design
+   ════════════════════════════════════════ */
+@media (max-width: 768px) {
+  /* Agenda admin — stack vertical */
+  .agenda-wrap{grid-template-columns:1fr;height:auto;overflow:visible;}
+  .aleft,.aright{border-right:none;border-left:none;border-bottom:1px solid #1f2937;}
+  .aright{border-top:1px solid #1f2937;}
+  .acenter{padding:10px;}
+
+  /* Nav — scroll horizontal compacto */
+  #globalNav{padding:0 6px;gap:0;}
+  .nav-brand{font-size:13px;margin-right:8px;}
+  .nav-btn{padding:0 9px;font-size:12px;}
+  .nav-user{display:none;}
+
+  /* Viewer cards — columna única */
+  .vw-wrap{padding:14px 10px 80px;}
+  .vw-card{grid-template-columns:48px 1fr;gap:0 12px;padding:14px 12px;}
+  .vw-card > div:last-child{display:none;}
+  .vw-time{font-size:16px;min-width:40px;}
+  .vw-kpis{grid-template-columns:repeat(2,1fr);gap:8px;}
+
+  /* Filtros viewer — stack */
+  .vw-filters{flex-direction:column;gap:8px;padding:12px;}
+  .vw-filter-group{min-width:unset;}
+
+  /* Exec cards móvil */
+  .exec-wrap{padding:16px 10px 60px;}
+  .exec-card{grid-template-columns:44px 1fr;gap:0 10px;padding:14px 12px;}
+  .exec-card > div:last-child{display:none;}
+  .exec-time{font-size:16px;min-width:40px;}
+  .exec-kpis{grid-template-columns:repeat(2,1fr);gap:8px;}
+  .exec-filters{flex-direction:column;gap:8px;padding:12px;}
+  .exec-filter-group{min-width:unset;}
+  .exec-topbar{margin-bottom:16px;}
+  .exec-brand-title{font-size:20px;}
+
+  /* Módulos — tabla scroll */
+  .module-wrap{padding:14px 10px 80px;}
+  .mod-table-wrap{overflow-x:auto;}
+  .mod-table{min-width:480px;}
+  .dir-grid{grid-template-columns:1fr;}
+  .mail-grid{grid-template-columns:1fr;}
+
+  /* Modal — full width */
+  .modal-box{width:96vw;padding:16px;}
+  .obs-box{width:96vw;max-height:90vh;}
+  .foto-box{width:96vw;max-height:92vh;}
+  .login-card{padding:24px 20px;}
+
+  /* Sync badge — arriba en móvil */
+  #syncBadge{bottom:auto;top:56px;right:10px;font-size:11px;padding:4px 10px;}
+
+  /* Sección colapsable — mejor tap target */
+  .section-toggle{padding:12px 14px;font-size:13px;}
+
+  /* KPI compacto */
+  .vw-kpi-val{font-size:20px;}
+  .exec-kpi-val{font-size:22px;}
+
+  /* Fotos grid */
+  .foto-grid{grid-template-columns:repeat(auto-fill,minmax(120px,1fr));}
+}
+
+/* ════ SECCIONES COLAPSABLES ════ */
+.section-toggle{
+  display:flex;align-items:center;justify-content:space-between;
+  cursor:pointer;padding:10px 14px;background:#0d1526;
+  border:1px solid #1e2d45;border-radius:10px;margin-bottom:6px;
+  user-select:none;transition:.15s;
+}
+.section-toggle:hover{background:#111827;border-color:#334155;}
+.section-toggle-left{display:flex;align-items:center;gap:8px;}
+.section-toggle-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#9ca3af;}
+.section-toggle-count{background:#1e2d45;color:#60a5fa;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;border:1px solid #2d4a6e;}
+.section-toggle-arrow{font-size:12px;color:#374151;transition:transform .2s;}
+.section-toggle-arrow.open{transform:rotate(180deg);}
+.section-body{overflow:hidden;transition:max-height .3s ease;}
+.section-body.collapsed{max-height:0 !important;}
+
 </style>
 </head>
 <body>
@@ -356,18 +438,80 @@ button{padding:6px 10px;margin-top:5px;border:none;border-radius:5px;cursor:poin
       <div id="metricas" class="metric"></div>
     </div>
     <div class="ap acenter">
-      <h3 style="border-bottom:1px solid #374151;padding-bottom:8px;">📌 Hoy</h3><div id="hoy"></div>
-      <h3 style="border-bottom:1px solid #374151;padding-bottom:8px;margin-top:16px;">📆 Mañana</h3><div id="manana"></div>
-      <h3 style="border-bottom:1px solid #374151;padding-bottom:8px;margin-top:16px;">⏳ Atrasados</h3><div id="atrasados"></div>
+      <!-- HOY -->
+      <div class="section-toggle" id="togHoy" onclick="toggleSec('hoy',this)">
+        <div class="section-toggle-left">
+          <span class="section-toggle-title">📌 Hoy</span>
+          <span class="section-toggle-count">0</span>
+        </div>
+        <span class="section-toggle-arrow open">▼</span>
+      </div>
+      <div class="section-body" id="hoy-body" style="max-height:9999px;"><div id="hoy"></div></div>
+
+      <!-- MAÑANA -->
+      <div class="section-toggle" id="togMan" onclick="toggleSec('manana',this)" style="margin-top:10px;">
+        <div class="section-toggle-left">
+          <span class="section-toggle-title">📆 Mañana</span>
+          <span class="section-toggle-count">0</span>
+        </div>
+        <span class="section-toggle-arrow open">▼</span>
+      </div>
+      <div class="section-body" id="manana-body" style="max-height:9999px;"><div id="manana"></div></div>
+
+      <!-- ATRASADOS -->
+      <div class="section-toggle" id="togAtr" onclick="toggleSec('atrasados',this)" style="margin-top:10px;">
+        <div class="section-toggle-left">
+          <span class="section-toggle-title">⏳ Atrasados</span>
+          <span class="section-toggle-count">0</span>
+        </div>
+        <span class="section-toggle-arrow open">▼</span>
+      </div>
+      <div class="section-body" id="atrasados-body" style="max-height:9999px;"><div id="atrasados"></div></div>
     </div>
+
     <div class="ap aright">
-      <h3 style="border-bottom:1px solid #374151;padding-bottom:8px;">📅 Mes actual</h3><div id="mes"></div>
-      <h3 style="border-bottom:1px solid #374151;padding-bottom:8px;margin-top:16px;">🗓 Próximos meses</h3><div id="meses"></div>
-      <h3 style="border-bottom:1px solid #374151;padding-bottom:8px;margin-top:16px;">📦 Archivados <span id="arrowArchivados" onclick="toggleArchivados()" style="cursor:pointer;">⬇️</span></h3>
-      <div id="archivados" style="display:none;"></div>
-      <h3 style="border-bottom:1px solid #374151;padding-bottom:8px;margin-top:16px;">🗑 Papelera <span id="arrowPapelera" onclick="togglePapelera()" style="cursor:pointer;">⬇️</span></h3>
-      <button class="clear" onclick="vaciarPapelera()">Vaciar papelera</button>
-      <div id="papelera"></div>
+      <!-- MES ACTUAL -->
+      <div class="section-toggle" id="togMes" onclick="toggleSec('mes',this)">
+        <div class="section-toggle-left">
+          <span class="section-toggle-title">📅 Mes actual</span>
+          <span class="section-toggle-count">0</span>
+        </div>
+        <span class="section-toggle-arrow open">▼</span>
+      </div>
+      <div class="section-body" id="mes-body" style="max-height:9999px;"><div id="mes"></div></div>
+
+      <!-- PRÓXIMOS MESES -->
+      <div class="section-toggle" id="togMeses" onclick="toggleSec('meses',this)" style="margin-top:10px;">
+        <div class="section-toggle-left">
+          <span class="section-toggle-title">🗓 Próximos meses</span>
+          <span class="section-toggle-count">0</span>
+        </div>
+        <span class="section-toggle-arrow open">▼</span>
+      </div>
+      <div class="section-body" id="meses-body" style="max-height:9999px;"><div id="meses"></div></div>
+
+      <!-- ARCHIVADOS -->
+      <div class="section-toggle" id="togArch" onclick="toggleSec('archivados',this)" style="margin-top:10px;">
+        <div class="section-toggle-left">
+          <span class="section-toggle-title">📦 Archivados</span>
+          <span class="section-toggle-count">0</span>
+        </div>
+        <span class="section-toggle-arrow">▼</span>
+      </div>
+      <div class="section-body collapsed" id="archivados-body"><div id="archivados"></div></div>
+
+      <!-- PAPELERA -->
+      <div class="section-toggle" id="togPap" onclick="toggleSec('papelera',this)" style="margin-top:10px;">
+        <div class="section-toggle-left">
+          <span class="section-toggle-title">🗑 Papelera</span>
+          <span class="section-toggle-count">0</span>
+        </div>
+        <span class="section-toggle-arrow">▼</span>
+      </div>
+      <div class="section-body collapsed" id="papelera-body">
+        <button class="clear" onclick="vaciarPapelera()" style="width:100%;margin-bottom:6px;">Vaciar papelera</button>
+        <div id="papelera"></div>
+      </div>
     </div>
   </div>
   </div>
@@ -669,7 +813,7 @@ function renderViewer(){
   document.getElementById('vwTitle').textContent=`PENDIENTES ACTIVOS — ${data.length} resultado${data.length!==1?'s':''}`;
   let lista=document.getElementById('vwLista');lista.innerHTML='';
   if(!data.length){lista.innerHTML='<div class="vw-empty">✅ No hay pendientes activos.</div>';return;}
-  data.forEach(t=>{let[y,m,d]=t.fecha.split('-');let fl=new Date(y,m-1,d).toLocaleDateString('es-CO',{weekday:'short',day:'numeric',month:'short'});let card=document.createElement('div');card.className=`vw-card e-${t.prioridad}`;
+  data.forEach(t=>{let[y,m,d]=t.fecha.split('-');let fl=new Date(y,m-1,d).toLocaleDateString('es-CO',{weekday:'long',day:'numeric',month:'long',year:'numeric'});let card=document.createElement('div');card.className=`vw-card e-${t.prioridad}`;
     let allArch=(fotosPorTarea[t.id]||[]);let imgs=allArch.filter(f=>f.tipo&&f.tipo.startsWith('image/'));let docs=allArch.filter(f=>!f.tipo||!f.tipo.startsWith('image/'));let total=allArch.length;
     let adjHTML='';if(total>0){let thumbs=imgs.slice(-4).map(f=>`<img class="vw-foto-thumb" src="${f.base64}" onclick="abrirLightbox('${f.base64}')" title="${f.nombre||''}">`).join('');let docBadge=docs.length?`<span class="foto-badge" style="align-self:center;margin-left:4px;">📄 ${docs.length} doc${docs.length!==1?'s':''}</span>`:'';let totalBadge=`<span class="foto-badge" style="align-self:center;background:rgba(99,102,241,.18);color:#a5b4fc;border-color:rgba(99,102,241,.35);">📎 ${total} adjunto${total!==1?'s':''}</span>`;adjHTML=`<div class="vw-fotos" style="align-items:center;margin-top:10px;">${totalBadge}${thumbs}${docBadge}</div>`;}
     card.innerHTML=`<div><div class="vw-time">${t.hora}</div><div class="vw-time-date">${fl}</div></div><div><div class="vw-persona">${t.persona||'—'}</div><div class="vw-tema">${t.tema}</div><span class="vw-badge e-badge-${t.prioridad}">${t.prioridad}</span>${t.observacion?`<div class="vw-obs">💬 ${t.observacion}</div>`:''}${adjHTML}</div><div></div>`;lista.appendChild(card);});
@@ -693,32 +837,127 @@ function vaciarPapelera(){if(confirm('¿Vaciar papelera?')){papeleraData.splice(
 function desarchivar(id){let t=archivadosA.find(x=>x.id===id);if(t){t.done=false;tareas.push(t);archivadosA=archivadosA.filter(x=>x.id!==id);saveA();render();}}
 function verObs(id){let t=tareas.find(x=>x.id===id)||archivadosA.find(x=>x.id===id);if(!t||!t.observacion)return;document.getElementById('contenidoObs').innerText=t.observacion;document.getElementById('modalObs').classList.add('open');}
 function cerrarObs(){document.getElementById('modalObs').classList.remove('open');}
-function toggleArchivados(){let el=document.getElementById('archivados'),a=document.getElementById('arrowArchivados');el.style.display=el.style.display==='none'?'block':'none';a.innerText=el.style.display==='none'?'⬇️':'⬆️';}
-function togglePapelera(){let el=document.getElementById('papelera'),a=document.getElementById('arrowPapelera');el.style.display=el.style.display==='none'?'block':'none';a.innerText=el.style.display==='none'?'⬇️':'⬆️';}
+function toggleSec(id,tog){
+  let body=document.getElementById(id+'-body');
+  if(!body)return;
+  let isOpen=!body.classList.contains('collapsed');
+  let arrow=tog?tog.querySelector('.section-toggle-arrow'):null;
+  if(isOpen){
+    body.style.maxHeight=body.scrollHeight+'px';
+    requestAnimationFrame(()=>{body.style.maxHeight='0';body.classList.add('collapsed');if(arrow)arrow.classList.remove('open');});
+  } else {
+    body.classList.remove('collapsed');
+    body.style.maxHeight=body.scrollHeight+'px';
+    setTimeout(()=>{body.style.maxHeight='9999px';},310);
+    if(arrow)arrow.classList.add('open');
+  }
+}
 function exportarWhatsApp(){let fecha=document.getElementById('buscarFecha').value;if(!fecha){alert('Selecciona una fecha');return;}let lista=tareas.filter(t=>t.fecha===fecha);if(!lista.length){alert('No hay tareas para esa fecha');return;}let txt='📅 Agenda del día\n\n';lista.forEach(t=>{txt+=`• ${t.hora} - ${t.persona||''}\n${t.tema}\n(${t.prioridad})\n\n`;});window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank');}
 function cardHTML(t){
   let fc=(fotosPorTarea[t.id]||[]).length;
   let fb=fc>0?`<span class="foto-badge">📎 ${fc} archivo${fc!==1?'s':''}</span>`:'';
   return `<strong>${t.hora}</strong> — ${t.persona||''}<br>${t.tema} ${fb}<br>📅 ${t.fecha}<br><span class="badge bad-${t.prioridad}">${t.prioridad.toUpperCase()}</span><br><div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;"><button onclick="toggleDone(${t.id})">✔</button><button class="edit" onclick='editar(${JSON.stringify(t)})'>✏️ Editar</button><button class="delete" onclick="eliminar(${t.id})">🗑</button><button onclick="verObs(${t.id})" ${t.observacion?'':'disabled'}>📝 Obs</button><button onclick="abrirFotos(${t.id},\`${(t.tema||'').replace(/\`/g,"'").substring(0,35)}\`)" style="background:#1e3a5f;border:1px solid #2563eb;color:#93c5fd;">📎 Archivos${fc>0?' ('+fc+')':''}</button></div>`;
 }
+/* Helper: label de fecha con día de la semana */
+function fechaLabel(fechaStr){
+  let[y,m,d]=fechaStr.split('-');
+  let dt=new Date(y,m-1,d);
+  let dias=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+  let meses2=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  return dias[dt.getDay()]+', '+d+' '+meses2[dt.getMonth()]+' '+y;
+}
+
+/* Helper: renderizar sección colapsable en el panel admin */
+function renderSeccion(containerId, toggleId, items, emptyMsg){
+  let cont=document.getElementById(containerId);
+  if(!cont)return;
+  cont.innerHTML='';
+  items.forEach(i=>cont.appendChild(i.el));
+  // actualizar contador en el toggle
+  let tog=document.getElementById(toggleId);
+  if(tog){
+    let countEl=tog.querySelector('.section-toggle-count');
+    if(countEl)countEl.textContent=items.length;
+  }
+}
+
 function render(){
   let texto=document.getElementById('buscarTexto').value.toLowerCase(),fechaFiltro=document.getElementById('buscarFecha').value;
-  let headers=document.querySelectorAll('.acenter h3');
-  if(!fechaFiltro&&headers.length>=3){headers[0].innerText='📌 Hoy';headers[1].innerText='📆 Mañana';headers[2].innerText='⏳ Atrasados';}
   let now=nowCO(),hoy=format(now),md=new Date(now);md.setDate(md.getDate()+1);let manana=format(md);
   let mesActual=now.getMonth(),añoActual=now.getFullYear();
-  ['hoy','manana','atrasados','mes','meses','papelera','archivados'].forEach(id=>document.getElementById(id).innerHTML='');
+  ['hoy','manana','atrasados','mes','meses','papelera','archivados'].forEach(id=>{let el=document.getElementById(id);if(el)el.innerHTML='';});
+
   let data=tareas.filter(t=>(!texto||(t.persona||'').toLowerCase().includes(texto)||t.tema.toLowerCase().includes(texto))&&(!fechaFiltro||t.fecha===fechaFiltro));
-  if(fechaFiltro){if(headers.length)headers[0].innerText='📅 '+fechaFiltro;let items=[];data.forEach(t=>{let[y,m,d]=t.fecha.split('-');let div=document.createElement('div');div.className='task '+t.prioridad+(t.done?' done':'');div.innerHTML=cardHTML(t);items.push({fechaT:new Date(y,m-1,d),hora:t.hora,el:div});});items.sort((a,b)=>a.fechaT-b.fechaT||a.hora.localeCompare(b.hora));items.forEach(i=>document.getElementById('hoy').appendChild(i.el));renderMetricas(data);return;}
+
+  if(fechaFiltro){
+    let items=[];
+    data.forEach(t=>{let[y,m,d]=t.fecha.split('-');let div=document.createElement('div');div.className='task '+t.prioridad+(t.done?' done':'');div.innerHTML=cardHTML(t);items.push({fechaT:new Date(y,m-1,d),hora:t.hora,el:div});});
+    items.sort((a,b)=>a.fechaT-b.fechaT||a.hora.localeCompare(b.hora));
+    // Actualizar títulos de secciones con la fecha buscada
+    let togHoy=document.getElementById('togHoy');if(togHoy){let tit=togHoy.querySelector('.section-toggle-title');if(tit)tit.textContent='📅 '+fechaFiltro;}
+    items.forEach(i=>document.getElementById('hoy').appendChild(i.el));
+    renderMetricas(data);return;
+  }
+
+  // Restaurar títulos normales
+  let togHoy=document.getElementById('togHoy');if(togHoy){let tit=togHoy.querySelector('.section-toggle-title');if(tit)tit.textContent='📌 Hoy — '+fechaLabel(hoy);}
+  let togMan=document.getElementById('togMan');if(togMan){let tit=togMan.querySelector('.section-toggle-title');if(tit)tit.textContent='📆 Mañana — '+fechaLabel(manana);}
+
   let hoyI=[],manI=[],atrI=[],mesI=[],meses={},total=0,done=0;
-  data.forEach(t=>{total++;if(t.done)done++;let[y,m,d]=t.fecha.split('-');let ft=new Date(y,m-1,d);let div=document.createElement('div');div.className='task '+t.prioridad+(t.done?' done':'');div.innerHTML=cardHTML(t);
-    if(t.fecha===hoy)hoyI.push({fechaT:ft,hora:t.hora,el:div});else if(t.fecha===manana)manI.push({fechaT:ft,hora:t.hora,el:div});else if(ft<now)atrI.push({fechaT:ft,hora:t.hora,el:div});else if(ft.getMonth()===mesActual&&ft.getFullYear()===añoActual)mesI.push({fechaT:ft,hora:t.hora,el:div});else{let k=ft.getFullYear()+'-'+ft.getMonth();if(!meses[k])meses[k]={fecha:ft,items:[]};meses[k].items.push({fechaT:ft,hora:t.hora,el:div});}
+  data.forEach(t=>{
+    total++;if(t.done)done++;
+    let[y,m,d]=t.fecha.split('-');let ft=new Date(y,m-1,d);
+    let div=document.createElement('div');div.className='task '+t.prioridad+(t.done?' done':'');div.innerHTML=cardHTML(t);
+    if(t.fecha===hoy)hoyI.push({fechaT:ft,hora:t.hora,el:div});
+    else if(t.fecha===manana)manI.push({fechaT:ft,hora:t.hora,el:div});
+    else if(ft<now)atrI.push({fechaT:ft,hora:t.hora,el:div});
+    else if(ft.getMonth()===mesActual&&ft.getFullYear()===añoActual)mesI.push({fechaT:ft,hora:t.hora,el:div});
+    else{let k=ft.getFullYear()+'-'+ft.getMonth();if(!meses[k])meses[k]={fecha:ft,items:[]};meses[k].items.push({fechaT:ft,hora:t.hora,el:div});}
   });
   let srt=arr=>arr.sort((a,b)=>a.fechaT-b.fechaT||a.hora.localeCompare(b.hora));
-  srt(hoyI).forEach(i=>document.getElementById('hoy').appendChild(i.el));srt(manI).forEach(i=>document.getElementById('manana').appendChild(i.el));srt(atrI).forEach(i=>document.getElementById('atrasados').appendChild(i.el));srt(mesI).forEach(i=>document.getElementById('mes').appendChild(i.el));
-  Object.values(meses).sort((a,b)=>a.fecha-b.fecha).forEach(g=>{let t2=document.createElement('div');t2.innerHTML=`<strong style="color:#60a5fa;">📅 ${g.fecha.toLocaleString('es',{month:'long',year:'numeric'})}</strong>`;document.getElementById('meses').appendChild(t2);srt(g.items).forEach(o=>document.getElementById('meses').appendChild(o.el));});
-  archivadosA.forEach(t=>{let div=document.createElement('div');div.className='task done';div.innerHTML=`${t.fecha} - ${t.tema}<br><button onclick="desarchivar(${t.id})">↩ Desarchivar</button>`;document.getElementById('archivados').appendChild(div);});
+  renderSeccion('hoy','togHoy',srt(hoyI));
+  renderSeccion('manana','togMan',srt(manI));
+  renderSeccion('atrasados','togAtr',srt(atrI));
+  renderSeccion('mes','togMes',srt(mesI));
+
+  // Otros meses — agrupar por mes con subtítulo + día de semana
+  let mesesEl=document.getElementById('meses');
+  Object.values(meses).sort((a,b)=>a.fecha-b.fecha).forEach(g=>{
+    let t2=document.createElement('div');
+    t2.innerHTML=`<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#374151;padding:8px 0 6px;">📅 ${g.fecha.toLocaleString('es',{month:'long',year:'numeric'})}</div>`;
+    mesesEl.appendChild(t2);
+    srt(g.items).forEach(o=>mesesEl.appendChild(o.el));
+  });
+  // Contar meses
+  let togMeses=document.getElementById('togMeses');
+  if(togMeses){let cnt=togMeses.querySelector('.section-toggle-count');if(cnt){let tot=Object.values(meses).reduce((s,g)=>s+g.items.length,0);cnt.textContent=tot;}}
+
+  // Archivados — mostrar obs y adjuntos
+  let archCont=document.getElementById('archivados');
+  archivadosA.forEach(t=>{
+    let fc=(fotosPorTarea[t.id]||[]).length;
+    let fotoB=fc>0?`<span class="foto-badge">📎 ${fc} archivo${fc!==1?'s':''}</span>`:'';
+    let obsB=t.observacion?`<span class="foto-badge" style="background:rgba(59,130,246,.12);color:#93c5fd;border-color:rgba(59,130,246,.3);">💬 Obs</span>`:'';
+    let div=document.createElement('div');div.className='task done';
+    div.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap;">
+      <div><strong style="font-size:11px;color:#6b7280;">${fechaLabel(t.fecha)}</strong><div style="margin-top:3px;">${t.tema}</div>${t.persona?`<div style="font-size:11px;color:#4b5563;margin-top:2px;">👤 ${t.persona}</div>`:''}</div>
+      <div style="display:flex;gap:4px;align-items:center;flex-wrap:wrap;">${fotoB}${obsB}</div>
+    </div>
+    ${t.observacion?`<div style="margin-top:8px;background:#111827;border-left:3px solid #2563eb;border-radius:0 6px 6px 0;padding:6px 10px;font-size:12px;color:#9ca3af;">💬 ${t.observacion}</div>`:''}
+    <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">
+      <button onclick="desarchivar(${t.id})">↩ Desarchivar</button>
+      ${fc>0?`<button onclick="abrirFotos(${t.id},\`${(t.tema||'').replace(/\`/g,"'").substring(0,30)}\`)" style="background:#1e3a5f;border:1px solid #2563eb;color:#93c5fd;">📎 Ver archivos (${fc})</button>`:''}
+    </div>`;
+    archCont.appendChild(div);
+  });
+  // Contar archivados
+  let togArch=document.getElementById('togArch');
+  if(togArch){let cnt=togArch.querySelector('.section-toggle-count');if(cnt)cnt.textContent=archivadosA.length;}
+
   papeleraData.forEach(t=>{let div=document.createElement('div');div.className='task';div.innerHTML=`${t.fecha} - ${t.tema}<br><button class="restore" onclick="restaurar(${t.id})">Recuperar</button>`;document.getElementById('papelera').appendChild(div);});
+  let togPap=document.getElementById('togPap');
+  if(togPap){let cnt=togPap.querySelector('.section-toggle-count');if(cnt)cnt.textContent=papeleraData.length;}
+
   renderMetricas({length:total,done});
 }
 function renderMetricas(data){let total=Array.isArray(data)?data.length:data.length||0,done=Array.isArray(data)?data.filter(t=>t.done).length:data.done||0,pct=total?Math.round(done/total*100):0;document.getElementById('metricas').innerHTML=`<div>📊 Total: <strong>${total}</strong></div><div style="margin-top:5px;">✅ Cumplimiento: <strong>${pct}%</strong></div>`;}
@@ -734,7 +973,7 @@ function renderExec(){
   document.getElementById('execSecTitle').innerText=`PENDIENTES ACTIVOS — ${data.length} resultado${data.length!==1?'s':''}`;
   let lista=document.getElementById('execLista');lista.innerHTML='';
   if(!data.length){lista.innerHTML=`<div class="exec-empty"><div class="exec-empty-icon">✅</div>No hay pendientes.</div>`;return;}
-  data.forEach(t=>{let[y,m,d]=t.fecha.split('-');let fl=new Date(y,m-1,d).toLocaleDateString('es-CO',{weekday:'short',day:'numeric',month:'short'});let card=document.createElement('div');card.className=`exec-card e-${t.prioridad}`;
+  data.forEach(t=>{let[y,m,d]=t.fecha.split('-');let fl=new Date(y,m-1,d).toLocaleDateString('es-CO',{weekday:'long',day:'numeric',month:'long',year:'numeric'});let card=document.createElement('div');card.className=`exec-card e-${t.prioridad}`;
     let allArch=(fotosPorTarea[t.id]||[]);let imgs=allArch.filter(f=>f.tipo&&f.tipo.startsWith('image/'));let docs=allArch.filter(f=>!f.tipo||!f.tipo.startsWith('image/'));let total=allArch.length;
     let adjHTML='';if(total>0){let thumbs=imgs.slice(-4).map(f=>`<img class="vw-foto-thumb" src="${f.base64}" onclick="abrirLightbox('${f.base64}')" title="${f.nombre||''}">`).join('');let docBadge=docs.length?`<span class="foto-badge" style="align-self:center;margin-left:4px;">📄 ${docs.length} doc${docs.length!==1?'s':''}</span>`:'';let totalBadge=`<span class="foto-badge" style="align-self:center;background:rgba(99,102,241,.18);color:#a5b4fc;border-color:rgba(99,102,241,.35);">📎 ${total} adjunto${total!==1?'s':''}</span>`;adjHTML=`<div class="vw-fotos" style="align-items:center;margin-top:10px;">${totalBadge}${thumbs}${docBadge}</div>`;}
     card.innerHTML=`<div><div class="exec-time">${t.hora}</div><div class="exec-time-date">${fl}</div></div><div><div class="exec-body-persona">${t.persona||'—'}</div><div class="exec-body-tema">${t.tema}</div><span class="exec-badge e-badge-${t.prioridad}">${t.prioridad}</span>${t.observacion?`<div class="exec-body-obs">💬 ${t.observacion}</div>`:''}${adjHTML}</div><div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;"><button class="exec-close-btn" onclick="cerrarPendienteExec(${t.id})">✔ Cerrar</button></div>`;lista.appendChild(card);});
