@@ -888,6 +888,11 @@ function render(){
   let now=nowCO(),hoy=format(now),md=new Date(now);md.setDate(md.getDate()+1);let manana=format(md);
   let mesActual=now.getMonth(),añoActual=now.getFullYear();
   ['hoy','manana','atrasados','mes','meses','papelera','archivados'].forEach(id=>{let el=document.getElementById(id);if(el)el.innerHTML='';});
+  // Resetear TODOS los contadores a 0 al inicio — se actualizan luego según resultados reales
+  ['togHoy','togMan','togAtr','togMes','togMeses','togArch','togPap'].forEach(tid=>{
+    let tog=document.getElementById(tid);
+    if(tog){let c=tog.querySelector('.section-toggle-count');if(c)c.textContent='0';}
+  });
 
   let data=tareas.filter(t=>(!texto||(t.persona||'').toLowerCase().includes(texto)||t.tema.toLowerCase().includes(texto))&&(!fechaFiltro||t.fecha===fechaFiltro));
 
@@ -895,11 +900,6 @@ function render(){
     let items=[];
     data.forEach(t=>{let[y,m,d]=t.fecha.split('-');let div=document.createElement('div');div.className='task '+t.prioridad+(t.done?' done':'');div.innerHTML=cardHTML(t);items.push({fechaT:new Date(y,m-1,d),hora:t.hora,el:div});});
     items.sort((a,b)=>a.fechaT-b.fechaT||a.hora.localeCompare(b.hora));
-    // Resetear contadores de todas las secciones a 0
-    ['togHoy','togMan','togAtr','togMes','togMeses','togArch','togPap'].forEach(tid=>{
-      let tog=document.getElementById(tid);
-      if(tog){let c=tog.querySelector('.section-toggle-count');if(c)c.textContent='0';}
-    });
     // Solo hoy muestra resultados del filtro
     let togHoy=document.getElementById('togHoy');
     if(togHoy){
@@ -1011,7 +1011,7 @@ function guardarCuenta(){let banco=document.getElementById('cuentaBanco').value.
 function eliminarCuenta(id){let c=cuentas.find(x=>x.id===id);if(!c)return;if(!confirm(`¿Eliminar cuenta de ${c.titular||c.num}?`))return;cuentas=cuentas.filter(x=>x.id!==id);saveCuentas();renderCuentas();}
 
 /* CORREO */
-function renderCorreo(){let buscar=document.getElementById('correoBuscar').value.toLowerCase(),fechaFiltro=document.getElementById('correoFechaFiltro').value;let data=correos.filter(c=>{if(fechaFiltro&&c.fecha!==fechaFiltro)return false;if(buscar&&!JSON.stringify(c).toLowerCase().includes(buscar))return false;return true;});data.sort((a,b)=>a.fecha===b.fecha?b.hora.localeCompare(a.hora):a.fecha.localeCompare(b.fecha));document.getElementById('correoCount').textContent=data.length+' correo'+(data.length!==1?'s':'');let container=document.getElementById('correoContainer');container.innerHTML='';if(!data.length){container.innerHTML='<div class="mail-empty">📭 No se encontraron correos.</div>';return;}let grupos={};data.forEach(c=>{if(!grupos[c.fecha])grupos[c.fecha]=[];grupos[c.fecha].push(c);});Object.keys(grupos).sort().reverse().forEach(fecha=>{let[y,m,d]=fecha.split('-');let label=new Date(y,m-1,d).toLocaleDateString('es-CO',{weekday:'long',year:'numeric',month:'long',day:'numeric'}).toUpperCase();let sec=document.createElement('div');let h=document.createElement('div');h.className='mail-section-date';h.textContent='📅 '+label;sec.appendChild(h);let grid=document.createElement('div');grid.className='mail-grid';grupos[fecha].forEach(c=>{let card=document.createElement('div');card.className='mail-card';card.innerHTML=`<div class="mail-card-top"><span class="mail-card-hora">🕐 ${c.hora}</span><span class="tag tag-purple" style="font-size:10px;">${c.fecha}</span></div><div class="mail-card-remitente">${c.remitente||'(sin remitente)'}</div>${c.email?`<div class="mail-card-email">✉️ ${c.email}</div>`:''}<div class="mail-card-asunto">${c.asunto}</div>${c.nota?`<div class="mail-card-nota">📌 ${c.nota}</div>`:''}<div class="mail-card-actions"><button class="edit" onclick="editarCorreo(${c.id})">✏️ Editar</button><button class="delete" onclick="eliminarCorreo(${c.id})">🗑 Eliminar</button></div>`;grid.appendChild(card);});sec.appendChild(grid);container.appendChild(sec);});}
+function renderCorreo(){let buscar=document.getElementById('correoBuscar').value.toLowerCase(),fechaFiltro=document.getElementById('correoFechaFiltro').value;let data=correos.filter(c=>{if(fechaFiltro&&c.fecha!==fechaFiltro)return false;if(buscar&&!JSON.stringify(c).toLowerCase().includes(buscar))return false;return true;});data.sort((a,b)=>a.fecha===b.fecha?b.hora.localeCompare(a.hora):a.fecha.localeCompare(b.fecha));document.getElementById('correoCount').textContent=data.length+' correo'+(data.length!==1?'s':'');let container=document.getElementById('correoContainer');container.innerHTML='';if(!data.length){container.innerHTML='<div class="mail-empty">📭 No se encontraron correos.</div>';return;}let grupos={};data.forEach(c=>{if(!grupos[c.fecha])grupos[c.fecha]=[];grupos[c.fecha].push(c);});Object.keys(grupos).sort().reverse().forEach(fecha=>{let[y,m,d]=fecha.split('-');let label=new Date(y,m-1,d).toLocaleDateString('es-CO',{weekday:'long',year:'numeric',month:'long',day:'numeric'}).toUpperCase();let sec=document.createElement('div');let h=document.createElement('div');h.className='mail-section-date';h.textContent='📅 '+label;sec.appendChild(h);let grid=document.createElement('div');grid.className='mail-grid';grupos[fecha].sort((a,b)=>b.hora.localeCompare(a.hora)).forEach(c=>{let card=document.createElement('div');card.className='mail-card';card.innerHTML=`<div class="mail-card-top"><span class="mail-card-hora">🕐 ${c.hora}</span><span class="tag tag-purple" style="font-size:10px;">${c.fecha}</span></div><div class="mail-card-remitente">${c.remitente||'(sin remitente)'}</div>${c.email?`<div class="mail-card-email">✉️ ${c.email}</div>`:''}<div class="mail-card-asunto">${c.asunto}</div>${c.nota?`<div class="mail-card-nota">📌 ${c.nota}</div>`:''}<div class="mail-card-actions"><button class="edit" onclick="editarCorreo(${c.id})">✏️ Editar</button><button class="delete" onclick="eliminarCorreo(${c.id})">🗑 Eliminar</button></div>`;grid.appendChild(card);});sec.appendChild(grid);container.appendChild(sec);});}
 function abrirModalCorreo(){document.getElementById('correoEditId').value='';document.getElementById('modalCorreoTitle').textContent='➕ Agregar correo';['correoFecha','correoHora','correoRemitente','correoEmail','correoAsunto','correoNota'].forEach(id=>document.getElementById(id).value='');document.getElementById('modalCorreo').classList.add('open');}
 function cerrarModalCorreo(){document.getElementById('modalCorreo').classList.remove('open');}
 document.getElementById('modalCorreo').addEventListener('click',function(e){if(e.target===this)cerrarModalCorreo();});
