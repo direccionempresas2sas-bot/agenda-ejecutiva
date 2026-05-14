@@ -10,21 +10,21 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 <style>
 :root{--bg:#0b1220;--panel:#111827;--card:#1f2937;--txt:#e5e7eb;--muted:#9ca3af;--green:#22c55e;--amber:#f59e0b;--blue:#3b82f6;--red:#ef4444;}
-body.light-mode{--bg:#f1f5f9;--panel:#ffffff;--card:#e2e8f0;--txt:#0f172a;--muted:#64748b;--green:#16a34a;--amber:#d97706;--blue:#2563eb;--red:#dc2626;}
+body.light-mode{--bg:#f1f5f9;--panel:#ffffff;--card:#e2e8f0;--txt:#1e293b;--muted:#475569;--green:#16a34a;--amber:#b45309;--blue:#1d4ed8;--red:#dc2626;}
 body.light-mode #globalNav{background:#ffffff;border-bottom-color:#e2e8f0;}
 body.light-mode #viewerScreen,body.light-mode .viewer-topbar{background:#f1f5f9;}
 body.light-mode .viewer-topbar{border-bottom-color:#e2e8f0;}
 body.light-mode .vw-card,body.light-mode .vw-kpi,body.light-mode .exec-card,body.light-mode .exec-kpi,body.light-mode .dir-card,body.light-mode .mail-card{background:#ffffff;border-color:#cbd5e1;}
 body.light-mode .vw-obs,body.light-mode .exec-body-obs{background:#f8fafc;border-color:#93c5fd;}
-body.light-mode .vw-filters,body.light-mode .exec-filters,body.light-mode .module-search input,body.light-mode .module-search select{background:#ffffff;border-color:#cbd5e1;color:#0f172a;}
+body.light-mode .vw-filters,body.light-mode .exec-filters,body.light-mode .module-search input,body.light-mode .module-search select{background:#ffffff;border-color:#cbd5e1;color:#1e293b;}
 body.light-mode .mod-table-wrap{border-color:#cbd5e1;}
 body.light-mode .mod-table thead{background:#f8fafc;}
 body.light-mode .mod-table th{color:#64748b;}
 body.light-mode .mod-table tbody tr:hover{background:#f1f5f9;}
-body.light-mode .mod-table td{color:#0f172a;}
+body.light-mode .mod-table td{color:#1e293b;}
 body.light-mode .modal-box,.light-mode .login-card{background:#ffffff;border-color:#cbd5e1;}
 body.light-mode .modal-box h3{border-bottom-color:#e2e8f0;}
-body.light-mode input,body.light-mode select,body.light-mode textarea{background:#f8fafc;color:#0f172a;border:1px solid #cbd5e1;}
+body.light-mode input,body.light-mode select,body.light-mode textarea{background:#f8fafc;color:#1e293b;border:1px solid #cbd5e1;}
 body.light-mode .task{background:#ffffff;}
 body.light-mode .metric{background:#f8fafc;}
 body.light-mode .section-toggle{background:#ffffff;border-color:#cbd5e1;}
@@ -33,20 +33,30 @@ body.light-mode #syncBadge{background:#ffffff;border-color:#cbd5e1;}
 body.light-mode .obs-box{background:#ffffff;border-color:#cbd5e1;}
 body.light-mode .count-pill{background:#e0e7ff;color:#3730a3;border-color:#a5b4fc;}
 body.light-mode #vistaEjecutiva,body.light-mode #viewerScreen{background:#f1f5f9;}
-body.light-mode .exec-wrap{color:#0f172a;}
+body.light-mode .exec-wrap{color:#1e293b;}
 body.light-mode .foto-box{background:#ffffff;border-color:#cbd5e1;}
 body.light-mode .foto-scroll{background:#f8fafc;}
 body.light-mode .foto-item{background:#f1f5f9;border-color:#cbd5e1;}
 body.light-mode .mail-section-date{color:#64748b;border-bottom-color:#e2e8f0;}
 body.light-mode #loadingScreen{background:#f1f5f9;}
-body.light-mode #correoKpis .vw-kpi{background:#ffffff;border-color:#cbd5e1;}
-body.light-mode #correoConsolidadoContainer .mod-table-wrap{border-color:#cbd5e1;}
 body.light-mode .nav-btn{color:#64748b;}
 body.light-mode .nav-btn:hover{color:#0f172a;}
 body.light-mode .nav-btn.active{color:#2563eb;border-bottom-color:#2563eb;}
 body.light-mode .nav-user{color:#64748b;}
 body.light-mode .btn-logout{border-color:#cbd5e1;color:#64748b;}
 body.light-mode .btn-logout:hover{background:#f1f5f9;color:#0f172a;}
+body.light-mode .module-sub{color:#475569;}
+body.light-mode .vw-section-title,body.light-mode .exec-section-title{color:#475569;border-bottom-color:#cbd5e1;}
+body.light-mode .dir-card-row{color:#475569;}
+body.light-mode .dir-card-val{color:#1e293b;}
+body.light-mode .dir-card-val a{color:#1d4ed8;}
+body.light-mode .dir-card-nombre{color:#0f172a;}
+body.light-mode .vw-tema,body.light-mode .exec-body-tema{color:#0f172a;}
+body.light-mode .vw-persona,body.light-mode .exec-body-persona{color:#475569;}
+body.light-mode .vw-obs,body.light-mode .exec-body-obs{color:#334155;}
+body.light-mode .section-toggle-title{color:#475569;}
+body.light-mode .task{color:#1e293b;}
+body.light-mode label{color:#475569;}
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{overflow-x:hidden;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--txt);}
 
@@ -292,19 +302,6 @@ button{padding:6px 10px;margin-top:5px;border:none;border-radius:5px;cursor:poin
 #lightboxImg{max-width:92vw;max-height:90vh;border-radius:8px;box-shadow:0 0 40px rgba(0,0,0,.9);}
 #lightCloseBtn{position:fixed;top:18px;right:22px;background:rgba(255,255,255,.12);border:none;color:#fff;font-size:24px;cursor:pointer;border-radius:6px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;}
 
-.mail-section-date{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#374151;padding:10px 0;border-bottom:1px solid #0d1526;margin-bottom:14px;}
-.mail-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin-bottom:28px;width:100%;}
-.mail-card{background:#0d1526;border:1px solid #1e2d45;border-radius:12px;padding:16px 18px;transition:.2s;word-break:break-word;overflow:hidden;}
-.mail-card:hover{border-color:#334155;box-shadow:0 4px 16px rgba(0,0,0,.4);}
-.mail-card-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:6px;}
-.mail-card-hora{font-size:12px;font-weight:700;color:#60a5fa;}
-.mail-card-remitente{font-size:13px;font-weight:700;color:#f1f5f9;margin-bottom:2px;line-height:1.3;}
-.mail-card-email{font-size:11px;color:#4b5563;margin-bottom:8px;word-break:break-all;}
-.mail-card-asunto{font-size:12px;color:#d1d5db;line-height:1.5;margin-bottom:6px;}
-.mail-card-nota{background:#111827;border-left:3px solid #a78bfa;border-radius:0 6px 6px 0;padding:6px 10px;font-size:11px;color:#c4b5fd;line-height:1.4;margin-top:8px;}
-.mail-card-actions{display:flex;gap:6px;margin-top:12px;}
-.mail-card-actions button{flex:1;padding:6px;font-size:12px;border-radius:7px;margin-top:0;}
-.mail-empty{text-align:center;color:#374151;padding:80px 0;font-size:14px;}
 
 /* ════════════════════════════════════════
    MODO MÓVIL — App-like responsive design
@@ -445,7 +442,6 @@ button{padding:6px 10px;margin-top:5px;border:none;border-radius:5px;cursor:poin
     <button class="nav-btn active" onclick="showPage('agenda',this)">📅 Agenda</button>
     <button class="nav-btn" onclick="showPage('directorio',this)">🏥 Directorio Médico</button>
     <button class="nav-btn" onclick="showPage('cuentas',this)">🏦 Cuentas Bancarias</button>
-    <button class="nav-btn" onclick="showPage('correo',this)">📧 Correo Personal</button>
     <div class="nav-right">
       <span class="nav-user" id="adminUserName"></span>
       <button id="btnModo" onclick="toggleModo()" title="Cambiar modo claro/oscuro" style="background:transparent;border:1px solid #374151;color:#6b7280;padding:5px 10px;border-radius:6px;cursor:pointer;font-size:14px;font-family:'DM Sans',sans-serif;transition:.2s;margin-top:0;">🌙</button>
@@ -595,73 +591,6 @@ button{padding:6px 10px;margin-top:5px;border:none;border-radius:5px;cursor:poin
     </div>
   </div>
   </div>
-
-  <div id="page-correo" class="page module-page">
-  <div class="module-wrap">
-    <div class="module-header">
-      <div>
-        <div class="module-title" style="background:linear-gradient(135deg,#a78bfa,#f472b6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">📧 Correo Personal</div>
-        <div class="module-sub">gerardo.alvarado@mileniumgas.com · Registro y consolidado</div>
-      </div>
-      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-        <span class="count-pill" id="correoCount" style="color:#c4b5fd;border-color:#4c1d95;">0 correos</span>
-        <button onclick="descargarCorreosExcel()" style="background:#1e3a5f;border:1px solid #2563eb;color:#93c5fd;padding:8px 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;margin-top:0;white-space:nowrap;">⬇ Exportar Excel</button>
-        <button class="btn-add" style="background:linear-gradient(135deg,#6d28d9,#be185d);" onclick="abrirModalCorreo()">+ Registrar correo</button>
-      </div>
-    </div>
-
-    <!-- KPIs dinámicos -->
-    <div id="correoKpis" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px;margin-bottom:20px;"></div>
-
-    <!-- Filtros -->
-    <div class="module-search" style="margin-bottom:16px;">
-      <input type="text" id="correoBuscar" placeholder="🔍 Buscar remitente, asunto…" oninput="renderCorreo()">
-      <select id="correoFiltroCategoria" onchange="renderCorreo()" style="flex:0;min-width:165px;background:#0d1526;border:1px solid #1e2d45;border-radius:8px;color:#e5e7eb;padding:10px 12px;font-size:13px;font-family:'DM Sans',sans-serif;margin-top:0;">
-        <option value="">Todas las categorías</option>
-        <option value="BANCOS">BANCOS</option>
-        <option value="MAYORISTA">MAYORISTA</option>
-        <option value="PROVEEDORES">PROVEEDORES</option>
-        <option value="PUBLICIDAD">PUBLICIDAD</option>
-        <option value="DIAN">DIAN</option>
-        <option value="NOTICIAS">NOTICIAS</option>
-        <option value="FACTURACION">FACTURACION</option>
-        <option value="JUNTA DIRECTIVA">JUNTA DIRECTIVA</option>
-        <option value="VUELOS">VUELOS</option>
-        <option value="HOSPEDAJE">HOSPEDAJE</option>
-        <option value="OTROS">OTROS</option>
-      </select>
-      <select id="correoFiltroEstado" onchange="renderCorreo()" style="flex:0;min-width:145px;background:#0d1526;border:1px solid #1e2d45;border-radius:8px;color:#e5e7eb;padding:10px 12px;font-size:13px;font-family:'DM Sans',sans-serif;margin-top:0;">
-        <option value="">Todos los estados</option>
-        <option value="INFORMATIVO">INFORMATIVO</option>
-        <option value="IMPORTANTE">IMPORTANTE</option>
-        <option value="PRIORITARIO">PRIORITARIO</option>
-      </select>
-    </div>
-    <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;align-items:center;">
-      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-        <label style="font-size:12px;color:#4b5563;margin:0;">Desde:</label>
-        <input type="date" id="correoFechaDesde" onchange="renderCorreo()" style="width:auto;background:#0d1526;border:1px solid #1e2d45;border-radius:8px;color:#e5e7eb;padding:8px 12px;font-size:13px;font-family:'DM Sans',sans-serif;margin-top:0;">
-        <label style="font-size:12px;color:#4b5563;margin:0;">Hasta:</label>
-        <input type="date" id="correoFechaHasta" onchange="renderCorreo()" style="width:auto;background:#0d1526;border:1px solid #1e2d45;border-radius:8px;color:#e5e7eb;padding:8px 12px;font-size:13px;font-family:'DM Sans',sans-serif;margin-top:0;">
-        <button onclick="limpiarFiltrosCorreo()" style="background:#1f2937;color:#9ca3af;padding:8px 14px;border-radius:8px;border:1px solid #374151;font-size:13px;margin-top:0;cursor:pointer;">✕ Limpiar</button>
-      </div>
-      <!-- Tabs vista -->
-      <div style="margin-left:auto;display:flex;gap:6px;">
-        <button id="tabDetalle" onclick="setCorreoTab('detalle')" style="background:#1e3a5f;border:1px solid #2563eb;color:#93c5fd;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;margin-top:0;">📋 Detalle</button>
-        <button id="tabConsolidado" onclick="setCorreoTab('consolidado')" style="background:#111827;border:1px solid #374151;color:#6b7280;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;margin-top:0;">📊 Consolidado</button>
-      </div>
-    </div>
-
-    <!-- Vista detalle -->
-    <div id="correoVistaDetalle">
-      <div id="correoContainer"></div>
-    </div>
-
-    <!-- Vista consolidado -->
-    <div id="correoVistaConsolidado" style="display:none;">
-      <div id="correoConsolidadoContainer"></div>
-    </div>
-  </div>
   </div>
 </div><!-- /adminPanel -->
 
@@ -724,40 +653,6 @@ button{padding:6px 10px;margin-top:5px;border:none;border-radius:5px;cursor:poin
     <div class="modal-actions"><button class="btn-cancel" onclick="cerrarModalCuenta()">Cancelar</button><button class="save" onclick="guardarCuenta()">💾 Guardar</button></div>
   </div>
 </div>
-<div id="modalCorreo" class="modal-overlay">
-  <div class="modal-box">
-    <h3 id="modalCorreoTitle">➕ Registrar correo</h3>
-    <input type="hidden" id="correoEditId">
-    <label>Fecha *</label><input type="date" id="correoFecha">
-    <label>Remitente (nombre) *</label><input type="text" id="correoRemitente" placeholder="Ej: BANCOLOMBIA">
-    <label>Empresa / Categoría *</label>
-    <select id="correoCategoria">
-      <option value="BANCOS">BANCOS</option>
-      <option value="MAYORISTA">MAYORISTA</option>
-      <option value="PROVEEDORES">PROVEEDORES</option>
-      <option value="PUBLICIDAD">PUBLICIDAD</option>
-      <option value="DIAN">DIAN</option>
-      <option value="NOTICIAS">NOTICIAS</option>
-      <option value="FACTURACION">FACTURACION</option>
-      <option value="JUNTA DIRECTIVA">JUNTA DIRECTIVA</option>
-      <option value="VUELOS">VUELOS</option>
-      <option value="HOSPEDAJE">HOSPEDAJE</option>
-      <option value="OTROS">OTROS</option>
-    </select>
-    <label>Asunto *</label><textarea id="correoAsunto" rows="2" placeholder="Descripción del asunto"></textarea>
-    <label>Estado</label>
-    <select id="correoEstado">
-      <option value="INFORMATIVO">INFORMATIVO</option>
-      <option value="IMPORTANTE">IMPORTANTE</option>
-      <option value="PRIORITARIO">PRIORITARIO</option>
-    </select>
-    <label>Observaciones / Acción tomada</label><textarea id="correoNota" rows="2" placeholder="Ej: Remitido a Yessica, ya fue informado…"></textarea>
-    <div class="modal-actions">
-      <button class="btn-cancel" onclick="cerrarModalCorreo()">Cancelar</button>
-      <button class="save" style="background:#7c3aed;" onclick="guardarCorreo()">💾 Guardar</button>
-    </div>
-  </div>
-</div>
 
 <!-- VISTA EJECUTIVA ADMIN -->
 <div id="vistaEjecutiva">
@@ -784,7 +679,7 @@ const ADMIN_EMAIL="direccionempresas2.sas@gmail.com";
 
 let db,auth;
 let tareas=[],papeleraData=[],archivadosA=[];
-let directorio=[],cuentas=[],correos=[];
+let directorio=[],cuentas=[];
 
 /* SYNC */
 function syncStart(){let b=document.getElementById('syncBadge');b.className='syncing';document.getElementById('syncText').textContent='Guardando…';}
@@ -829,21 +724,18 @@ async function initApp(){
 
   // Seed cada coleccion de forma INDEPENDIENTE — nunca sobreescribe datos existentes
   try{
-    const [agendaDoc,dirDoc,cuentasDoc,correosDoc]=await Promise.all([
+    const [agendaDoc,dirDoc,cuentasDoc]=await Promise.all([
       db.collection('gjac').doc('agendaState').get(),
       db.collection('gjac').doc('directorio').get(),
-      db.collection('gjac').doc('cuentas').get(),
-      db.collection('gjac').doc('correos').get(),
+      db.collection('gjac').doc('cuentas').get()
     ]);
     const seeds=[];
     if(!agendaDoc.exists) seeds.push(db.collection('gjac').doc('agendaState').set({tareas:[],papelera:[],archivados:[]}));
-    // Solo hacer seed de directorio/cuentas/correos si NO existen O si están vacíos
+    // Solo hacer seed de directorio/cuentas si NO existen O si están vacíos
     if(!dirDoc.exists || !(dirDoc.data().items||[]).length)
       seeds.push(db.collection('gjac').doc('directorio').set({items:DIR_DEFAULT}));
     if(!cuentasDoc.exists || !(cuentasDoc.data().items||[]).length)
       seeds.push(db.collection('gjac').doc('cuentas').set({items:CUENTAS_DEFAULT}));
-    if(!correosDoc.exists || !(correosDoc.data().items||[]).length)
-      seeds.push(db.collection('gjac').doc('correos').set({items:CORREOS_DEFAULT}));
     // fotos: documentos individuales por tarea — no requieren seed global
     if(seeds.length) await Promise.all(seeds);
   }catch(e){console.warn('Seed error:',e);}
@@ -869,7 +761,6 @@ function setupListeners(){
   },()=>syncErr());
   db.collection('gjac').doc('directorio').onSnapshot(doc=>{directorio=doc.exists?(doc.data().items||[]):[];if(document.getElementById('page-directorio').classList.contains('active'))renderDir();});
   db.collection('gjac').doc('cuentas').onSnapshot(doc=>{cuentas=doc.exists?(doc.data().items||[]):[];if(document.getElementById('page-cuentas').classList.contains('active'))renderCuentas();});
-  db.collection('gjac').doc('correos').onSnapshot(doc=>{correos=doc.exists?(doc.data().items||[]):[];if(document.getElementById('page-correo').classList.contains('active'))renderCorreo();});
 }
 function setupViewerListener(){
   db.collection('gjac_fotos').onSnapshot(snap=>{
@@ -882,14 +773,12 @@ function setupViewerListener(){
   },()=>syncErr());
   db.collection('gjac').doc('directorio').onSnapshot(doc=>{directorio=doc.exists?(doc.data().items||[]):[];});
   db.collection('gjac').doc('cuentas').onSnapshot(doc=>{cuentas=doc.exists?(doc.data().items||[]):[];});
-  db.collection('gjac').doc('correos').onSnapshot(doc=>{correos=doc.exists?(doc.data().items||[]):[];});
 }
 
 /* SAVE */
 function saveA(){syncStart();db.collection('gjac').doc('agendaState').set({tareas,papelera:papeleraData,archivados:archivadosA}).then(syncOk).catch(syncErr);}
 function saveDir(){syncStart();db.collection('gjac').doc('directorio').set({items:directorio}).then(syncOk).catch(syncErr);}
 function saveCuentas(){syncStart();db.collection('gjac').doc('cuentas').set({items:cuentas}).then(syncOk).catch(syncErr);}
-function saveCorreos(){syncStart();db.collection('gjac').doc('correos').set({items:correos}).then(syncOk).catch(syncErr);}
 
 /* NAV ADMIN */
 function showPage(name,btn){
@@ -899,7 +788,6 @@ function showPage(name,btn){
   if(btn)btn.classList.add('active');
   if(name==='directorio')renderDir();
   if(name==='cuentas')renderCuentas();
-  if(name==='correo')renderCorreo();
 }
 
 /* VIEWER */
@@ -1114,496 +1002,15 @@ function editarCuenta(id){let c=cuentas.find(x=>x.id===id);if(!c)return;document
 function guardarCuenta(){let banco=document.getElementById('cuentaBanco').value.trim().toUpperCase(),num=document.getElementById('cuentaNum').value.trim();if(!banco||!num){alert('Banco y número requeridos');return;}let obj={banco,num,tipo:document.getElementById('cuentaTipo').value.trim().toUpperCase(),titular:document.getElementById('cuentaTitular').value.trim().toUpperCase(),cc:document.getElementById('cuentaCC').value.trim()};let eid=document.getElementById('cuentaEditId').value;if(eid){cuentas=cuentas.map(c=>c.id===Number(eid)?{...obj,id:Number(eid)}:c);}else{obj.id=Date.now();cuentas.push(obj);}saveCuentas();cerrarModalCuenta();renderCuentas();}
 function eliminarCuenta(id){let c=cuentas.find(x=>x.id===id);if(!c)return;if(!confirm(`¿Eliminar cuenta de ${c.titular||c.num}?`))return;cuentas=cuentas.filter(x=>x.id!==id);saveCuentas();renderCuentas();}
 
-/* ══════════════════════════════════════════════════════
-   MÓDULO CORREO — versión reestructurada
-   Campos: fecha, remitente, categoria, asunto, estado, nota
-   Vistas: Detalle (por día) | Consolidado (tabla por categoría)
-   Exportación: CSV descargable
-══════════════════════════════════════════════════════ */
-let correoTabActivo = 'detalle';
 
-function setCorreoTab(tab){
-  correoTabActivo = tab;
-  document.getElementById('correoVistaDetalle').style.display = tab==='detalle' ? 'block' : 'none';
-  document.getElementById('correoVistaConsolidado').style.display = tab==='consolidado' ? 'block' : 'none';
-  document.getElementById('tabDetalle').style.background = tab==='detalle' ? '#1e3a5f' : '#111827';
-  document.getElementById('tabDetalle').style.color = tab==='detalle' ? '#93c5fd' : '#6b7280';
-  document.getElementById('tabDetalle').style.borderColor = tab==='detalle' ? '#2563eb' : '#374151';
-  document.getElementById('tabConsolidado').style.background = tab==='consolidado' ? '#1e3a5f' : '#111827';
-  document.getElementById('tabConsolidado').style.color = tab==='consolidado' ? '#93c5fd' : '#6b7280';
-  document.getElementById('tabConsolidado').style.borderColor = tab==='consolidado' ? '#2563eb' : '#374151';
-  renderCorreo();
-}
-
-function limpiarFiltrosCorreo(){
-  ['correoBuscar','correoFechaDesde','correoFechaHasta'].forEach(id=>{let el=document.getElementById(id);if(el)el.value='';});
-  document.getElementById('correoFiltroCategoria').value='';
-  document.getElementById('correoFiltroEstado').value='';
-  renderCorreo();
-}
-
-/* Colores por categoría */
-const catColorMap = {
-  'BANCOS':'tag-amber','MAYORISTA':'tag-blue','PROVEEDORES':'tag-green',
-  'PUBLICIDAD':'tag-purple','DIAN':'tag-red','NOTICIAS':'tag-teal',
-  'FACTURACION':'tag-amber','JUNTA DIRECTIVA':'tag-red','VUELOS':'tag-blue',
-  'HOSPEDAJE':'tag-teal','OTROS':'tag-purple'
-};
-const estadoColorMap = {
-  'INFORMATIVO':'tag-blue','IMPORTANTE':'tag-amber','PRIORITARIO':'tag-red'
-};
-
-function correoFiltrados(){
-  let buscar=(document.getElementById('correoBuscar').value||'').toLowerCase();
-  let cat=document.getElementById('correoFiltroCategoria').value;
-  let est=document.getElementById('correoFiltroEstado').value;
-  let desde=document.getElementById('correoFechaDesde').value;
-  let hasta=document.getElementById('correoFechaHasta').value;
-  return correos.filter(c=>{
-    if(cat && c.categoria!==cat) return false;
-    if(est && c.estado!==est) return false;
-    if(desde && c.fecha<desde) return false;
-    if(hasta && c.fecha>hasta) return false;
-    if(buscar && !(c.remitente||'').toLowerCase().includes(buscar) && !(c.asunto||'').toLowerCase().includes(buscar) && !(c.nota||'').toLowerCase().includes(buscar)) return false;
-    return true;
-  });
-}
-
-function renderKpisCorreo(data){
-  // KPIs: total general, total mes actual, hoy
-  let now=nowCO(), hoy=format(now);
-  let mesAno = hoy.substring(0,7); // YYYY-MM
-  let totalMes = correos.filter(c=>c.fecha&&c.fecha.startsWith(mesAno)).length;
-  let totalHoy = correos.filter(c=>c.fecha===hoy).length;
-  let prioritarios = data.filter(c=>c.estado==='PRIORITARIO').length;
-  let importantes = data.filter(c=>c.estado==='IMPORTANTE').length;
-  document.getElementById('correoKpis').innerHTML=`
-    <div class="vw-kpi"><div class="vw-kpi-val" style="color:#e5e7eb;">${correos.length}</div><div class="vw-kpi-lbl">Total registrados</div></div>
-    <div class="vw-kpi"><div class="vw-kpi-val" style="color:#c4b5fd;">${totalMes}</div><div class="vw-kpi-lbl">Este mes</div></div>
-    <div class="vw-kpi"><div class="vw-kpi-val" style="color:#60a5fa;">${totalHoy}</div><div class="vw-kpi-lbl">Hoy</div></div>
-    <div class="vw-kpi"><div class="vw-kpi-val kpi-red">${prioritarios}</div><div class="vw-kpi-lbl">Prioritarios</div></div>
-    <div class="vw-kpi"><div class="vw-kpi-val kpi-amber">${importantes}</div><div class="vw-kpi-lbl">Importantes</div></div>
-    <div class="vw-kpi"><div class="vw-kpi-val kpi-green">${data.length}</div><div class="vw-kpi-lbl">En vista</div></div>`;
-}
-
-function renderCorreo(){
-  let data = correoFiltrados();
-  data.sort((a,b)=>b.fecha.localeCompare(a.fecha));
-  document.getElementById('correoCount').textContent=data.length+' correo'+(data.length!==1?'s':'');
-  renderKpisCorreo(data);
-  if(correoTabActivo==='detalle') renderCorreoDetalle(data);
-  else renderCorreoConsolidado(data);
-}
-
-function renderCorreoDetalle(data){
-  let container=document.getElementById('correoContainer');
-  container.innerHTML='';
-  if(!data.length){container.innerHTML='<div class="mail-empty">📭 No se encontraron correos.</div>';return;}
-  let grupos={};
-  data.forEach(c=>{if(!grupos[c.fecha])grupos[c.fecha]=[];grupos[c.fecha].push(c);});
-  Object.keys(grupos).sort().reverse().forEach(fecha=>{
-    let[y,m,d]=fecha.split('-');
-    let label=new Date(y,m-1,d).toLocaleDateString('es-CO',{weekday:'long',year:'numeric',month:'long',day:'numeric'}).toUpperCase();
-    let cnt=grupos[fecha].length;
-    let sec=document.createElement('div');
-    // Cabecera del día con conteo
-    let h=document.createElement('div');
-    h.className='mail-section-date';
-    h.innerHTML=`📅 ${label} <span style="background:#1e2d45;color:#a78bfa;font-size:10px;padding:2px 9px;border-radius:20px;border:1px solid #4c1d95;font-weight:700;margin-left:8px;">${cnt} correo${cnt!==1?'s':''}</span>`;
-    sec.appendChild(h);
-    let grid=document.createElement('div');
-    grid.className='mail-grid';
-    grupos[fecha].forEach(c=>{
-      let card=document.createElement('div');
-      card.className='mail-card';
-      let catCls=catColorMap[c.categoria]||'tag-purple';
-      let estCls=estadoColorMap[c.estado]||'tag-blue';
-      card.innerHTML=`
-        <div class="mail-card-top">
-          <span class="tag ${catCls}" style="font-size:10px;">${c.categoria||'OTROS'}</span>
-          <span class="tag ${estCls}" style="font-size:10px;">${c.estado||'INFORMATIVO'}</span>
-        </div>
-        <div class="mail-card-remitente">${c.remitente||'(sin remitente)'}</div>
-        <div class="mail-card-asunto" style="margin-top:6px;">${c.asunto||''}</div>
-        ${c.nota?`<div class="mail-card-nota">📌 ${c.nota}</div>`:''}
-        <div class="mail-card-actions">
-          <button class="edit" onclick="editarCorreo(${c.id})">✏️ Editar</button>
-          <button class="delete" onclick="eliminarCorreo(${c.id})">🗑 Eliminar</button>
-        </div>`;
-      grid.appendChild(card);
-    });
-    sec.appendChild(grid);
-    container.appendChild(sec);
-  });
-}
-
-function renderCorreoConsolidado(data){
-  let cont=document.getElementById('correoConsolidadoContainer');
-  cont.innerHTML='';
-  if(!data.length){cont.innerHTML='<div class="mail-empty">📭 No hay datos para consolidar.</div>';return;}
-
-  // Agrupar por mes + día para mostrar subtotales
-  let porMes={};
-  data.forEach(c=>{
-    let mes=c.fecha?c.fecha.substring(0,7):'';
-    if(!porMes[mes])porMes[mes]={};
-    let cat=(c.categoria||'OTROS').toUpperCase();
-    if(!porMes[mes][cat])porMes[mes][cat]=0;
-    porMes[mes][cat]++;
-  });
-
-  // Resumen global por categoría (todos los datos filtrados)
-  let porCat={};
-  data.forEach(c=>{let cat=(c.categoria||'OTROS').toUpperCase();if(!porCat[cat])porCat[cat]=0;porCat[cat]++;});
-  let cats=Object.keys(porCat).sort();
-  let totalGlobal=data.length;
-
-  // Tabla global
-  let html=`<div style="margin-bottom:28px;">
-    <div style="font-size:11px;text-transform:uppercase;letter-spacing:2px;color:#374151;font-weight:700;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid #111827;">📊 RESUMEN EJECUTIVO — ${totalGlobal} correos en la vista actual</div>
-    <div class="mod-table-wrap"><table class="mod-table">
-      <thead><tr><th style="width:40%;">Categoría / Empresa</th><th style="width:20%;text-align:center;">Cantidad</th><th style="width:40%;">Observaciones</th></tr></thead>
-      <tbody>
-        ${cats.map(cat=>`<tr>
-          <td><span class="tag ${catColorMap[cat]||'tag-purple'}">${cat}</span></td>
-          <td style="text-align:center;font-size:18px;font-weight:700;color:#c4b5fd;">${porCat[cat]}</td>
-          <td style="font-size:12px;color:#6b7280;">${correoObsResumen(cat,data)}</td>
-        </tr>`).join('')}
-        <tr style="background:#0d1526;border-top:2px solid #374151;">
-          <td style="font-weight:700;color:#e5e7eb;">TOTAL</td>
-          <td style="text-align:center;font-size:20px;font-weight:700;color:#34d399;">${totalGlobal}</td>
-          <td></td>
-        </tr>
-      </tbody>
-    </table></div>
-  </div>`;
-
-  // Desglose por mes
-  Object.keys(porMes).sort().reverse().forEach(mes=>{
-    let[y,m]=mes.split('-');
-    let meses=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-    let nomMes=meses[parseInt(m)-1]+' '+y;
-    let totalMes=Object.values(porMes[mes]).reduce((a,b)=>a+b,0);
-
-    // Desglose diario para este mes
-    let correosMes=data.filter(c=>c.fecha&&c.fecha.startsWith(mes));
-    let porDia={};
-    correosMes.forEach(c=>{if(!porDia[c.fecha])porDia[c.fecha]=0;porDia[c.fecha]++;});
-
-    html+=`<div style="margin-bottom:24px;">
-      <div style="font-size:11px;text-transform:uppercase;letter-spacing:2px;color:#374151;font-weight:700;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #111827;">
-        📅 ${nomMes.toUpperCase()}
-        <span style="background:#1e2d45;color:#60a5fa;font-size:10px;padding:2px 9px;border-radius:20px;border:1px solid #2d4a6e;font-weight:700;margin-left:8px;">${totalMes} correos</span>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;flex-wrap:wrap;">
-        <!-- Tabla por categoría -->
-        <div>
-          <div style="font-size:10px;color:#4b5563;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;font-weight:700;">Por categoría</div>
-          <div class="mod-table-wrap"><table class="mod-table">
-            <thead><tr><th>Categoría</th><th style="text-align:center;">Cant.</th></tr></thead>
-            <tbody>
-              ${Object.keys(porMes[mes]).sort().map(cat=>`<tr>
-                <td><span class="tag ${catColorMap[cat]||'tag-purple'}" style="font-size:10px;">${cat}</span></td>
-                <td style="text-align:center;font-weight:700;color:#c4b5fd;">${porMes[mes][cat]}</td>
-              </tr>`).join('')}
-              <tr style="background:#0d1526;">
-                <td style="font-weight:700;color:#e5e7eb;font-size:12px;">TOTAL</td>
-                <td style="text-align:center;font-weight:700;color:#34d399;">${totalMes}</td>
-              </tr>
-            </tbody>
-          </table></div>
-        </div>
-        <!-- Desglose diario -->
-        <div>
-          <div style="font-size:10px;color:#4b5563;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;font-weight:700;">Por día</div>
-          <div class="mod-table-wrap"><table class="mod-table">
-            <thead><tr><th>Fecha</th><th style="text-align:center;">Cant.</th></tr></thead>
-            <tbody>
-              ${Object.keys(porDia).sort().reverse().map(f=>{let[fy,fm,fd]=f.split('-');let dias=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];let dn=dias[new Date(fy,fm-1,fd).getDay()];return`<tr>
-                <td style="font-size:12px;color:#d1d5db;">${dn} ${fd}/${fm}/${fy}</td>
-                <td style="text-align:center;font-weight:700;color:#60a5fa;">${porDia[f]}</td>
-              </tr>`;}).join('')}
-            </tbody>
-          </table></div>
-        </div>
-      </div>
-    </div>`;
-  });
-  cont.innerHTML=html;
-}
-
-/* Observaciones automáticas del resumen */
-function correoObsResumen(cat, data){
-  let items=data.filter(c=>c.categoria===cat&&c.nota);
-  if(!items.length) return '';
-  let unicas=[...new Set(items.map(c=>c.nota))];
-  return unicas.slice(0,2).join(' / ');
-}
-
-function abrirModalCorreo(){
-  document.getElementById('correoEditId').value='';
-  document.getElementById('modalCorreoTitle').textContent='➕ Registrar correo';
-  document.getElementById('correoFecha').valueAsDate=nowCO();
-  document.getElementById('correoRemitente').value='';
-  document.getElementById('correoCategoria').value='BANCOS';
-  document.getElementById('correoAsunto').value='';
-  document.getElementById('correoEstado').value='INFORMATIVO';
-  document.getElementById('correoNota').value='';
-  document.getElementById('modalCorreo').classList.add('open');
-}
-function cerrarModalCorreo(){document.getElementById('modalCorreo').classList.remove('open');}
-document.getElementById('modalCorreo').addEventListener('click',function(e){if(e.target===this)cerrarModalCorreo();});
-function editarCorreo(id){let c=correos.find(x=>x.id===id);if(!c)return;document.getElementById('correoEditId').value=c.id;document.getElementById('modalCorreoTitle').textContent='✏️ Editar correo';document.getElementById('correoFecha').value=c.fecha;document.getElementById('correoRemitente').value=c.remitente||'';document.getElementById('correoCategoria').value=c.categoria||'OTROS';document.getElementById('correoAsunto').value=c.asunto||'';document.getElementById('correoEstado').value=c.estado||'INFORMATIVO';document.getElementById('correoNota').value=c.nota||'';document.getElementById('modalCorreo').classList.add('open');}
-function guardarCorreo(){let fecha=document.getElementById('correoFecha').value,remitente=document.getElementById('correoRemitente').value.trim().toUpperCase(),asunto=document.getElementById('correoAsunto').value.trim();if(!fecha||!remitente||!asunto){alert('Fecha, remitente y asunto son requeridos');return;}let obj={fecha,remitente,categoria:document.getElementById('correoCategoria').value,asunto,estado:document.getElementById('correoEstado').value,nota:document.getElementById('correoNota').value.trim()};let eid=document.getElementById('correoEditId').value;if(eid){correos=correos.map(c=>c.id===Number(eid)?{...obj,id:Number(eid)}:c);}else{obj.id=Date.now();correos.push(obj);}saveCorreos();cerrarModalCorreo();renderCorreo();}
-function eliminarCorreo(id){let c=correos.find(x=>x.id===id);if(!c)return;if(!confirm('¿Eliminar este correo?'))return;correos=correos.filter(x=>x.id!==id);saveCorreos();renderCorreo();}
-
-/* EXPORTAR A CSV (descargable como Excel) */
-function descargarCorreosExcel(){
-  let data=correoFiltrados().sort((a,b)=>b.fecha.localeCompare(a.fecha));
-  if(!data.length){alert('No hay correos para exportar.');return;}
   let bom='\uFEFF';
   let hdr='Fecha\tRemitente\tEmpresa/Categoría\tAsunto\tEstado\tObservaciones\n';
   let rows=data.map(c=>[c.fecha,c.remitente||'',c.categoria||'',c.asunto||'',c.estado||'',c.nota||''].join('\t')).join('\n');
   // Resumen por categoría
-  let porCat={};data.forEach(c=>{let cat=c.categoria||'OTROS';if(!porCat[cat])porCat[cat]=0;porCat[cat]++;});
-  let resumen='\n\nRESUMEN EJECUTIVO\nCategoría\tCantidad\n'+Object.keys(porCat).sort().map(k=>k+'\t'+porCat[k]).join('\n')+'\nTOTAL\t'+data.length;
-  let content=bom+hdr+rows+resumen;
-  let blob=new Blob([content],{type:'text/tab-separated-values;charset=utf-8'});
-  let url=URL.createObjectURL(blob);
-  let a=document.createElement('a');
-  let hoy=format(nowCO());
-  a.href=url;a.download='Correo_Personal_'+hoy+'.xls';a.click();URL.revokeObjectURL(url);
-}
 
 /* DATOS POR DEFECTO */
 const DIR_DEFAULT=[{id:1,esp:"ORTOPEDISTA",nombre:"EDWIN MIGUEL TOVAR TORRES",tel:"6082747555",cel:"3046035555",ciudad:"IBAGUÉ",dir:"COMPLEJO MÉDICO LA SAMARIA",cons:"605",correo:"migueltovarortopedista@gmail.com",cita:"PROGRAMAR APROX. 10 Julio/2026"},{id:2,esp:"CARDIÓLOGO",nombre:"ALEJANDRO MIGUEL SANTOS ZAVALA",tel:"6082798643",cel:"3165709731",ciudad:"IBAGUÉ",dir:"VÍA AEROPUERTO NUEVA CLÍNICA MEDICADIZ",cons:"204",correo:"dralejandrosantos@gmail.com",cita:"PROGRAMAR APROX. 24 Sept/2026"},{id:3,esp:"BARIÁTRICO",nombre:"CARLOS FELIPE CHAUX MOSQUERA",tel:"6017033872",cel:"3126162182",ciudad:"BOGOTÁ",dir:"CALLE 83 No.16A-44 EDIFICIO CIMA",cons:"304 A",correo:"programacioncirugia@ucomcolombia.com",cita:"-"},{id:4,esp:"OPTÓMETRA",nombre:"AGUSTIN VIDALLER NIETO",tel:"6012187077",cel:"",ciudad:"BOGOTÁ",dir:"AVENIDA 100 No.18a-51 CLÍNICA BARRAQUER",cons:"103",correo:"",cita:"-"},{id:5,esp:"OFTALMÓLOGO",nombre:"LUIS MIGUEL SALAZAR AMATURE",tel:"6012187077",cel:"3188018671",ciudad:"BOGOTÁ",dir:"AVENIDA 100 No.18a-51 CLÍNICA BARRAQUER",cons:"322",correo:"LMSALAZARA@BARRAQUER.COM.CO",cita:"-"},{id:6,esp:"REUMATÓLOGO",nombre:"SEBASTIAN MOLINA RIOS",tel:"6014824488",cel:"",ciudad:"BOGOTÁ",dir:"FUNDACIÓN SANTA FE BOGOTÁ · CALLE 119 # 7-80 PISO 3",cons:"305",correo:"",cita:"22 Abril/2026 a las 2:40PM"},{id:7,esp:"URÓLOGO",nombre:"MAURICIO ANDRÉS LÓPEZ GUERRERO",tel:"6082596447",cel:"3168333134",ciudad:"IBAGUÉ",dir:"UROTOL - 3 PISO CLÍNICA MEDICADIZ VIA AEROPUERTO",cons:"",correo:"urotol@hotmail.com",cita:"PDTE HACERSE EXÁMENES"},{id:8,esp:"NEURÓLOGO",nombre:"ORLANDO LÓPEZ CARVAJAL",tel:"6082771186",cel:"",ciudad:"IBAGUÉ",dir:"CRA 5 No.31-114 CADIZ",cons:"910",correo:"",cita:"PDTE PROGRAMAR CITA POLISOMNOGRAFÍA"},{id:9,esp:"NEUROFISIOLOGÍA",nombre:"CENTRAL DE ESPECIALISTAS",tel:"",cel:"3161095388",ciudad:"IBAGUÉ",dir:"CRA 4BIS # 35-72 BRR CADIZ",cons:"1",correo:"atencion@centralespecialistascolombia.com",cita:""},{id:10,esp:"NEUROFISIOLOGÍA",nombre:"FUNDACIÓN SANTA FE",tel:"6014824488",cel:"",ciudad:"BOGOTÁ",dir:"CALLE 119 # 7-14 PISO 2",cons:"1",correo:"",cita:"CITA POLISOMNOGRAFÍA 13 Mayo/2026 a las 8PM"},{id:11,esp:"MEDICINA ESTÉTICA",nombre:"ANDREA DEL PILAR CARDONA OLMOS",tel:"6082632262",cel:"3102386611",ciudad:"IBAGUÉ",dir:"CALLE 6 No.5-82 BRR LA POLA",cons:"",correo:"ipsandreacardona@gmail.com",cita:"2 Mayo/2026 a las 10AM"},{id:12,esp:"DERMATÓLOGA",nombre:"MONICA HERNANDEZ BULLA",tel:"",cel:"3178559081",ciudad:"IBAGUÉ",dir:"WORD TRADE CENTER, AQUA POWER CENTER, AV. GUABINAL #57-15",cons:"807",correo:"",cita:"-"},{id:13,esp:"LABORATORIO CLÍNICO",nombre:"ANALICEMOS",tel:"6082772036",cel:"3219612486",ciudad:"IBAGUÉ",dir:"SEDE 1: CRA 4H No.34-83 | SEDE 2: CALLE 32 No.4K-27 | SEDE 3: TORRE MÉDICA MEDICADIZ CONS.909",cons:"-",correo:"recepcion@analicemoslaboratorio.com",cita:"-"},{id:14,esp:"CHEQUEO EJECUTIVO",nombre:"CLÍNICA PABLO TOBÓN URIBE",tel:"6044459000",cel:"3147751125",ciudad:"MEDELLÍN",dir:"CL 78B No.69-240 PISO 7 - TORRE B CORDOBA",cons:"-",correo:"chequeos@hptu.org.co",cita:"-"},{id:15,esp:"INTERNISTA",nombre:"ANTONIO JOSÉ OVIEDO LEONEL",tel:"",cel:"3102823544",ciudad:"IBAGUÉ",dir:"",cons:"",correo:"",cita:"-"},{id:16,esp:"OFTALMÓLOGO",nombre:"PAOLO SOLANO LEAL",tel:"6082553855",cel:"3186912279",ciudad:"IBAGUÉ",dir:"CLÍNICA MEDICADIZ - NAZAR GRUPO OFTALMOLÓGICO",cons:"302",correo:"info@nazaroftalmologos.com",cita:"-"}];
 const CUENTAS_DEFAULT=[{id:1,banco:"BANCOLOMBIA",num:"7973987644",tipo:"AHORROS",titular:"GERARDO JAVIER ALVARADO CUBILLOS",cc:"86059446"},{id:2,banco:"BANCOLOMBIA",num:"079782612-34",tipo:"AHORROS",titular:"SARITA ALVARADO",cc:""},{id:3,banco:"BANCOLOMBIA",num:"86948258562",tipo:"AHORROS",titular:"EDNA LORENA MURILLO RODRIGUEZ",cc:"38211759"},{id:4,banco:"BANCOLOMBIA",num:"06881006039",tipo:"AHORROS",titular:"SANDRA LILIANA NIETO CASTRILLON",cc:"39565280"},{id:5,banco:"NEQUI",num:"320 3770085",tipo:"DEP. ELECTRÓNICO",titular:"OLIVER LA TORRE CAPERA",cc:"12134257"},{id:6,banco:"BANCOLOMBIA",num:"38341300581",tipo:"AHORROS",titular:"",cc:""},{id:7,banco:"BANCOLOMBIA",num:"079000494-41",tipo:"AHORROS",titular:"DANNY FABIAN SALAZAR CAMACHO",cc:"1110525870"},{id:8,banco:"BANCOLOMBIA",num:"29993077613",tipo:"AHORROS",titular:"SERGIO BODENSIEK",cc:"1026259624"},{id:9,banco:"NEQUI",num:"3204612987",tipo:"DEP. ELECTRÓNICO",titular:"ARQUITECTO NICOLAS (JAIME FORERO)",cc:""},{id:10,banco:"NEQUI",num:"3176635775",tipo:"DEP. ELECTRÓNICO",titular:"MANUEL POLLO (MANUEL CORREA)",cc:"86065449"}];
-const CORREOS_DEFAULT=[
-/* ── Abril 2026 ── */
-{id:1,fecha:"2026-04-22",remitente:"DIRECCION EMPRESAS",categoria:"OTROS",asunto:"REPORTE DIARIO DE SALDOS BANCARIOS 22/04/2026",estado:"INFORMATIVO",nota:""},
-{id:2,fecha:"2026-04-22",remitente:"NOTIFICACIONES MOVILGAS",categoria:"JUNTA DIRECTIVA",asunto:"ACTA NO.45 JUNTA GENERAL ORDINARIA MOVILGAS LTDA 27 MARZO 2026",estado:"IMPORTANTE",nota:""},
-{id:3,fecha:"2026-04-22",remitente:"NOTIFICACIONES MOVILGAS",categoria:"JUNTA DIRECTIVA",asunto:"ACTA NO.31 JUNTA GENERAL ORDINARIA MOVILGAS LTDA 28 MARZO 2026",estado:"IMPORTANTE",nota:""},
-{id:4,fecha:"2026-04-22",remitente:"LAURA CHALA",categoria:"MAYORISTA",asunto:"AUSENCIA LAURA CHALA MARTES DE 7AM A 11AM",estado:"INFORMATIVO",nota:""},
-{id:5,fecha:"2026-04-22",remitente:"CORPORACION COLEGIO SAN BONIFACION DE LAS LANZAS",categoria:"OTROS",asunto:"CORPORACION COLEGIO SAN BONIFACION DE LAS LANZAS",estado:"INFORMATIVO",nota:""},
-{id:6,fecha:"2026-04-22",remitente:"LAURA CHALA",categoria:"MAYORISTA",asunto:"BORRADOR ACTA N.4: ESTADO DE PENDIENTES REUNION VIERNES 17",estado:"IMPORTANTE",nota:""},
-{id:7,fecha:"2026-04-22",remitente:"CORRESPONDENCIA",categoria:"PROVEEDORES",asunto:"29195 - KSAVAL INFORME SAGRILAFT Y PTEE 2025",estado:"IMPORTANTE",nota:""},
-{id:8,fecha:"2026-04-23",remitente:"HAROLD CASTRO CASTILLO",categoria:"JUNTA DIRECTIVA",asunto:"REVISION 2020-2024",estado:"PRIORITARIO",nota:""},
-{id:9,fecha:"2026-04-23",remitente:"SERGIO BODENSIEK",categoria:"JUNTA DIRECTIVA",asunto:"SOLICITUD REEMBOLSO GASTOS DE VIAJE",estado:"IMPORTANTE",nota:""},
-{id:10,fecha:"2026-04-23",remitente:"DIRECCION EMPRESAS",categoria:"OTROS",asunto:"REPORTE DIARIO DE SALDOS BANCARIOS 23/04/2026",estado:"INFORMATIVO",nota:""},
-{id:11,fecha:"2026-04-23",remitente:"BANCOLOMBIA",categoria:"BANCOS",asunto:"LLEGO TU EXTRACTO DEL MES (MARZO)",estado:"INFORMATIVO",nota:""},
-{id:12,fecha:"2026-04-23",remitente:"BANCOLOMBIA",categoria:"BANCOS",asunto:"PAGA TU IMPUESTO PREDIAL",estado:"INFORMATIVO",nota:"Se remite a gerente ksaval"},
-{id:13,fecha:"2026-04-23",remitente:"MONICA SOFIA ALARCON ALARCON",categoria:"PROVEEDORES",asunto:"REPORTE PAGOS A PROVEEDORES_20260423",estado:"IMPORTANTE",nota:"Se remite a Yessica"},
-{id:14,fecha:"2026-04-23",remitente:"LAURA CHALA",categoria:"MAYORISTA",asunto:"BORRADOR RENTA",estado:"IMPORTANTE",nota:""},
-{id:15,fecha:"2026-04-23",remitente:"LAURA CHALA",categoria:"MAYORISTA",asunto:"CERTIFICADO TRIBUTARIO 2025 GERARDO JAVIER ALVARADO",estado:"IMPORTANTE",nota:"Se da a conocer a Andrea"},
-{id:16,fecha:"2026-04-24",remitente:"DIRECCION EMPRESAS",categoria:"OTROS",asunto:"REPORTE DIARIO DE SALDOS BANCARIOS 24/04/2026",estado:"INFORMATIVO",nota:""},
-{id:17,fecha:"2026-04-26",remitente:"AVIANCA",categoria:"VUELOS",asunto:"MONICA MARIA BOCANEGRA RICO, 03MAY/0905/SAN ANDRES ISLAND",estado:"IMPORTANTE",nota:"Pendiente respuesta Señora Monica"},
-{id:18,fecha:"2026-04-26",remitente:"AVIANCA",categoria:"VUELOS",asunto:"GERARDO JAVIER ALVARADO CUBILLOS, 03MAY/0905/SAN ANDRES ISLAND",estado:"INFORMATIVO",nota:""},
-{id:19,fecha:"2026-04-27",remitente:"FENALCO TOLIMA",categoria:"NOTICIAS",asunto:"INVITACION EMPRESARIAL - JUEVES 30 ABRIL AUDITORIO CAMARA DE COMERCIO IBAGUE",estado:"INFORMATIVO",nota:"Informacion a Don Gerardo"},
-{id:20,fecha:"2026-04-27",remitente:"BBVA",categoria:"BANCOS",asunto:"ENVIO SOPORTES EXTRACTOS LEASING A LOS CLIENTES",estado:"INFORMATIVO",nota:"Remitido a gerencia ksaval"},
-{id:21,fecha:"2026-04-27",remitente:"LAURA CHALA",categoria:"MAYORISTA",asunto:"IMPUESTO PREDIAL",estado:"INFORMATIVO",nota:""},
-{id:22,fecha:"2026-04-27",remitente:"ENERGY FALCON",categoria:"FACTURACION",asunto:"ORDEN DE FACTURACION CONTRATO 33214 CLIENTE K-SAVAL ENERGY SAS",estado:"IMPORTANTE",nota:""},
-{id:23,fecha:"2026-04-27",remitente:"EDER MAURICIO RUGELES SERRATO",categoria:"MAYORISTA",asunto:"COMUNICADO GESTION CONTROL FLOTA",estado:"INFORMATIVO",nota:"Remitido a gerencia ksaval"},
-{id:24,fecha:"2026-04-28",remitente:"DIRECCION EMPRESAS",categoria:"OTROS",asunto:"REPORTE DIARIO DE SALDOS BANCARIOS 28/04/2026",estado:"INFORMATIVO",nota:""},
-{id:25,fecha:"2026-04-28",remitente:"BLANCA INCER CASALLAS",categoria:"OTROS",asunto:"INCUMPLIMIENTO CIERRE FINANCIERO (AMARILO)",estado:"PRIORITARIO",nota:""},
-{id:26,fecha:"2026-04-29",remitente:"BBVA",categoria:"BANCOS",asunto:"ENVIO SOPORTES EXTRACTOS LEASING A LOS CLIENTES",estado:"INFORMATIVO",nota:""},
-{id:27,fecha:"2026-04-29",remitente:"DIRECCION EMPRESAS",categoria:"OTROS",asunto:"REPORTE DIARIO DE SALDOS BANCARIOS 29/04/2026",estado:"INFORMATIVO",nota:""},
-{id:28,fecha:"2026-04-29",remitente:"BANCOLOMBIA",categoria:"BANCOS",asunto:"CORREGIMOS EL PLAZO DE TU AMPLIACION CON TARJETA DE CREDITO",estado:"INFORMATIVO",nota:""},
-/* ── Mayo 11/2026 (Excel enviado) ── */
-{id:1001,fecha:"2026-05-11",remitente:"GUIAS DIGITALES",categoria:"MAYORISTA",asunto:"450037000",estado:"INFORMATIVO",nota:""},
-{id:1002,fecha:"2026-05-11",remitente:"GUIAS DIGITALES",categoria:"MAYORISTA",asunto:"450037000",estado:"INFORMATIVO",nota:""},
-{id:1003,fecha:"2026-05-11",remitente:"GUIAS DIGITALES",categoria:"MAYORISTA",asunto:"450037000",estado:"INFORMATIVO",nota:""},
-{id:1004,fecha:"2026-05-11",remitente:"DIRECCION EMPRESAS",categoria:"OTROS",asunto:"REPORTE DIARIO DE SALDOS BANCARIOS 11/05/2026",estado:"INFORMATIVO",nota:""},
-{id:1005,fecha:"2026-05-11",remitente:"BANCOLOMBIA",categoria:"BANCOS",asunto:"ALERTAS Y NOTIFICACIONES",estado:"INFORMATIVO",nota:"Recibe transferencia de $1.900.500 de carlos arenas a la cuenta 7644"},
-{id:1006,fecha:"2026-05-11",remitente:"BANCOLOMBIA",categoria:"BANCOS",asunto:"ALERTAS Y NOTIFICACIONES",estado:"INFORMATIVO",nota:"Se envia transferencia de $18.791.950 de la cuenta corriente 2485 a la 3498"},
-{id:1007,fecha:"2026-05-11",remitente:"BANCOLOMBIA",categoria:"BANCOS",asunto:"ALERTAS Y NOTIFICACIONES",estado:"INFORMATIVO",nota:"Se envia transferencia de $624.000 de la cuenta corriente 3497 a la 3498"},
-{id:1008,fecha:"2026-05-11",remitente:"BANCOLOMBIA",categoria:"BANCOS",asunto:"ALERTAS Y NOTIFICACIONES",estado:"INFORMATIVO",nota:"Se envia transferencia de $3.782.500 de la cuenta corriente 3118 a la 3498"},
-{id:1009,fecha:"2026-05-11",remitente:"BANCOLOMBIA",categoria:"BANCOS",asunto:"ALERTAS Y NOTIFICACIONES",estado:"INFORMATIVO",nota:"Se envia transferencia de $21.144.260 de la cuenta corriente 2486 a la 3498"},
-{id:1010,fecha:"2026-05-11",remitente:"QUALITY SIGN",categoria:"OTROS",asunto:"SOLICITUD DE FIRMA DE DOCUMENTOS",estado:"IMPORTANTE",nota:""},
-{id:1011,fecha:"2026-05-11",remitente:"EQUIPO DE CUENTAS MICROSOFT",categoria:"OTROS",asunto:"TU CODIGO DE UN SOLO USO",estado:"INFORMATIVO",nota:""},
-{id:1012,fecha:"2026-05-11",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:1013,fecha:"2026-05-11",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:1014,fecha:"2026-05-11",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:1015,fecha:"2026-05-11",remitente:"GUIAS DIGITALES",categoria:"MAYORISTA",asunto:"450037000",estado:"INFORMATIVO",nota:""},
-{id:1016,fecha:"2026-05-11",remitente:"GUIAS DIGITALES",categoria:"MAYORISTA",asunto:"450037000",estado:"INFORMATIVO",nota:""},
-{id:1017,fecha:"2026-05-11",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:1018,fecha:"2026-05-11",remitente:"GUIAS DIGITALES",categoria:"MAYORISTA",asunto:"450037000",estado:"INFORMATIVO",nota:""},
-{id:1019,fecha:"2026-05-11",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:1020,fecha:"2026-05-11",remitente:"SERGIO BODENSIEK",categoria:"JUNTA DIRECTIVA",asunto:"CUENTA DE COBRO SERVICIO DE ABRIL 2026",estado:"PRIORITARIO",nota:"Cuenta de cobro del mes de abril del Dr. Harold Castro"},
-{id:1021,fecha:"2026-05-11",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:1022,fecha:"2026-05-11",remitente:"BANCOLOMBIA",categoria:"BANCOS",asunto:"ALERTAS Y NOTIFICACIONES",estado:"INFORMATIVO",nota:"Se envia pago de proveedores prosegur-8may-ats por $25.469.000 desde la cuenta 4852"},
-{id:1023,fecha:"2026-05-11",remitente:"BANCOLOMBIA",categoria:"BANCOS",asunto:"ALERTAS Y NOTIFICACIONES",estado:"INFORMATIVO",nota:"Se envia pago de proveedores prosegur-8may-m3 por $22.413.000 desde la cuenta 3118"},
-{id:1024,fecha:"2026-05-11",remitente:"BANCOLOMBIA",categoria:"BANCOS",asunto:"ALERTAS Y NOTIFICACIONES",estado:"INFORMATIVO",nota:"Se envia pago de proveedores prosegur-8may-ats por $32.482.000 desde la cuenta 4852"},
-{id:1025,fecha:"2026-05-11",remitente:"BANCOLOMBIA",categoria:"BANCOS",asunto:"ALERTAS Y NOTIFICACIONES",estado:"INFORMATIVO",nota:"Se envia pago de proveedores prosegur-8may-m6 por $18.794.000 desde la cuenta 5309"},
-{id:1026,fecha:"2026-05-11",remitente:"BANCOLOMBIA",categoria:"BANCOS",asunto:"ALERTAS Y NOTIFICACIONES",estado:"INFORMATIVO",nota:"Se envia pago de proveedores prosegur-8may-m3 por $22.014.000 desde la cuenta 3118"},
-{id:1027,fecha:"2026-05-11",remitente:"BANCOLOMBIA",categoria:"BANCOS",asunto:"ALERTAS Y NOTIFICACIONES",estado:"INFORMATIVO",nota:"Se envia pago de proveedores prosegur-8may-ats por $26.708.000 desde la cuenta 4852"},
-{id:1028,fecha:"2026-05-11",remitente:"BANCOLOMBIA",categoria:"BANCOS",asunto:"ALERTAS Y NOTIFICACIONES",estado:"INFORMATIVO",nota:"Se envia pago de proveedores prosegur-8may-m6 por $27.052.000 desde la cuenta 5309"},
-{id:1029,fecha:"2026-05-11",remitente:"BANCOLOMBIA",categoria:"BANCOS",asunto:"ALERTAS Y NOTIFICACIONES",estado:"INFORMATIVO",nota:"Se envia pago de proveedores prosegur-10may-m3 por $14.448.000 desde la cuenta 3118"},
-{id:1030,fecha:"2026-05-11",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:1031,fecha:"2026-05-11",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:1032,fecha:"2026-05-11",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:1033,fecha:"2026-05-11",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:1034,fecha:"2026-05-11",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:1035,fecha:"2026-05-11",remitente:"GUIAS DIGITALES",categoria:"MAYORISTA",asunto:"450037000",estado:"INFORMATIVO",nota:""},
-{id:1036,fecha:"2026-05-11",remitente:"KELLY MARCELA BERMUDEZ VILLALBA",categoria:"MAYORISTA",asunto:"RV: AGENDA RED VIRTUAL SEMANA DEL 11 AL 15 DE MAYO 2026",estado:"INFORMATIVO",nota:""},
-{id:1037,fecha:"2026-05-11",remitente:"KELLY MARCELA BERMUDEZ VILLALBA",categoria:"MAYORISTA",asunto:"RV: AGENDA RED VIRTUAL SEMANA DEL 11 AL 15 DE MAYO 2026",estado:"INFORMATIVO",nota:""},
-{id:1038,fecha:"2026-05-11",remitente:"KELLY MARCELA BERMUDEZ VILLALBA",categoria:"MAYORISTA",asunto:"RV: AGENDA RED VIRTUAL SEMANA DEL 11 AL 15 DE MAYO 2026",estado:"INFORMATIVO",nota:""},
-{id:1039,fecha:"2026-05-11",remitente:"FENALCO PRESIDENCIA NACIONAL",categoria:"NOTICIAS",asunto:"NOTIJURIDICO 2026 - BOLETIN - 045",estado:"INFORMATIVO",nota:""},
-{id:1040,fecha:"2026-05-11",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:1041,fecha:"2026-05-11",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:1042,fecha:"2026-05-11",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:1043,fecha:"2026-05-11",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:1044,fecha:"2026-05-11",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:1045,fecha:"2026-05-11",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:1046,fecha:"2026-05-11",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:1047,fecha:"2026-05-11",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:1048,fecha:"2026-05-11",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:1049,fecha:"2026-05-11",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:1050,fecha:"2026-05-11",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:1051,fecha:"2026-05-11",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:1052,fecha:"2026-05-11",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:1053,fecha:"2026-05-11",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:1054,fecha:"2026-05-11",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:1055,fecha:"2026-05-11",remitente:"HAROLD CASTRO",categoria:"JUNTA DIRECTIVA",asunto:"INVITACION ACTUALIZADA: PRESENTACION INFORME DIFERENCIA REPORTADA (PERIODO 2020-2025) JUE 14 DE MAY DE 2026 3:30PM",estado:"PRIORITARIO",nota:""},
-{id:1056,fecha:"2026-05-11",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:1057,fecha:"2026-05-11",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:1058,fecha:"2026-05-11",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:1059,fecha:"2026-05-11",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:1060,fecha:"2026-05-11",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:1061,fecha:"2026-05-11",remitente:"GUIAS DIGITALES",categoria:"MAYORISTA",asunto:"450037000",estado:"INFORMATIVO",nota:""},
-{id:1062,fecha:"2026-05-11",remitente:"BLUSH-BAR GLOW",categoria:"PUBLICIDAD",asunto:"SORPRENDE A MAMA CON UN REGALO ESPECIAL",estado:"INFORMATIVO",nota:""},
-{id:1063,fecha:"2026-05-11",remitente:"GUIAS DIGITALES",categoria:"MAYORISTA",asunto:"450037000",estado:"INFORMATIVO",nota:""},
-{id:1064,fecha:"2026-05-11",remitente:"GUIAS DIGITALES",categoria:"MAYORISTA",asunto:"450037000",estado:"INFORMATIVO",nota:""},
-{id:1065,fecha:"2026-05-11",remitente:"GUIAS DIGITALES",categoria:"MAYORISTA",asunto:"450037000",estado:"INFORMATIVO",nota:""},
-{id:1066,fecha:"2026-05-11",remitente:"GUIAS DIGITALES",categoria:"MAYORISTA",asunto:"450037000",estado:"INFORMATIVO",nota:""},
-{id:1067,fecha:"2026-05-11",remitente:"GUIAS DIGITALES",categoria:"MAYORISTA",asunto:"450037000",estado:"INFORMATIVO",nota:""},
-{id:1068,fecha:"2026-05-11",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:1069,fecha:"2026-05-11",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:1070,fecha:"2026-05-11",remitente:"BANCOLOMBIA",categoria:"BANCOS",asunto:"ALERTAS Y NOTIFICACIONES",estado:"INFORMATIVO",nota:"Se envia pago de proveedores bloque2798 por $1.812.421 desde la cuenta 5309"},
-{id:1071,fecha:"2026-05-11",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:1072,fecha:"2026-05-11",remitente:"GUIAS DIGITALES",categoria:"MAYORISTA",asunto:"450037000",estado:"INFORMATIVO",nota:""},
-{id:1073,fecha:"2026-05-11",remitente:"GUIAS DIGITALES",categoria:"MAYORISTA",asunto:"450037000",estado:"INFORMATIVO",nota:""},
-{id:1074,fecha:"2026-05-11",remitente:"GUIAS DIGITALES",categoria:"MAYORISTA",asunto:"450037000",estado:"INFORMATIVO",nota:""},
-{id:1075,fecha:"2026-05-11",remitente:"GUIAS DIGITALES",categoria:"MAYORISTA",asunto:"450037000",estado:"INFORMATIVO",nota:""},
-{id:1076,fecha:"2026-05-11",remitente:"GUIAS DIGITALES",categoria:"MAYORISTA",asunto:"450037000",estado:"INFORMATIVO",nota:""},
-{id:1077,fecha:"2026-05-11",remitente:"GUIAS DIGITALES",categoria:"MAYORISTA",asunto:"450037000",estado:"INFORMATIVO",nota:""},
-{id:1078,fecha:"2026-05-11",remitente:"GUIAS DIGITALES",categoria:"MAYORISTA",asunto:"450037000",estado:"INFORMATIVO",nota:""},
-{id:1079,fecha:"2026-05-11",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:1080,fecha:"2026-05-11",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:1081,fecha:"2026-05-11",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:1082,fecha:"2026-05-11",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:1083,fecha:"2026-05-11",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:1084,fecha:"2026-05-11",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",nota:"",estado:"INFORMATIVO"},
-{id:1085,fecha:"2026-05-11",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:1086,fecha:"2026-05-11",remitente:"MASTERCARD PRICELESS",categoria:"PUBLICIDAD",asunto:"GASTRONOMIA, NATURALEZA Y MAS",estado:"INFORMATIVO",nota:""},
-{id:1087,fecha:"2026-05-11",remitente:"EDER MAURICIO RUGELES SERRATO",categoria:"MAYORISTA",asunto:"CAMBIO DIGITO CAJA AVISO DE PRECIOS (EXTRA)",estado:"INFORMATIVO",nota:""},
-{id:1088,fecha:"2026-05-11",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:1089,fecha:"2026-05-11",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:1090,fecha:"2026-05-11",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:1091,fecha:"2026-05-11",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:1092,fecha:"2026-05-11",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:1093,fecha:"2026-05-11",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:1094,fecha:"2026-05-11",remitente:"MONICA SOFIA ALARCON ALARCON",categoria:"PROVEEDORES",asunto:"REPORTE PAGOS A PROVEEDORES_20260511",estado:"IMPORTANTE",nota:"REPORTADO A JULIAN CASTRO Y YESSICA MORENO"},
-{id:1095,fecha:"2026-05-11",remitente:"MONICA SOFIA ALARCON ALARCON",categoria:"PROVEEDORES",asunto:"REPORTE PAGOS A PROVEEDORES_20260511",estado:"IMPORTANTE",nota:"REPORTADO A JULIAN CASTRO Y YESSICA MORENO"},
-{id:1096,fecha:"2026-05-11",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:1097,fecha:"2026-05-11",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:1098,fecha:"2026-05-11",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-/* ── Mayo 12/2026 ── */
-{id:2001,fecha:"2026-05-12",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:2002,fecha:"2026-05-12",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:2003,fecha:"2026-05-12",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:2004,fecha:"2026-05-12",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:2005,fecha:"2026-05-12",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:2006,fecha:"2026-05-12",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:2007,fecha:"2026-05-12",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:2008,fecha:"2026-05-12",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:2009,fecha:"2026-05-12",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:2010,fecha:"2026-05-12",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:2011,fecha:"2026-05-12",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:2012,fecha:"2026-05-12",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:2013,fecha:"2026-05-12",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:2014,fecha:"2026-05-12",remitente:"GUIAS DIGITALES",categoria:"MAYORISTA",asunto:"450037000",estado:"INFORMATIVO",nota:""},
-{id:2015,fecha:"2026-05-12",remitente:"GUIAS DIGITALES",categoria:"MAYORISTA",asunto:"450037000",estado:"INFORMATIVO",nota:""},
-{id:2016,fecha:"2026-05-12",remitente:"QUALITY SIGN",categoria:"OTROS",asunto:"SOLICITUD FIRMA DE DOCUMENTOS",estado:"IMPORTANTE",nota:""},
-{id:2017,fecha:"2026-05-12",remitente:"COMUNICACIONES FUNDACION SANTA FE DE BOGOTA",categoria:"PUBLICIDAD",asunto:"TU APP FSFB Y PORTAL DE PACIENTE ESTAN DISPONIBLES NUEVAMENTE",estado:"INFORMATIVO",nota:""},
-{id:2018,fecha:"2026-05-12",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:2019,fecha:"2026-05-12",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:2020,fecha:"2026-05-12",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:2021,fecha:"2026-05-12",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:2022,fecha:"2026-05-12",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:2023,fecha:"2026-05-12",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:2024,fecha:"2026-05-12",remitente:"GUIAS DIGITALES",categoria:"MAYORISTA",asunto:"450037000",estado:"INFORMATIVO",nota:""},
-{id:2025,fecha:"2026-05-12",remitente:"GUIAS DIGITALES",categoria:"MAYORISTA",asunto:"450037000",estado:"INFORMATIVO",nota:""},
-{id:2026,fecha:"2026-05-12",remitente:"GUIAS DIGITALES",categoria:"MAYORISTA",asunto:"450037000",estado:"INFORMATIVO",nota:""},
-{id:2027,fecha:"2026-05-12",remitente:"GUIAS DIGITALES",categoria:"MAYORISTA",asunto:"450037000",estado:"INFORMATIVO",nota:""},
-{id:2028,fecha:"2026-05-12",remitente:"NOA EXPERIENCE",categoria:"FACTURACION",asunto:"901023476; NOA EXPERIENCE SAS;FEE116938;01",estado:"INFORMATIVO",nota:""},
-{id:2029,fecha:"2026-05-12",remitente:"GUIAS DIGITALES",categoria:"MAYORISTA",asunto:"450037000",estado:"INFORMATIVO",nota:""},
-{id:2030,fecha:"2026-05-12",remitente:"AVIANCA",categoria:"VUELOS",asunto:"GERARDO JAVIER ALVARADO CUBILLOS, 13MAY/0740/IBAGUE",estado:"IMPORTANTE",nota:""},
-{id:2031,fecha:"2026-05-12",remitente:"DIRECCION EMPRESAS",categoria:"OTROS",asunto:"REPORTE DIARIO DE SALDOS BANCARIOS 12/05/2026",estado:"INFORMATIVO",nota:""},
-{id:2032,fecha:"2026-05-12",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:2033,fecha:"2026-05-12",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:2034,fecha:"2026-05-12",remitente:"COMUNICACIONES FUNDACION SANTA FE DE BOGOTA",categoria:"PUBLICIDAD",asunto:"CONOCE ALIADO PARA TU CUIDADO DE LA FUNDACION SANTA FE DE BOGOTA",estado:"INFORMATIVO",nota:""},
-{id:2035,fecha:"2026-05-12",remitente:"BANCOLOMBIA",categoria:"BANCOS",asunto:"ALERTAS Y NOTIFICACIONES",estado:"INFORMATIVO",nota:"Recibe transferencia de $158.000 de claudia coy a la cuenta 7644"},
-{id:2036,fecha:"2026-05-12",remitente:"BANCOLOMBIA",categoria:"BANCOS",asunto:"ALERTAS Y NOTIFICACIONES",estado:"INFORMATIVO",nota:"Se envia transferencia de $120.000 de la cuenta 7644 a la cuenta 3216875964"},
-{id:2037,fecha:"2026-05-12",remitente:"BANCOLOMBIA",categoria:"BANCOS",asunto:"ALERTAS Y NOTIFICACIONES",estado:"INFORMATIVO",nota:"Compraste $130.000 en avianca con tu T.Deb 2243"},
-{id:2038,fecha:"2026-05-12",remitente:"BANCOLOMBIA",categoria:"BANCOS",asunto:"ALERTAS Y NOTIFICACIONES",estado:"INFORMATIVO",nota:"Se envia pago de proveedores prosegur-11may-ats por $27.207.000 desde la cuenta 4852"},
-{id:2039,fecha:"2026-05-12",remitente:"BANCOLOMBIA",categoria:"BANCOS",asunto:"ALERTAS Y NOTIFICACIONES",estado:"INFORMATIVO",nota:"Se envia pago de proveedores prosegur-11may-m6 por $25.283.000 desde la cuenta 5309"},
-{id:2040,fecha:"2026-05-12",remitente:"BANCOLOMBIA",categoria:"BANCOS",asunto:"ALERTAS Y NOTIFICACIONES",estado:"INFORMATIVO",nota:"Se envia pago de proveedores prosegur-11may-m3 por $22.398.000 desde la cuenta 3118"},
-{id:2041,fecha:"2026-05-12",remitente:"SICOM",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:2042,fecha:"2026-05-12",remitente:"SICOM",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:2043,fecha:"2026-05-12",remitente:"SICOM",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:2044,fecha:"2026-05-12",remitente:"SICOM",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:2045,fecha:"2026-05-12",remitente:"SICOM",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:2046,fecha:"2026-05-12",remitente:"FENALCO PRESIDENCIA NACIONAL",categoria:"PUBLICIDAD",asunto:"PARTICIPAR EN ENCUESTA DEL COMERCIO - ABRIL 2026",estado:"INFORMATIVO",nota:""},
-{id:2047,fecha:"2026-05-12",remitente:"FENALCO PRESIDENCIA NACIONAL",categoria:"PUBLICIDAD",asunto:"PARTICIPAR EN ENCUESTA DEL COMERCIO - ABRIL 2026",estado:"INFORMATIVO",nota:"ESTA A NOMBRE DE KSAVAL, YA FUE REMITIDO"},
-{id:2048,fecha:"2026-05-12",remitente:"AVIANCA",categoria:"VUELOS",asunto:"PREMIAMOS TU FLEXIBILIDAD: RECIBE $260.000 COP POR PASAJERO",estado:"INFORMATIVO",nota:"YA FUE REPORTADO A LA SEÑORA MONICA"},
-{id:2049,fecha:"2026-05-12",remitente:"DESPEGAR",categoria:"PUBLICIDAD",asunto:"70% DTO EN OUTLET DE VIAJE + 3 CUOTAS SIN INTERESES",estado:"INFORMATIVO",nota:""},
-{id:2050,fecha:"2026-05-12",remitente:"COMUNICACIONES FUNDACION SANTA FE DE BOGOTA",categoria:"PUBLICIDAD",asunto:"SENTIDO PLENO: NUEVO MODELO DE SALUD MENTAL",estado:"INFORMATIVO",nota:""},
-{id:2051,fecha:"2026-05-12",remitente:"FENALCO PRESIDENCIA NACIONAL",categoria:"NOTICIAS",asunto:"NOTIJURIDICO 2026 - BOLETIN - 046",estado:"INFORMATIVO",nota:""},
-{id:2052,fecha:"2026-05-12",remitente:"BANCOLOMBIA",categoria:"BANCOS",asunto:"ALERTAS Y NOTIFICACIONES",estado:"INFORMATIVO",nota:"Recibe transferencia de $28.245 a la tarjeta credito 5494 desde wompi-PSE"},
-{id:2053,fecha:"2026-05-12",remitente:"BANCOLOMBIA",categoria:"BANCOS",asunto:"ALERTAS Y NOTIFICACIONES",estado:"INFORMATIVO",nota:"Recibe transferencia de $146.790 a la tarjeta credito 3390 desde wompi-PSE"},
-{id:2054,fecha:"2026-05-12",remitente:"BANCOLOMBIA",categoria:"BANCOS",asunto:"ALERTAS Y NOTIFICACIONES",estado:"INFORMATIVO",nota:"Recibe transferencia de $1.113.796 a la tarjeta credito 3661 desde wompi-PSE"},
-{id:2055,fecha:"2026-05-12",remitente:"BANCOLOMBIA",categoria:"BANCOS",asunto:"ALERTAS Y NOTIFICACIONES",estado:"INFORMATIVO",nota:"Se transfiere $5.000.000 desde la cuenta 3118 a la cuenta 2487"},
-{id:2056,fecha:"2026-05-12",remitente:"BANCOLOMBIA",categoria:"BANCOS",asunto:"ALERTAS Y NOTIFICACIONES",estado:"INFORMATIVO",nota:"Se envia pago de proveedores bloque0078 por $621.300 desde la cuenta 2291"},
-{id:2057,fecha:"2026-05-12",remitente:"BANCOLOMBIA",categoria:"BANCOS",asunto:"AHORRA 30% EN TU SEGURO DE VIAJE",estado:"INFORMATIVO",nota:""},
-{id:2058,fecha:"2026-05-12",remitente:"NANCY MIRELLA ROJAS ORTIZ",categoria:"BANCOS",asunto:"CONVERSEMOS CON KSAVAL (BANCOLOMBIA)",estado:"IMPORTANTE",nota:"YA SE INFORMO A LOS MIEMBROS A PARTICIPAR A ESTA REUNION (YESSICA, ANDREA Y DON GERARDO)"},
-{id:2059,fecha:"2026-05-12",remitente:"SPOTIFY",categoria:"PUBLICIDAD",asunto:"REGALALE A UN AMIGO 3 MESES DE PREMIUM",estado:"INFORMATIVO",nota:""},
-{id:2060,fecha:"2026-05-12",remitente:"GUIAS DIGITALES",categoria:"MAYORISTA",asunto:"450037000",estado:"INFORMATIVO",nota:""},
-{id:2061,fecha:"2026-05-12",remitente:"ASTRID MILENA SANCHEZ GARCIA",categoria:"BANCOS",asunto:"PROPUESTA CUENTAS Y DEPOSITOS A TERMINO EN BBVA PANAMA",estado:"IMPORTANTE",nota:"Le pregunte a andrea si se lo enviaba y me dijo que no"},
-{id:2062,fecha:"2026-05-12",remitente:"BANCOLOMBIA",categoria:"BANCOS",asunto:"ALERTAS Y NOTIFICACIONES",estado:"INFORMATIVO",nota:"Se envia transferencia de $150.000 de la cuenta 7644 a la cuenta 3126768852"},
-{id:2063,fecha:"2026-05-12",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:2064,fecha:"2026-05-12",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:2065,fecha:"2026-05-12",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:2066,fecha:"2026-05-12",remitente:"GUIAS DIGITALES",categoria:"MAYORISTA",asunto:"450037000",estado:"INFORMATIVO",nota:""},
-{id:2067,fecha:"2026-05-12",remitente:"GUIAS DIGITALES",categoria:"MAYORISTA",asunto:"450037000",estado:"INFORMATIVO",nota:""},
-{id:2068,fecha:"2026-05-12",remitente:"GUIAS DIGITALES",categoria:"MAYORISTA",asunto:"450037000",estado:"INFORMATIVO",nota:""},
-{id:2069,fecha:"2026-05-12",remitente:"GUIAS DIGITALES",categoria:"MAYORISTA",asunto:"450037000",estado:"INFORMATIVO",nota:""},
-{id:2070,fecha:"2026-05-12",remitente:"GUIAS DIGITALES",categoria:"MAYORISTA",asunto:"450037000",estado:"INFORMATIVO",nota:""},
-{id:2071,fecha:"2026-05-12",remitente:"BBVA",categoria:"BANCOS",asunto:"UN REGALO QUE NO SE COMPARA",estado:"INFORMATIVO",nota:""},
-{id:2072,fecha:"2026-05-12",remitente:"GUIAS DIGITALES",categoria:"MAYORISTA",asunto:"450037000",estado:"INFORMATIVO",nota:""},
-{id:2073,fecha:"2026-05-12",remitente:"BANCOLOMBIA",categoria:"BANCOS",asunto:"ALERTAS Y NOTIFICACIONES",estado:"INFORMATIVO",nota:"Compraste $51.500 en club campestre de ib con tu T.Deb 2243"},
-/* ── Mayo 13/2026 ── */
-{id:3001,fecha:"2026-05-13",remitente:"FENALCO PRESIDENCIA NACIONAL",categoria:"NOTICIAS",asunto:"NOTIJURIDICO 2026 - BOLETIN - 046",estado:"INFORMATIVO",nota:""},
-{id:3002,fecha:"2026-05-13",remitente:"AVIANCA",categoria:"VUELOS",asunto:"TU VUELO ESTA ABORDANDO EN LA PUERTA 1",estado:"INFORMATIVO",nota:""},
-{id:3003,fecha:"2026-05-13",remitente:"AVIANCA",categoria:"VUELOS",asunto:"IMPORTANTE PUERTA DE EMBARQUE ASIGNADA",estado:"INFORMATIVO",nota:""},
-{id:3004,fecha:"2026-05-13",remitente:"BOOKING",categoria:"HOSPEDAJE",asunto:"CASA SANTA MARGARITA ESTA ESPERANDO TU COMENTARIO",estado:"INFORMATIVO",nota:""},
-{id:3005,fecha:"2026-05-13",remitente:"GUIAS DIGITALES",categoria:"MAYORISTA",asunto:"450037000",estado:"INFORMATIVO",nota:""},
-{id:3006,fecha:"2026-05-13",remitente:"GUIAS DIGITALES",categoria:"MAYORISTA",asunto:"450037000",estado:"INFORMATIVO",nota:""},
-{id:3007,fecha:"2026-05-13",remitente:"DIRECCION EMPRESAS",categoria:"OTROS",asunto:"REPORTE DIARIO DE SALDOS BANCARIOS 13/05/2026",estado:"INFORMATIVO",nota:""},
-{id:3008,fecha:"2026-05-13",remitente:"COMUNICACIONES FUNDACION SANTA FE DE BOGOTA",categoria:"PUBLICIDAD",asunto:"UNETE AL CONVERSATORIO: SALUD DE LA MUJER: MAS ALLA DEL CUIDADO",estado:"INFORMATIVO",nota:""},
-{id:3009,fecha:"2026-05-13",remitente:"FENALCO PRESIDENCIA NACIONAL",categoria:"NOTICIAS",asunto:"RECORDATORIO - CITACION ASAMBLEA GENERAL ORDINARIA DE AFILIADOS - OCTOGESIMA SEGUNDA",estado:"INFORMATIVO",nota:""},
-{id:3010,fecha:"2026-05-13",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:3011,fecha:"2026-05-13",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:3012,fecha:"2026-05-13",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:3013,fecha:"2026-05-13",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:3014,fecha:"2026-05-13",remitente:"BANCOLOMBIA",categoria:"BANCOS",asunto:"ALERTAS Y NOTIFICACIONES",estado:"INFORMATIVO",nota:"Compraste $218.000 en andres paradero aerp con tu T.Deb 2243"},
-{id:3015,fecha:"2026-05-13",remitente:"KSAVAL",categoria:"FACTURACION",asunto:"900568774;KSAVAL ENERGY SAS BIC;FEV23668;01;KSAVAL ENERGY SAS BIC",estado:"INFORMATIVO",nota:"Ya fue remitido a yessica"},
-{id:3016,fecha:"2026-05-13",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:3017,fecha:"2026-05-13",remitente:"TERPEL",categoria:"MAYORISTA",asunto:"FACTURA - DO NOT REPLY",estado:"INFORMATIVO",nota:""},
-{id:3018,fecha:"2026-05-13",remitente:"PLACETOPAY",categoria:"OTROS",asunto:"SOLICITUD DE PAGO FUNDACION SANTAFE - LINK DE PAGOS",estado:"IMPORTANTE",nota:"Ya se realizo pago y fue informado a don gerardo"},
-{id:3019,fecha:"2026-05-13",remitente:"ORDENES NEUROLOGIA",categoria:"OTROS",asunto:"POLISOMNOGRAMA 13 DE MAYO DE 2026 (LINK PAGO)",estado:"IMPORTANTE",nota:"Ya se realizo pago y fue informado a don gerardo"},
-{id:3020,fecha:"2026-05-13",remitente:"PLACETOPAY",categoria:"OTROS",asunto:"TRANSACCION APROBADA EN FUNDACION SANTAFE - LINK DE PAGOS 86059446",estado:"IMPORTANTE",nota:"Ya se realizo pago y fue informado a don gerardo"},
-{id:3021,fecha:"2026-05-13",remitente:"SERVICIO PSE",categoria:"OTROS",asunto:"PSE - TRANSACCION APROBADA CUS 304716859",estado:"IMPORTANTE",nota:"Ya se realizo pago y fue informado a don gerardo"}
-];
 
 /* MODO CLARO / OSCURO */
 function toggleModo(){
